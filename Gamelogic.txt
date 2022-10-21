@@ -1,0 +1,47 @@
+Game start:
+1. Give players money
+2. Roll dice to determine start order
+
+Player turn (not in jail):
+    1. Roll dice
+    2. Move to new location
+    2.5. Check if they pass go, if they do, give money
+    3. Check location specs: Property, action (6 cards spaces, 2 tax spaces, 3 nothing spaces(go, jail visit, free parking), go to jail)
+        4. If action, go to action phase
+        5. If location, go to location phase
+
+Action:
+1. Card spaces are nothing spaces (for now)
+2. In tax spaces, pay tax  
+    If no money, go to no money phase
+
+Location: 
+1. If location owned by
+
+
+
+No money phase:
+1. Sell buildings
+2. Mortgage properties
+
+
+Player turn (in jail):
+    1. Take action:
+        a. No action
+        b. Pay fine
+        c. Use get out of jail free card (if available)
+    2. Roll dice, if doubles, get out of jail
+        3. If doubles, check pay or get out of jail
+        4. If not doubles, get if third roll, if third roll, pay fine
+
+Then merge with player turn
+
+    
+
+
+Notes: 
+1. for now, card spaces are nothing spaces
+
+Not implemented:
+1. Sell get out of jail card?
+2. No trading
