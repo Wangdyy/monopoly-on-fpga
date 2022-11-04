@@ -27,3 +27,25 @@ void payTax(player* player);
 void goToJail(player* player);
 
 void payRent(player* player, propertySquare* property);
+
+void buyProperty(player* player, propertySquare* property);
+
+void mortgageProperty(player* player, propertySquare* property);
+
+void unmortgageProperty(player* player, propertySquare* property);
+
+void sellProperty(player* player, propertySquare* property);
+
+void buyHouse(player* player, propertySquare* property);
+
+void sellHouse(player* player, propertySquare* property);
+
+void buyHotel(player* player, propertySquare* property);
+
+void sellHotel(player* player, propertySquare* property);
+
+void payUtilityRent(player* player, utilitySquare* utility);
+
+void payRailroadRent(player* player, railroadSquare* railroad);
+
+void payJailFine(player* player);
