@@ -39,17 +39,15 @@ typedef struct propertySquare {
     enum Owners owner;
     int price;
     bool mortgaged;
-    union Properties{
-        coloredProperty coloredPropety;
-        int railRoadRent;
-    } properties;
+    coloredProperty coloredPropety;
 } propertySquare;
 
 typedef struct square{
+    char name[20];
     enum SquareType type;
+    enum SquareNames squareName;
     union Square{
         propertySquare property;
         enum ActionType action;
     } data;
-    char name[20];
 } square;

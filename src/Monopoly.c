@@ -6,11 +6,14 @@
 #include <stdbool.h>
 #include <math.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "Squares.h"
 #include "Players.h"
 #include "Gamestate.h"
 #include "helper_functions.h"
+
+#define OWNER_TO_PLAYER(player) (player + 1)
 
 /*Function defs*/
 
@@ -43,7 +46,7 @@ void moveToSquare(player* player, struct diceRoll diceRoll, gamestate* game){
 }
 
 void landOnSquare(player* player, square* square, gamestate* game){
-    printf("%s landed on %s\n", player->name, square->name);
+    printf("player %d landed on %s\n", OWNER_TO_PLAYER(player->owner), square->name);
     if (square->type == Property) {
         doPropertySquare(player, square, game);
     }
@@ -118,16 +121,16 @@ void goToJail(player* player){
 /**************************************
  * Property Squares
  **************************************/
-void payRent(player* player, propertySquare* property, gamestate* game){
-    switch(property->type){
+void payRent(player* player, square* square, gamestate* game){
+    switch(square->data.property.type){
         case (Colored):
-            payColorSetRent(player, property);
+            payColorSetRent(player, square, game);
             break;
         case (Utility):
-            payUtilityRent(player, property);
+            payUtilityRent(player, square, game);
             break;
         case (RailRoad):
-            payRailroadRent(player, property);
+            payRailroadRent(player, square, game);
             break;
         default:
             printf("Error: Property type not recognized\n");
@@ -135,16 +138,69 @@ void payRent(player* player, propertySquare* property, gamestate* game){
     }
 }
 
-void payColorSetRent(player* player, propertySquare* property, gamestate* game){
-    printf("Not implemented yet!\n");
+void payColorSetRent(player* player, square* square, gamestate* game){
+    enum Owners owner = square->data.property.owner;
+    int rent = square->data.property.coloredPropety.rent[0];
 }
 
-void payUtilityRent(player* player, propertySquare* property, gamestate* game){
-    enum utility Owner = property->owner;
+void payUtilityRent(player* player, square* square, gamestate* game){
+    enum Owners utilityOwner = square->data.property.owner;
+    enum Owners otherUtilityOwner;
+    if (square->squareName == ElectricCompany) {
+        enum Owners otherUtilityOwner = game->board[WaterWorks].data.property.owner;
+    } else if (square->squareName == WaterWorks) {
+        enum Owners otherUtilityOwner = game->board[ElectricCompany].data.property.owner;
+    } else {
+        printf("Error: Utility square not recognized\n");
+        return;
+    }
+    int rent;
+    if (utilityOwner == otherUtilityOwner) {
+            printf("Both utilities owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+            rent = 10 * game->lastDiceRoll;
+    } else {
+            printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+            rent = 4 * game->lastDiceRoll;
+    }
+    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
+    payPlayer(player, &game->players[utilityOwner], rent);
 }
 
-void payRailroadRent(player* player, propertySquare* propert, gamestate* game){
-    printf("Not implemented yet!\n");
+void payRailroadRent(player* player, square* square, gamestate* game){
+    enum Owners railroadOwner = square->data.property.owner;
+    int railRoadsOwned = 0;
+    if (game->board[ReadingRailRoad].data.property.owner == railroadOwner) {
+        railRoadsOwned++;
+    }
+    if (game->board[PennsylvaniaRailRoad].data.property.owner == railroadOwner) {
+        railRoadsOwned++;
+    }
+    if (game->board[BAndORailRoad].data.property.owner == railroadOwner) {
+        railRoadsOwned++;
+    }
+    if (game->board[ShortLine].data.property.owner == railroadOwner) {
+        railRoadsOwned++;
+    }
+    int rent;
+    switch (railRoadsOwned) {
+        case (1):
+            rent = 25;
+            break;
+        case (2):
+            rent = 50;
+            break;
+        case (3):
+            rent = 100;
+            break;
+        case (4):
+            rent = 200;
+            break;
+        default:
+            printf("Error: Wrong Number of railroads owned\n");
+            break;
+    }
+    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
+    payPlayer(player, &game->players[railroadOwner], rent);
 }
 
 void buyProperty(player* player, propertySquare* property){
@@ -158,32 +214,36 @@ void sellProperty(player* player, propertySquare* property){
 /**************************************
  * Payment
  **************************************/
+void payPlayer(player* payer, player* payee, int amount){
+    printf("Player %d is paying player %d $%d\n", OWNER_TO_PLAYER(payer->owner), OWNER_TO_PLAYER(payee->owner), amount);
+    int moneyPaid = payMoney(payer, amount);
+    receiveMoney(payee, moneyPaid);
+}
+
 int payMoney(player* player, int amount){
     if (player->money < amount){
         printf("You don't have enough money to pay!\n");
         if (sellAssets(player, amount)){
             printf("You sold enough assets to pay!\n");
-            player->money -= amount;
-            printf("Player %d paid $%d", player->owner + 1, amount);
-            return amount;
         }
         else{
             printf("You don't have enough money to pay!\n");
             amount = player->money;
             player->money = 0;
-            printf("Player %d paid $%d", player->owner + 1, amount);
+            player->bankrupt = true;
+            printf("Player %d paid $%d", OWNER_TO_PLAYER(player->owner), amount);
+            printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
             return amount;
         }
-    } else {
-        player->money -= amount;
-        printf("Player %d paid $%d", player->owner + 1, amount);
-        return amount;
     }
+    player->money -= amount;
+    printf("Player %d paid $%d", OWNER_TO_PLAYER(player->owner), amount);
+    return amount;
 }
 
 void receiveMoney(player* player, int amount){
     player->money += amount;
-    printf("Player %d received $%d", player->owner + 1, amount);
+    printf("Player %d received $%d", OWNER_TO_PLAYER(player->owner), amount);
 }
 
 bool sellAssets(player* player, int amount){

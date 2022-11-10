@@ -6,7 +6,7 @@
 #include "Squares.h"
 
 typedef struct player{
-    char name[20];
+    char name[20]; /*Not implementing name yet, just called players 1-4*/
     enum Owners owner;
     int money;
     enum SquareNames position;
