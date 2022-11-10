@@ -1,6 +1,6 @@
 IDIR =../include
 CC=gcc
-CFLAGS=-I$(IDIR)
+CFLAGS=-I$(IDIR) -Wall -W -pedantic -Wno-unused-parameter
 
 ODIR=obj
 LDIR =../lib
@@ -23,4 +23,4 @@ Monopoly: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+	del obj\Monopoly.o
