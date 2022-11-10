@@ -20,6 +20,11 @@
 /**************************************
  * Game related
  **************************************/
+
+void gameStart(gamestate* game){
+    printf("Not implemented yet\n");
+}
+
 bool checkForGameOver(gamestate* game){
     if (game->player_count == 1){
         printf("Game Over!\n");
@@ -141,15 +146,82 @@ void payRent(player* player, square* square, gamestate* game){
 void payColorSetRent(player* player, square* square, gamestate* game){
     enum Owners owner = square->data.property.owner;
     int rent = square->data.property.coloredPropety.rent[0];
+    enum Colors setColor = square->data.property.coloredPropety.color;
+    bool setOwned = false;
+    switch (setColor) {
+        case (Brown):
+            if (game->board[MediteraneanAvenue].data.property.owner == owner &&
+                game->board[BalticAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (LightBlue):
+            if (game->board[OrientalAvenue].data.property.owner == owner &&
+                game->board[VermontAvenue].data.property.owner == owner &&
+                game->board[ConnecticutAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (Pink):
+            if (game->board[StCharlesPlace].data.property.owner == owner &&
+                game->board[StatesAvenue].data.property.owner == owner &&
+                game->board[VirginiaAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (Orange):
+            if (game->board[StJamesPlace].data.property.owner == owner &&
+                game->board[TennesseeAvenue].data.property.owner == owner &&
+                game->board[NewYorkAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (Red):
+            if (game->board[KentuckyAvenue].data.property.owner == owner &&
+                game->board[IndianaAvenue].data.property.owner == owner &&
+                game->board[IllinoisAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (Yellow):
+            if (game->board[AtlanticAvenue].data.property.owner == owner &&
+                game->board[VentnorAvenue].data.property.owner == owner &&
+                game->board[MarvinGardens].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (Green):
+            if (game->board[PacificAvenue].data.property.owner == owner &&
+                game->board[NorthCarolinaAvenue].data.property.owner == owner &&
+                game->board[PennsylvaniaAvenue].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        case (DarkBlue):
+            if (game->board[ParkPlace].data.property.owner == owner &&
+                game->board[Boardwalk].data.property.owner == owner) {
+                setOwned = true;
+            }
+            break;
+        default:
+            printf("Error: Color not recognized\n");
+            break;
+    }
+    if (setOwned) {
+        printf("Player %d owns the set, rent is doubled!\n", OWNER_TO_PLAYER(owner));
+        rent *= 2;
+    }
+    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
+    payPlayer(player, &game->players[owner], rent);
 }
 
 void payUtilityRent(player* player, square* square, gamestate* game){
     enum Owners utilityOwner = square->data.property.owner;
     enum Owners otherUtilityOwner;
     if (square->squareName == ElectricCompany) {
-        enum Owners otherUtilityOwner = game->board[WaterWorks].data.property.owner;
+        otherUtilityOwner = game->board[WaterWorks].data.property.owner;
     } else if (square->squareName == WaterWorks) {
-        enum Owners otherUtilityOwner = game->board[ElectricCompany].data.property.owner;
+        otherUtilityOwner = game->board[ElectricCompany].data.property.owner;
     } else {
         printf("Error: Utility square not recognized\n");
         return;
