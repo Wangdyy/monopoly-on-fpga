@@ -1,51 +1,77 @@
+#pragma once
+#include "Squares.h"
+#include "Players.h"
+#include "Gamestate.h"
+/*Function decl*/
+
+/**************************************
+ * Game related
+ **************************************/
+void gameStart(gamestate* game);
+
 bool checkForGameOver(gamestate* game);
+
 struct diceRoll rollDice();
 
-bool checkForGameOver(gamestate* game){
-    if (game->player_count == 1){
-        printf("Game Over!\n");
-        return true;
-    }
-    return false;
-}
+void moveToSquare(player* player, struct diceRoll diceRoll, gamestate* game);
 
-struct diceRoll rollDice(){
-    struct diceRoll roll;
-    roll.die1 = rand() % 6 + 1;
-    roll.die2 = rand() % 6 + 1;
-    if (roll.die1 == roll.die2){
-        roll.doubles = true;
-    }
-    else{
-        roll.doubles = false;
-    }
-    return roll;
-}
+void landOnSquare(player* player, square* square, gamestate* game);
 
-void payTax(player* player);
+void doActionSquare(player* player, square* square, gamestate* game);
+
+void doPropertySquare(player* player, square* square, gamestate* game);
+
+/**************************************
+ * Action Squares
+ **************************************/
+void payIncomeTax(player* player);
+
+void payLuxuryTax(player* player);
 
 void goToJail(player* player);
 
-void payRent(player* player, propertySquare* property);
+
+/**************************************
+ * Property Squares
+ **************************************/
+void payRent(player* player, propertySquare* property, gamestate* game);
+
+void payColorSetRent(player* player, propertySquare* property, gamestate* game);
+
+void payUtilityRent(player* player, propertySquare* property, gamestate* game);
+
+void payRailroadRent(player* player, propertySquare* property, gamestate* game);
 
 void buyProperty(player* player, propertySquare* property);
 
-void mortgageProperty(player* player, propertySquare* property);
-
-void unmortgageProperty(player* player, propertySquare* property);
-
 void sellProperty(player* player, propertySquare* property);
 
-void buyHouse(player* player, propertySquare* property);
+/**************************************
+ * Payment
+ **************************************/
+/*Returns how much money was actually paid, useful in checking how much
+rent was actually paid*/
+int payMoney(player* player, int amount);
 
-void sellHouse(player* player, propertySquare* property);
+void receiveMoney(player* player, int amount);
 
-void buyHotel(player* player, propertySquare* property);
+/*Returns true if after selling assets the player can pay the amount, false otherwise*/
+bool sellAssets(player* player, int amount);
 
-void sellHotel(player* player, propertySquare* property);
-
-void payUtilityRent(player* player, utilitySquare* utility);
-
-void payRailroadRent(player* player, railroadSquare* railroad);
-
+/**************************************
+ * Miscellaneous
+ **************************************/
 void payJailFine(player* player);
+
+
+// void buyHouse(player* player, propertySquare* property);
+
+// void sellHouse(player* player, propertySquare* property);
+
+// void buyHotel(player* player, propertySquare* property);
+
+// void sellHotel(player* player, propertySquare* property);
+
+// void mortgageProperty(player* player, propertySquare* property);
+
+// void unmortgageProperty(player* player, propertySquare* property);
