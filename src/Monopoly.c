@@ -22,7 +22,22 @@
  **************************************/
 
 void gameStart(gamestate* game){
-    printf("Not implemented yet\n");
+    for (int i = 0; i < MAX_PLAYERS; i++){
+        game->players[i].owner = i;
+        game->players[i].money = 1500;
+        game->players[i].position = Go;
+        game->players[i].jailTime = 0;
+        game->players[i].inJail = false;
+        game->players[i].bankrupt = false;
+        game->players[i].owned_properties_count = 0;
+    }
+    game->player_count = 4;
+    game->turn = 0;
+    game->doubles = 0;
+    game->gameOver = false;
+    game->houses = 32;
+    game->hotels = 12;
+    game->lastDiceRoll = 0;
 }
 
 bool checkForGameOver(gamestate* game){
@@ -94,12 +109,35 @@ void doActionSquare(player* player, square* square, gamestate* game){
     }
 }
 
-void doPropertySquare(player* player, square* square, gamestate* game){
-    /*Either: 
+/*Either: 
     1. Buy property if no one owns it
     2. Pay rent if someone else owns it
-    3. Do nothing if they own it*/
-    printf("Not implemented yet!\n");
+    3. Do nothing if they own it
+*/
+void doPropertySquare(player* player, square* square, gamestate* game){
+    if (square->data.property.owner == Bank){
+        printf("This property is unowned!\n");
+        if (player->money >= square->data.property.price){
+            printf("Would you like to buy %s for $%d? (y/n)\n", square->name, square->data.property.price);
+            char input = 'n';
+            scanf(" %c", &input);
+            if (input == 'y'){
+                buyProperty(player, square);
+            } else {
+                printf("You chose not to buy %s\n", square->name);
+            }
+        }
+        else{
+            printf("You don't have enough money to buy this property\n");
+            //Not implemented: Auctioning
+        }
+    }
+    else if (square->data.property.owner != player->owner){
+        payRent(player, square, game);
+    }
+    else{
+        printf("You own this property!\n");
+    }
 }
 
 /**************************************
@@ -275,12 +313,37 @@ void payRailroadRent(player* player, square* square, gamestate* game){
     payPlayer(player, &game->players[railroadOwner], rent);
 }
 
-void buyProperty(player* player, propertySquare* property){
-    printf("Not implemented yet!\n");
+void buyProperty(player* player, square* square){
+    if (player->money < square->data.property.price) {
+        printf("Error: Player %d does not have enough money to buy %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
+        return;
+    }
+    player->money -= square->data.property.price;
+    square->data.property.owner = player->owner;
+    printf("Player %d bought %s for $%d", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
+    player->owned_properties[player->owned_properties_count] = square;
+    player->owned_properties_count++;
 }
 
-void sellProperty(player* player, propertySquare* property){
-    printf("Not implemented yet!\n");
+void sellProperty(player* player, square* square){
+    if (square->data.property.owner != player->owner) {
+        printf("Error: Player %d does not own %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
+        return;
+    }
+    player->money += square->data.property.price;
+    square->data.property.owner = Bank;
+    printf("Player %d sold %s for $%d", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
+    bool found = false;
+    for (int i = 0; i < player->owned_properties_count; i++) {
+        if (player->owned_properties[i] == square) {
+            player->owned_properties[i] = NULL;
+            found = true;
+        }
+        if (found && i < player->owned_properties_count - 1) {
+            player->owned_properties[i] = player->owned_properties[i + 1];
+        }
+    }
+    player->owned_properties_count--;
 }
 
 /**************************************
@@ -319,11 +382,10 @@ void receiveMoney(player* player, int amount){
 }
 
 bool sellAssets(player* player, int amount){
+    //Selling to other players no implemented
     printf("Not implemented yet!\n");
     return false;
 }
-
-
 
 /**************************************
  * Main

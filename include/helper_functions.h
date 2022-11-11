@@ -42,9 +42,9 @@ void payUtilityRent(player* player, square* square, gamestate* game);
 
 void payRailroadRent(player* player, square* square, gamestate* game);
 
-void buyProperty(player* player, propertySquare* property);
+void buyProperty(player* player, square* square);
 
-void sellProperty(player* player, propertySquare* property);
+void sellProperty(player* player, square* square);
 
 /**************************************
  * Payment
@@ -77,3 +77,9 @@ void payJailFine(player* player);
 // void mortgageProperty(player* player, propertySquare* property);
 
 // void unmortgageProperty(player* player, propertySquare* property);
+
+// void tradeProperty(player* player, propertySquare* property);
+
+// void communityChest(player* player);
+
+// void chance(player* player);

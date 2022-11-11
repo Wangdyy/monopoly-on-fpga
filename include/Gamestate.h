@@ -6,6 +6,9 @@
 #include "Squares.h"
 #include "Players.h"
 
+#define MAX_PLAYERS 4
+#define MAX_SQUARES 40
+
 typedef struct gamestate{
     square board[40];
     player players[4];

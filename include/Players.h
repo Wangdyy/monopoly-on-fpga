@@ -13,6 +13,6 @@ typedef struct player{
     int jailTime;
     bool inJail;
     bool bankrupt;
-    propertySquare* owned_properties[28];
+    square* owned_properties[28];
     int owned_properties_count;
 } player;
