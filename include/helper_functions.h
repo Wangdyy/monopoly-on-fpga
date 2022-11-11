@@ -11,9 +11,15 @@ void initGame(gamestate* game);
 
 void gameStart(gamestate* game);
 
+/*Return True if game should end*/
 bool checkForGameOver(gamestate* game);
 
-struct diceRoll rollDice();
+diceRoll rollDice(gamestate* game);
+
+void playerTurn(player* player, gamestate* game);
+
+/*Turn end returns true if game ends*/
+bool turnEnd(gamestate* game);
 
 void moveToSquare(player* player, struct diceRoll diceRoll, gamestate* game);
 
@@ -31,7 +37,6 @@ void payIncomeTax(player* player);
 void payLuxuryTax(player* player);
 
 void goToJail(player* player);
-
 
 /**************************************
  * Property Squares
@@ -63,10 +68,21 @@ void receiveMoney(player* player, int amount);
 bool sellAssets(player* player, int amount);
 
 /**************************************
+ * Player in jail
+ **************************************/
+void playerInJail(player* player, gamestate* game);
+
+/*Called when player forced to pay jail fine, if they can't, they go bankrupt*/
+bool payJailFine(player* player);
+
+/**************************************
  * Miscellaneous
  **************************************/
-void payJailFine(player* player);
+void passGo(player* player);
 
+void bankruptPlayer(player* player);
+
+void waitForNextTurn();
 
 // void buyHouse(player* player, propertySquare* property);
 

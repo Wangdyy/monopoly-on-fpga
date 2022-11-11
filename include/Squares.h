@@ -44,7 +44,7 @@ typedef struct propertySquare {
 } propertySquare;
 
 typedef struct square{
-    char name[20];
+    char name[40];
     enum SquareType type;
     enum SquareNames squareName;
     union Square{
@@ -82,8 +82,8 @@ square square_KentuckyAvenue =                    {"Kentucky Avenue", Property, 
 square square_Chance2 =                                                  {"Chance", Action, Chance2, .data.action = ChanceAction};
 square square_IndianaAvenue =                       {"Indiana Avenue", Property, IndianaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredPropety = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
 square square_IllinoisAvenue =                    {"Illinois Avenue", Property, IllinoisAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 240, .mortgageValue = 120, .mortgaged = false, .coloredPropety = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {20, 100, 300, 750, 925, 1100}}}};
-square square_BAndO_RailRoad =                    {"B & O Rail Road", Property, BAndO_RailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_AtlanicAvenue =                      {"Atlantic Avenue", Property, AtlanicAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
+square square_BAndO_RailRoad =                     {"B & O Rail Road", Property, BAndORailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
+square square_AtlanicAvenue =                     {"Atlantic Avenue", Property, AtlanticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
 square square_VentnorAvenue =                       {"Ventnor Avenue", Property, VentnorAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
 square square_WaterWorks =                                {"Water Works", Property, WaterWorks, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
 square square_MarvinGardens =                       {"Marvin Gardens", Property, MarvinGardens, .data.property = {.type = Colored, .owner = Bank, .price = 280, .mortgageValue = 140, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {24, 120, 360, 850, 1025, 1200}}}};
@@ -94,9 +94,9 @@ square square_CommunityChest3 =                    {"Community Chest", Action, C
 square square_PennsylvaniaAvenue =        {"Pennsylvania Avenue", Property, PennsylvaniaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 320, .mortgageValue = 160, .mortgaged = false, .coloredPropety = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {28, 150, 450, 1000, 1200, 1400}}}};
 square square_ShortLine =                                   {"Short Line", Property, ShortLine, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
 square square_Chance3 =                                                  {"Chance", Action, Chance3, .data.action = ChanceAction};
-square square_ParkPlace =                                   {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredPropety = {.color = Blue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
+square square_ParkPlace =                                   {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredPropety = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
 square square_LuxuryTax =                                          {"Luxury Tax", Action, LuxuryTax, .data.action = LuxuryTaxAction};
-square square_Boardwalk =                                    {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredPropety = {.color = Blue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
+square square_Boardwalk =                                    {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredPropety = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
 
 
 

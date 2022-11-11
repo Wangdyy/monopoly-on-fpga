@@ -1,12 +1,8 @@
 //320*240
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <stdbool.h>
-#include <math.h>
-#include <ctype.h>
-#include <assert.h>
 
 #include "Squares.h"
 #include "Players.h"
@@ -73,10 +69,8 @@ void initGame(gamestate* game){
         game->players[i].bankrupt = false;
         game->players[i].owned_properties_count = 0;
     }
-    game->player_count = 4;
     game->turn = 0;
     game->doubles = 0;
-    game->gameOver = false;
     game->houses = 32;
     game->hotels = 12;
     game->lastDiceRoll = 0;
@@ -89,15 +83,22 @@ void gameStart(gamestate* game){
 }
 
 bool checkForGameOver(gamestate* game){
-    if (game->player_count == 1){
+    int playersLeft = 0;
+    for (int i = 0; i < MAX_PLAYERS; i++){
+        if (!game->players[i].bankrupt){
+            playersLeft++;
+        }
+    }
+    if (playersLeft > 1){
+        return false;
+    } else {
         printf("Game Over!\n");
         return true;
     }
-    return false;
 }
 
-struct diceRoll rollDice(){
-    struct diceRoll roll;
+diceRoll rollDice(gamestate* game){
+    diceRoll roll;
     roll.die1 = rand() % 6 + 1;
     roll.die2 = rand() % 6 + 1;
     if (roll.die1 == roll.die2){
@@ -106,11 +107,48 @@ struct diceRoll rollDice(){
     else{
         roll.doubles = false;
     }
+    printf("You rolled a %d and a %d\n", roll.die1, roll.die2);
+    game->lastDiceRoll = roll.die1 + roll.die2;
+    if (roll.doubles){
+        game->doubles++;
+    }
     return roll;
 }
 
+void playerTurn(player* player, gamestate* game){
+    if (player->bankrupt){
+        return;
+    }
+    printf("/**************************************\n");
+    printf("It is player %d's turn!\n", OWNER_TO_PLAYER(game->players[game->turn].owner));
+    printf("You are currently located at %s\n", game->board[player->position].name);
+    printf("You currently have $%d\n", player->money);
+    printf("**************************************/\n");
+    if (player->inJail){
+       playerInJail(player, game);
+    } else {
+        diceRoll roll = rollDice(game);
+        moveToSquare(player, roll, game);
+    }
+}
+
+/*Turn end returns true if game ends*/
+bool turnEnd(gamestate* game){
+    game->turn = (game->turn + 1) % MAX_PLAYERS;
+    game->doubles = 0;
+    return checkForGameOver(game);
+}
+
 void moveToSquare(player* player, struct diceRoll diceRoll, gamestate* game){
-    printf("Not implemented yet!\n");
+    int diceTotal = diceRoll.die1 + diceRoll.die2;
+    if (player->position + diceTotal >= MAX_SQUARES){
+        player->position = (player->position + diceTotal) - MAX_SQUARES;
+        passGo(player);
+    }
+    else{
+        player->position = player->position + diceTotal;
+    }
+    landOnSquare(player, &game->board[player->position], game);
 }
 
 void landOnSquare(player* player, square* square, gamestate* game){
@@ -368,7 +406,7 @@ void buyProperty(player* player, square* square){
     }
     player->money -= square->data.property.price;
     square->data.property.owner = player->owner;
-    printf("Player %d bought %s for $%d", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
+    printf("Player %d bought %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
     player->owned_properties[player->owned_properties_count] = square;
     player->owned_properties_count++;
 }
@@ -380,7 +418,7 @@ void sellProperty(player* player, square* square){
     }
     player->money += square->data.property.price;
     square->data.property.owner = Bank;
-    printf("Player %d sold %s for $%d", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
+    printf("Player %d sold %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
     bool found = false;
     for (int i = 0; i < player->owned_properties_count; i++) {
         if (player->owned_properties[i] == square) {
@@ -413,20 +451,19 @@ int payMoney(player* player, int amount){
             printf("You don't have enough money to pay!\n");
             amount = player->money;
             player->money = 0;
-            player->bankrupt = true;
-            printf("Player %d paid $%d", OWNER_TO_PLAYER(player->owner), amount);
-            printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
+            bankruptPlayer(player);
+            printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
             return amount;
         }
     }
     player->money -= amount;
-    printf("Player %d paid $%d", OWNER_TO_PLAYER(player->owner), amount);
+    printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
     return amount;
 }
 
 void receiveMoney(player* player, int amount){
     player->money += amount;
-    printf("Player %d received $%d", OWNER_TO_PLAYER(player->owner), amount);
+    printf("Player %d received $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 }
 
 bool sellAssets(player* player, int amount){
@@ -435,13 +472,89 @@ bool sellAssets(player* player, int amount){
     return false;
 }
 
+
+/**************************************
+ * Player in jail
+ **************************************/
+void playerInJail(player* player, gamestate* game){
+    player->jailTime++;
+    printf("It is player %d %d turn in jail!\n", OWNER_TO_PLAYER(player->owner), player->jailTime);
+    bool getOutOfJail = false;
+    //TODO: Implement get out of jail free cards
+    if (player->jailTime < 3 && player->money >= 50){
+        //Check if player would like to pay jail fine
+        printf("Would you like to pay $50 to get out of jail? (y/n)\n");
+        char input;
+        scanf(" %c", &input);
+        if (input == 'y'){
+            payMoney(player, 50);
+            getOutOfJail = true;
+        }
+    }
+    diceRoll roll = rollDice(game);
+    if (roll.doubles || getOutOfJail){
+        printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
+        player->jailTime = 0;
+        player->inJail = false;
+        moveToSquare(player, roll, game);
+    } else if (player->jailTime == 3){
+        printf("Player %d has been in jail for 3 turns and must pay $50 to get out!\n", OWNER_TO_PLAYER(player->owner));
+        if (payJailFine(player)){
+            printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
+            player->jailTime = 0;
+            player->inJail = false;
+            moveToSquare(player, roll, game);
+        }
+    }
+}
+
+bool payJailFine(player* player){
+    int moneyPaid = payMoney(player, 50);
+    if (moneyPaid == 50){
+        return true;
+    } else {
+        return false;
+    }
+}
+/**************************************
+ * Miscellaneous
+ **************************************/
+void passGo(player* player){
+    printf("Player %d passed go!\n", OWNER_TO_PLAYER(player->owner));
+    receiveMoney(player, 200);
+}
+
+void bankruptPlayer(player* player){
+    printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
+    player->bankrupt = true;
+    //TODO: Return all properties to bank, or auction them off
+    printf("Not implemented yet!\n");
+}
+
+void waitForNextTurn(){
+    printf("Press enter to continue...\n");
+    while (getchar() != '\n');
+    getchar();
+}
+
+
 /**************************************
  * Main
  **************************************/
 int main (void){
     printf("Welcome to Monopoly!\n");
+    /*Make it not random for debugging*/
+    //srand(time(NULL));
     gamestate game;
     initGame(&game);
     gameStart(&game);
+
+    while (true){
+        playerTurn(&game.players[game.turn], &game);
+        if (turnEnd(&game)){
+            break;
+        }
+        waitForNextTurn();
+    }
     return 0;
 }
