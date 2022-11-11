@@ -7,6 +7,8 @@
 /**************************************
  * Game related
  **************************************/
+void initGame(gamestate* game);
+
 void gameStart(gamestate* game);
 
 bool checkForGameOver(gamestate* game);

@@ -21,7 +21,49 @@
  * Game related
  **************************************/
 
-void gameStart(gamestate* game){
+void initGame(gamestate* game){
+    /*Init board*/
+    game->board[0] = square_Go;
+    game->board[1] = square_MediterraneanAvenue;
+    game->board[2] = square_CommunityChest1;
+    game->board[3] = square_BalticAvenue;
+    game->board[4] = square_IncomeTax;
+    game->board[5] = square_ReadingRailRoad;
+    game->board[6] = square_OrientalAvenue;
+    game->board[7] = square_Chance1;
+    game->board[8] = square_VermontAvenue;
+    game->board[9] = square_ConnecticutAvenue;
+    game->board[10] = square_JustVisiting;
+    game->board[11] = square_StCharlesPlace;
+    game->board[12] = square_ElectricCompany;
+    game->board[13] = square_StatesAvenue;
+    game->board[14] = square_VirginiaAvenue;
+    game->board[15] = square_PennsylvaniaRailRoad;
+    game->board[16] = square_StJamesPlace;
+    game->board[17] = square_CommunityChest2;
+    game->board[18] = square_TennesseeAvenue;
+    game->board[19] = square_NewYorkAvenue;
+    game->board[20] = square_FreeParking;
+    game->board[21] = square_KentuckyAvenue;
+    game->board[22] = square_Chance2;
+    game->board[23] = square_IndianaAvenue;
+    game->board[24] = square_IllinoisAvenue;
+    game->board[25] = square_BAndO_RailRoad;
+    game->board[26] = square_AtlanicAvenue;
+    game->board[27] = square_VentnorAvenue;
+    game->board[28] = square_WaterWorks;
+    game->board[29] = square_MarvinGardens;
+    game->board[30] = square_GoToJail;
+    game->board[31] = square_PacificAvenue;
+    game->board[32] = square_NorthCarolinaAvenue;
+    game->board[33] = square_CommunityChest3;
+    game->board[34] = square_PennsylvaniaAvenue;
+    game->board[35] = square_ShortLine;
+    game->board[36] = square_Chance3;
+    game->board[37] = square_ParkPlace;
+    game->board[38] = square_LuxuryTax;
+    game->board[39] = square_Boardwalk;
+    /*Init players*/
     for (int i = 0; i < MAX_PLAYERS; i++){
         game->players[i].owner = i;
         game->players[i].money = 1500;
@@ -38,6 +80,12 @@ void gameStart(gamestate* game){
     game->houses = 32;
     game->hotels = 12;
     game->lastDiceRoll = 0;
+}
+
+void gameStart(gamestate* game){
+    //TODO: Roll dice to determine turn order
+    //TODO: Ask for player names
+    printf("Not implemented yet!\n");
 }
 
 bool checkForGameOver(gamestate* game){
@@ -392,5 +440,8 @@ bool sellAssets(player* player, int amount){
  **************************************/
 int main (void){
     printf("Welcome to Monopoly!\n");
+    gamestate game;
+    initGame(&game);
+    gameStart(&game);
     return 0;
 }
