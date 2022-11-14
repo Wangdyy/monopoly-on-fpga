@@ -376,14 +376,16 @@ void draw_text(char* text, int x_position, int y_position){
 
 
 void wait_for_vsync(){
-    volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
-    volatile int *status =(int *)0x0000;
+    volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+	register int status;
+	
+	*pixel_ctrl_ptr = 1; // start synchronization (write to buffer register)
+	status = *(pixel_ctrl_ptr + 3);
 
-    *pixel_ctrl_ptr = 1; //request to sync with vga timing
-
-    while((*status & 0x01) != 0){
-		status = status; //keep reading status
+	while ((status & 0x01) != 0) { // wait for S to be 0
+		status = *(pixel_ctrl_ptr + 3);
 	}
-pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+	
+	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
 	
