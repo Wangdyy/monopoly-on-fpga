@@ -28,7 +28,8 @@ void draw_jail();
 void draw_go();
 void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int thickness, int color);
 void draw_horizontal(int x_start, int x_end, int y, int thickness, int color);
-void draw_vertical(int x, int y_start, int y_end, int thickness, int color);	
+void draw_vertical(int x, int y_start, int y_end, int thickness, int color);
+void draw_chance(int x, int y, int orientation);	
 
 void write_char(int x, int y, char c) {
   // VGA character buffer
@@ -175,19 +176,19 @@ void clear_screen(){
 	
 	//red properties
 	//#1 x1=33, y1=24, x2=51, y2 = 31
-	draw_rectangle(33,24,51,31, RED, 3);
+	draw_rectangle(33,24,51,32, RED, 3);
 	//#2: x1=52, y1=24, x2=70, y2 = 31
-	draw_rectangle(71,24,89,31, RED, 3);
+	draw_rectangle(71,24,89,32, RED, 3);
 	//#3: x1=90, y1=24, x2=108, y2 = 31
-	draw_rectangle(90,24,108,31, RED, 3);
+	draw_rectangle(90,24,108,32, RED, 3);
 	
 	//yellow properties
 	//#1: x1=128, y1=24, x2=146, y2 = 31
-	draw_rectangle(128,24,146,31, YELLOW, 3);
+	draw_rectangle(128,24,146,32, YELLOW, 3);
 	//#2: x1=147, y1=24, x2=165, y2 = 31
-	draw_rectangle(147,24,165,31, YELLOW, 3);
+	draw_rectangle(147,24,165,32, YELLOW, 3);
 	//#3: x1=185, y1=24, x2=208, y2 = 31
-	draw_rectangle(185,24,208,31, YELLOW, 3);
+	draw_rectangle(185,24,208,32, YELLOW, 3);
 	
 	//orange properties
 	//#1: x1=25, y1=33, x2=32, y2 = 51
@@ -230,10 +231,15 @@ void clear_screen(){
 	//Go square x:208-240, y: 208-240
 	draw_go();
 	
+	//chance squares
+	draw_chance(71, 209, 0);
+	draw_chance(70, 32, 2);
+	draw_chance(209, 185, 3);
+}
+
 	//Test horizontal and vertical line functions
 	//draw_horizontal(100,140,120,2,BLACK);
 	//draw_vertical(100,140,160,2,BLACK);
-}
 void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int thickness, int color){
 	//x and y define the centre of arc, radius defines the inner radius
 	//draw an arc from start_degrees to end_degrees
@@ -343,6 +349,38 @@ void draw_jail(){
 	
 	
 }
+
+void draw_chance(int x, int y, int orientation){
+	//0 -> bottom 1->left 2-> top 3-> right
+
+	if (orientation == 0){
+		draw_arc(x + 9, y + 11, 5, 180 + 90*orientation, 420 + 90*orientation, 1, BLACK);
+		draw_arc(x + 14, y + 19, 4, 180 + 90*orientation, 240 + 90*orientation, 1, BLACK);
+		draw_vertical(x + 9, y + 19, y + 22, 1, BLACK);
+		draw_vertical(x + 9, y + 25, y + 26, 1, BLACK);
+	}
+	else if (orientation == 1){
+		draw_arc(x - 11, y + 9, 5, 180 + 90*orientation, 420 + 90*orientation, 1, BLACK);
+		draw_arc(x - 19, y + 14, 4, 180 + 90*orientation, 240 + 90*orientation, 1, BLACK);
+		draw_horizontal(x - 22, x - 19, y + 9, 1, BLACK);
+		draw_horizontal(x - 26, x - 25, y + 9, 1, BLACK);
+	}
+	else if (orientation == 2){
+		draw_arc(x - 9, y - 11, 5, 180 + 90*orientation, 420 + 90*orientation, 1, BLACK);
+		draw_arc(x - 14, y - 19, 4, 180 + 90*orientation, 240 + 90*orientation, 1, BLACK);
+		draw_vertical(x - 9, y - 22, y - 19, 1, BLACK);
+		draw_vertical(x - 9, y - 26, y - 25, 1, BLACK);
+	}
+	else if (orientation == 3){
+		draw_arc(x + 11, y - 10, 5, 180 + 90*orientation, 420 + 90*orientation, 1, BLACK);
+		draw_arc(x + 19, y - 15, 4, 180 + 90*orientation, 240 + 90*orientation, 1, BLACK);
+		draw_horizontal(x + 19, x + 22, y - 10, 1, BLACK);
+		draw_horizontal(x + 25, x + 26, y - 10, 1, BLACK);
+	}
+	
+
+}
+
 void draw_rectangle(int x1, int y1, int x2, int y2, int color, int orientation){
 	for(int x = x1; x<x2; x++){
 		if (orientation ==3){
