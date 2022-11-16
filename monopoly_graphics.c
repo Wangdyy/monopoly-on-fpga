@@ -21,7 +21,7 @@
 void clear_screen();
 void wait_for_vsync();
 void plot_pixel(int x, int y, short int color);
-void draw_rectangle(int x1, int y1, int x2, int y2, int color, int orientation);
+void draw_rectangle(int x1, int y1, int x2, int y2, int color);
 void draw_railroad(int x1, int y1, int x2, int y2, int orientation);
 void draw_text(char* text, int x_position, int y_position);
 void draw_jail();
@@ -30,11 +30,21 @@ void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int 
 void draw_horizontal(int x_start, int x_end, int y, int thickness, int color);
 void draw_vertical(int x, int y_start, int y_end, int thickness, int color);
 void draw_chance(int x, int y, int orientation);	
+void draw_chest(int x1, int y1, int x2, int y2, int orientation);
 
 void write_char(int x, int y, char c) {
   // VGA character buffer
   volatile char * character_buffer = (char *) (0xC9000000 + (y<<7) + x);
   *character_buffer = c;
+}
+
+int min(int a, int b){
+	if (a<b){return a;}
+	else{return b;}
+}
+int max(int a, int b){
+	if (a>b){return a;}
+	else{return b;}
 }
 
 //global variables
@@ -162,53 +172,53 @@ void clear_screen(){
 	
 	//light blue properties
 	//#1: x1=33, y1=209, x2=51, y2 = 216
-	draw_rectangle(33,209,51,216, LIGHT_BLUE, 1);
+	draw_rectangle(33,209,51,216, LIGHT_BLUE);
 	//#2: x1=52, y1=209, x2=70, y2 = 216
-	draw_rectangle(52,209,70,216, LIGHT_BLUE, 1);
+	draw_rectangle(52,209,70,216, LIGHT_BLUE);
 	//#3: x1=90, y1=209, x2=108, y2 = 216
-	draw_rectangle(90,209,108,216, LIGHT_BLUE, 1);
+	draw_rectangle(90,209,108,216, LIGHT_BLUE);
 	
 	//brown properties
 	//#1: x1=147, y1=209, x2=165, y2 = 216
-	draw_rectangle(147,209,165,216, BROWN, 1);
+	draw_rectangle(147,209,165,216, BROWN);
 	//#2: x1=185, y1=209, x2=208, y2 = 216
-	draw_rectangle(185,209,208,216, BROWN, 1);
+	draw_rectangle(185,209,208,216, BROWN);
 	
 	//red properties
 	//#1 x1=33, y1=24, x2=51, y2 = 31
-	draw_rectangle(33,24,51,32, RED, 3);
+	draw_rectangle(33,24,51,32, RED);
 	//#2: x1=52, y1=24, x2=70, y2 = 31
-	draw_rectangle(71,24,89,32, RED, 3);
+	draw_rectangle(71,24,89,32, RED);
 	//#3: x1=90, y1=24, x2=108, y2 = 31
-	draw_rectangle(90,24,108,32, RED, 3);
+	draw_rectangle(90,24,108,32, RED);
 	
 	//yellow properties
 	//#1: x1=128, y1=24, x2=146, y2 = 31
-	draw_rectangle(128,24,146,32, YELLOW, 3);
+	draw_rectangle(128,24,146,32, YELLOW);
 	//#2: x1=147, y1=24, x2=165, y2 = 31
-	draw_rectangle(147,24,165,32, YELLOW, 3);
+	draw_rectangle(147,24,165,32, YELLOW);
 	//#3: x1=185, y1=24, x2=208, y2 = 31
-	draw_rectangle(185,24,208,32, YELLOW, 3);
+	draw_rectangle(185,24,208,32, YELLOW);
 	
 	//orange properties
 	//#1: x1=25, y1=33, x2=32, y2 = 51
-	draw_rectangle(25,33,32,51, ORANGE, 2);
-	draw_rectangle(25,52,32,70, ORANGE, 2);
-	draw_rectangle(25,90,32,108, ORANGE, 2);
+	draw_rectangle(25,33,32,51, ORANGE);
+	draw_rectangle(25,52,32,70, ORANGE);
+	draw_rectangle(25,90,32,108, ORANGE);
 	
 	//pink properties
-	draw_rectangle(25,128,32,146, PINK, 2);
-	draw_rectangle(25,147,32,165, PINK, 2);
-	draw_rectangle(25,185,32,208, PINK, 2);
+	draw_rectangle(25,128,32,146, PINK);
+	draw_rectangle(25,147,32,165, PINK);
+	draw_rectangle(25,185,32,208, PINK);
 	
 	//green properties
-	draw_rectangle(209,33,216,51, GREEN, 4);
-	draw_rectangle(209,52,216,70, GREEN, 4);
-	draw_rectangle(209,90,216,108, GREEN, 4);
+	draw_rectangle(209,33,216,51, GREEN);
+	draw_rectangle(209,52,216,70, GREEN);
+	draw_rectangle(209,90,216,108, GREEN);
 	
 	//pink properties
-	draw_rectangle(209,147,216,165, DARK_BLUE, 4);
-	draw_rectangle(209,185,216,208, DARK_BLUE, 4);
+	draw_rectangle(209,147,216,165, DARK_BLUE);
+	draw_rectangle(209,185,216,208, DARK_BLUE);
 	
 	//draw railroads
 	//bottom railroad
@@ -235,6 +245,62 @@ void clear_screen(){
 	draw_chance(71, 209, 0);
 	draw_chance(70, 32, 2);
 	draw_chance(209, 185, 3);
+
+	//community chests
+	draw_chest(166, 209, 184, 216, 1);
+	draw_chest(32, 71, 0, 89, 2);
+	draw_chest(209, 89, 240, 71, 4);
+}
+
+void draw_chest(int x1, int y1, int x2, int y2, int orientation){
+	if (orientation == 1){
+		int corner_x = x1 - 7 + ((x2 - x1) / 2);
+		int corner_y = y1 + 11;
+		draw_rectangle(corner_x,corner_y,corner_x + 14, corner_y + 3, BROWN);
+		draw_rectangle(corner_x,corner_y + 3,corner_x + 14,corner_y + 10, BROWN);
+		draw_horizontal(corner_x,corner_x + 13, corner_y + 2, 1, YELLOW);
+		draw_vertical(corner_x,corner_y,corner_y + 9, 1, YELLOW);
+		draw_vertical(corner_x + 13,corner_y,corner_y + 9, 1, YELLOW);
+		draw_horizontal(corner_x,corner_x + 13, corner_y + 3, 1, BLACK);
+		draw_horizontal(corner_x,corner_x + 13, corner_y + 9, 1, YELLOW);
+		draw_rectangle(corner_x + 6,corner_y + 2,corner_x + 8,corner_y + 4, YELLOW);
+	}
+	if (orientation == 2){
+		int corner_y = y1 - 7 + ((y2 - y1) / 2);
+		int corner_x = x1 - 11;
+		draw_rectangle(corner_x - 3,corner_y,corner_x + 1, corner_y + 14, BROWN);
+		draw_rectangle(corner_x - 10,corner_y,corner_x - 3,corner_y + 14, BROWN);
+		draw_vertical(corner_x - 2,corner_y, corner_y + 13, 1, YELLOW);
+		draw_horizontal(corner_x - 9, corner_x,corner_y, 1, YELLOW);
+		draw_horizontal(corner_x - 9, corner_x,corner_y + 13, 1, YELLOW);
+		draw_vertical(corner_x - 3,corner_y, corner_y + 13, 1, BLACK);
+		draw_vertical(corner_x - 10,corner_y, corner_y + 13, 1, YELLOW);
+		draw_rectangle(corner_x - 4,corner_y + 6,corner_x - 2,corner_y + 8, YELLOW);
+	}
+	if (orientation == 3){
+		int corner_x = x1 - 7 + ((x2 - x1) / 2);
+		int corner_y = y1 - 11;
+		draw_rectangle(corner_x,corner_y,corner_x - 14, corner_y - 3, BROWN);
+		draw_rectangle(corner_x,corner_y - 3,corner_x - 14,corner_y - 10, BROWN);
+		draw_horizontal(corner_x,corner_x - 13, corner_y - 2, 1, YELLOW);
+		draw_vertical(corner_x,corner_y,corner_y - 9, 1, YELLOW);
+		draw_vertical(corner_x - 13,corner_y,corner_y - 9, 1, YELLOW);
+		draw_horizontal(corner_x,corner_x - 13, corner_y - 3, 1, BLACK);
+		draw_horizontal(corner_x,corner_x - 13, corner_y - 9, 1, YELLOW);
+		draw_rectangle(corner_x - 6,corner_y - 2,corner_x - 8,corner_y - 4, YELLOW);
+	}
+	if (orientation == 4){
+		int corner_y = y1 + 7 - ((y1 - y2) / 2);
+		int corner_x = x1 + 11;
+		draw_rectangle(corner_x + 3,corner_y,corner_x - 1, corner_y - 14, BROWN);
+		draw_rectangle(corner_x + 10,corner_y,corner_x + 3,corner_y - 14, BROWN);
+		draw_vertical(corner_x + 1,corner_y-1, corner_y - 14, 1, YELLOW);
+		draw_horizontal(corner_x + 8, corner_x-1,corner_y-1, 1, YELLOW);
+		draw_horizontal(corner_x + 8, corner_x-1,corner_y - 14, 1, YELLOW);
+		draw_vertical(corner_x + 2,corner_y-1, corner_y - 14, 1, BLACK);
+		draw_vertical(corner_x + 9,corner_y-1, corner_y - 14, 1, YELLOW);
+		draw_rectangle(corner_x + 4,corner_y - 6,corner_x + 2,corner_y - 8, YELLOW);
+	}
 }
 
 	//Test horizontal and vertical line functions
@@ -257,20 +323,21 @@ void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int 
 	}
 }
 void draw_horizontal(int x_start, int x_end, int y, int thickness, int color){
-	for (int x_current = x_start; x_current <= x_end; x_current++){
+	for (int x_current = min(x_start, x_end); x_current <= max(x_start, x_end); x_current++){
 		for (int y_offset = 0; y_offset < thickness; y_offset++){
 			plot_pixel(x_current,y+y_offset,color);
 		}
 	}
 }
 void draw_vertical(int x, int y_start, int y_end, int thickness, int color){
-	for (int y_current = y_start; y_current <= y_end; y_current++){
+	for (int y_current = min(y_start, y_end); y_current <= max(y_start, y_end); y_current++){
 		for (int x_offset = 0; x_offset < thickness; x_offset++){
 			plot_pixel(x+x_offset,y_current,color);
 		}
 	}	
 }
 void draw_go(){
+	draw_rectangle(216,231,236,234,RED);
 	//Draw the triangle on the left
 	int y = 232;
 	int height = 1;
@@ -290,13 +357,13 @@ void draw_go(){
 		plot_pixel(216,232+y_offset,BLACK);
 		plot_pixel(216,232-y_offset,BLACK);
 	}
-	draw_rectangle(216,231,236,234,RED,4);
 	for(int x=216;x<237;x++){
 		plot_pixel(x,230,BLACK);
 		plot_pixel(x,234,BLACK);
 	}
+	draw_vertical(216,231,234,1,RED);
 	draw_arc(217,219,5,0,315,2,BLACK);
-	draw_rectangle(217,219,222,220,BLACK,1);
+	draw_rectangle(217,219,222,220,BLACK);
 	draw_arc(231,219,5,0,360,2,BLACK);
 	
 }
@@ -329,17 +396,14 @@ void draw_railroad(int x1, int y1, int x2, int y2, int orientation){
 	
 }
 void draw_jail(){
-	draw_rectangle(10, 209, 32, 231, ORANGE, 2);
+	draw_rectangle(10, 209, 32, 231, ORANGE);
 	for(int x=9; x<32; x++){
 	plot_pixel(x, 231, BLACK);	
 	}
-	draw_rectangle(16, 211, 28, 223, WHITE, 2);
+	draw_rectangle(16, 212, 27, 223, WHITE);
 	for(int x=15; x<28; x++){
 	plot_pixel(x, 211, BLACK);	
 	plot_pixel(x, 223, BLACK);	
-	}
-	for(int y=211; y<223; y++){
-	plot_pixel(27, y, BLACK);
 	}
 	for(int x=18; x<28; x=x+3){
 		for(int y=211; y<223; y++){
@@ -381,24 +445,21 @@ void draw_chance(int x, int y, int orientation){
 
 }
 
-void draw_rectangle(int x1, int y1, int x2, int y2, int color, int orientation){
-	for(int x = x1; x<x2; x++){
-		if (orientation ==3){
-			plot_pixel(x,y1-1,BLACK);
-		}
-		for (int y=y1; y<y2; y++){
-			if (orientation ==2){
-				plot_pixel(x1-1,y,BLACK);
-			}
+void draw_rectangle(int x1, int y1, int x2, int y2, int color){
+	int x_min = min(x1, x2);
+	int x_max = max(x1, x2);
+	int y_min = min(y1, y2);
+	int y_max = max(y1, y2);
+
+	for(int x = x_min; x<x_max; x++){
+		for (int y=y_min; y<y_max; y++){
 			plot_pixel(x, y, color);
-			if (orientation ==4){
-				plot_pixel(x2,y,BLACK);
-			}
-		}
-		if (orientation ==1){
-			plot_pixel(x,y2,BLACK);
 		}
 	}
+	draw_horizontal(x_min - 1, x_max, y_min - 1, 1, BLACK);
+	draw_horizontal(x_min - 1, x_max, y_max, 1, BLACK);
+	draw_vertical(x_min - 1, y_min - 1, y_max, 1, BLACK);
+	draw_vertical(x_max, y_min - 1, y_max, 1, BLACK);
 }
 
 void draw_text(char* text, int x_position, int y_position){
