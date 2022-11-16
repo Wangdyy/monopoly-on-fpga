@@ -1,7 +1,7 @@
 /****************************************************************************************
  * Gamestate.h
  * This file contains the struct defininition of the Gamestate
-*****************************************************************************************/
+ *****************************************************************************************/
 #pragma once
 #include "Squares.h"
 #include "Players.h"
@@ -9,7 +9,8 @@
 #define MAX_PLAYERS 4
 #define MAX_SQUARES 40
 
-typedef struct gamestate{
+typedef struct gamestate
+{
     square board[40];
     player players[4];
     int turn;
@@ -22,7 +23,8 @@ typedef struct gamestate{
     int lastDiceRoll;
 } gamestate;
 
-typedef struct diceRoll{
+typedef struct diceRoll
+{
     int die1;
     int die2;
     bool doubles;

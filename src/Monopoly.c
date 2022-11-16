@@ -1,4 +1,4 @@
-//320*240
+// 320*240
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,7 +17,8 @@
  * Game related
  **************************************/
 
-void initGame(gamestate* game){
+void initGame(gamestate *game)
+{
     /*Init board*/
     game->board[0] = square_Go;
     game->board[1] = square_MediterraneanAvenue;
@@ -60,7 +61,8 @@ void initGame(gamestate* game){
     game->board[38] = square_LuxuryTax;
     game->board[39] = square_Boardwalk;
     /*Init players*/
-    for (int i = 0; i < MAX_PLAYERS; i++){
+    for (int i = 0; i < MAX_PLAYERS; i++)
+    {
         game->players[i].owner = i;
         game->players[i].money = 1500;
         game->players[i].position = Go;
@@ -76,47 +78,60 @@ void initGame(gamestate* game){
     game->lastDiceRoll = 0;
 }
 
-void gameStart(gamestate* game){
-    //TODO: Roll dice to determine turn order
-    //TODO: Ask for player names
+void gameStart(gamestate *game)
+{
+    // TODO: Roll dice to determine turn order
+    // TODO: Ask for player names
     printf("Not implemented yet!\n");
 }
 
-bool checkForGameOver(gamestate* game){
+bool checkForGameOver(gamestate *game)
+{
     int playersLeft = 0;
-    for (int i = 0; i < MAX_PLAYERS; i++){
-        if (!game->players[i].bankrupt){
+    for (int i = 0; i < MAX_PLAYERS; i++)
+    {
+        if (!game->players[i].bankrupt)
+        {
             playersLeft++;
         }
     }
-    if (playersLeft > 1){
+    if (playersLeft > 1)
+    {
         return false;
-    } else {
+    }
+    else
+    {
         printf("Game Over!\n");
         return true;
     }
 }
 
-diceRoll rollDice(gamestate* game){
+diceRoll rollDice(gamestate *game)
+{
     diceRoll roll;
     roll.die1 = rand() % 6 + 1;
     roll.die2 = rand() % 6 + 1;
-    if (roll.die1 == roll.die2){
+    if (roll.die1 == roll.die2)
+    {
         roll.doubles = true;
     }
-    else{
+    else
+    {
         roll.doubles = false;
     }
     printf("You rolled a %d and a %d\n", roll.die1, roll.die2);
     game->lastDiceRoll = roll.die1 + roll.die2;
-    if (roll.doubles){
+    if (roll.doubles)
+    {
         game->doubles++;
     }
     return roll;
 }
 
-void playerTurn(player* player, gamestate* game){
-    if (player->bankrupt){
+void playerTurn(player *player, gamestate *game)
+{
+    if (player->bankrupt)
+    {
         return;
     }
     printf("/**************************************\n");
@@ -124,104 +139,127 @@ void playerTurn(player* player, gamestate* game){
     printf("You are currently located at %s\n", game->board[player->position].name);
     printf("You currently have $%d\n", player->money);
     printf("**************************************/\n");
-    if (player->inJail){
-       playerInJail(player, game);
-    } else {
+    if (player->inJail)
+    {
+        playerInJail(player, game);
+    }
+    else
+    {
         diceRoll roll = rollDice(game);
         moveToSquare(player, roll, game);
     }
 }
 
 /*Turn end returns true if game ends*/
-bool turnEnd(gamestate* game){
+bool turnEnd(gamestate *game)
+{
     game->turn = (game->turn + 1) % MAX_PLAYERS;
     game->doubles = 0;
     return checkForGameOver(game);
 }
 
-void moveToSquare(player* player, struct diceRoll diceRoll, gamestate* game){
+void moveToSquare(player *player, struct diceRoll diceRoll, gamestate *game)
+{
     int diceTotal = diceRoll.die1 + diceRoll.die2;
-    if (player->position + diceTotal >= MAX_SQUARES){
+    if (player->position + diceTotal >= MAX_SQUARES)
+    {
         player->position = (player->position + diceTotal) - MAX_SQUARES;
         passGo(player);
     }
-    else{
+    else
+    {
         player->position = player->position + diceTotal;
     }
     landOnSquare(player, &game->board[player->position], game);
 }
 
-void landOnSquare(player* player, square* square, gamestate* game){
+void landOnSquare(player *player, square *square, gamestate *game)
+{
     printf("player %d landed on %s\n", OWNER_TO_PLAYER(player->owner), square->name);
-    if (square->type == Property) {
+    if (square->type == Property)
+    {
         doPropertySquare(player, square, game);
     }
-    else if (square->type == Action) {
+    else if (square->type == Action)
+    {
         doActionSquare(player, square, game);
-    } else {
+    }
+    else
+    {
         printf("Error: Square type not recognized\n");
     }
 }
 
-void doActionSquare(player* player, square* square, gamestate* game){
-    switch (square->data.action) {
-        case (GoToJailAction):
-            goToJail(player);
-            break;
-        case (IncomeTaxAction):
-            payIncomeTax(player);
-            break;
-        case (LuxuryTaxAction):
-            payLuxuryTax(player);
-            break;
-        case (ChanceAction):
-            printf("Not implemented yet!\n");
-            break;
-        case (CommunityChestAction):
-            printf("Not implemented yet!\n");
-            break;
-        case (GoAction):
-            printf("You've passed go!\n");
-            break;
-        case (FreeParkingAction):
-            printf("Nothing happens...\n");
-            break;
-        case (JailAction):
-            printf("Just visiting...nothing happens\n");
-            break;
-        default:
-            printf("Error: Action Square type not recognized\n");
-            break;
+void doActionSquare(player *player, square *square, gamestate *game)
+{
+    switch (square->data.action)
+    {
+    case (GoToJailAction):
+        goToJail(player);
+        break;
+    case (IncomeTaxAction):
+        payIncomeTax(player);
+        break;
+    case (LuxuryTaxAction):
+        payLuxuryTax(player);
+        break;
+    case (ChanceAction):
+        printf("Not implemented yet!\n");
+        break;
+    case (CommunityChestAction):
+        printf("Not implemented yet!\n");
+        break;
+    case (GoAction):
+        printf("You've passed go!\n");
+        break;
+    case (FreeParkingAction):
+        printf("Nothing happens...\n");
+        break;
+    case (JailAction):
+        printf("Just visiting...nothing happens\n");
+        break;
+    default:
+        printf("Error: Action Square type not recognized\n");
+        break;
     }
 }
 
-/*Either: 
+/*Either:
     1. Buy property if no one owns it
     2. Pay rent if someone else owns it
     3. Do nothing if they own it
 */
-void doPropertySquare(player* player, square* square, gamestate* game){
-    if (square->data.property.owner == Bank){
+void doPropertySquare(player *player, square *square, gamestate *game)
+{
+    if (square->data.property.owner == Bank)
+    {
         printf("This property is unowned!\n");
-        if (player->money >= square->data.property.price){
+        if (player->money >= square->data.property.price)
+        {
             printf("Would you like to buy %s for $%d? (y/n)\n", square->name, square->data.property.price);
             char input = 'n';
             scanf(" %c", &input);
-            if (input == 'y'){
+            if (input == 'y')
+            {
                 buyProperty(player, square);
-            } else {
+            }
+            else
+            {
                 printf("You chose not to buy %s\n", square->name);
             }
         }
-        else{
+        else
+        {
             printf("You don't have enough money to buy this property\n");
-            //Not implemented: Auctioning
+            // Not implemented: Auctioning
         }
     }
-    else if (square->data.property.owner != player->owner){
+    else if (square->data.property.owner != player->owner)
+    {
         payRent(player, square, game);
     }
-    else{
+    else
+    {
         printf("You own this property!\n");
     }
 }
@@ -229,19 +267,22 @@ void doPropertySquare(player* player, square* square, gamestate* game){
 /**************************************
  * Action Squares
  **************************************/
-void payIncomeTax(player* player){
+void payIncomeTax(player *player)
+{
     /*Players should get to decide whether to pay 200 or 10% of net worth
     but for now, we will only implement paying 200*/
     printf("Paying $200 income tax...\n");
     payMoney(player, 200);
 }
 
-void payLuxuryTax(player* player){
+void payLuxuryTax(player *player)
+{
     printf("Paying $100 luxury tax...\n");
     payMoney(player, 100);
 }
 
-void goToJail(player* player){
+void goToJail(player *player)
+{
     printf("Going to jail...\n");
     player->position = JustVisiting;
     player->inJail = true;
@@ -250,88 +291,101 @@ void goToJail(player* player){
 /**************************************
  * Property Squares
  **************************************/
-void payRent(player* player, square* square, gamestate* game){
-    switch(square->data.property.type){
-        case (Colored):
-            payColorSetRent(player, square, game);
-            break;
-        case (Utility):
-            payUtilityRent(player, square, game);
-            break;
-        case (RailRoad):
-            payRailroadRent(player, square, game);
-            break;
-        default:
-            printf("Error: Property type not recognized\n");
-            break;
+void payRent(player *player, square *square, gamestate *game)
+{
+    switch (square->data.property.type)
+    {
+    case (Colored):
+        payColorSetRent(player, square, game);
+        break;
+    case (Utility):
+        payUtilityRent(player, square, game);
+        break;
+    case (RailRoad):
+        payRailroadRent(player, square, game);
+        break;
+    default:
+        printf("Error: Property type not recognized\n");
+        break;
     }
 }
 
-void payColorSetRent(player* player, square* square, gamestate* game){
+void payColorSetRent(player *player, square *square, gamestate *game)
+{
     enum Owners owner = square->data.property.owner;
     int rent = square->data.property.coloredPropety.rent[0];
     enum Colors setColor = square->data.property.coloredPropety.color;
     bool setOwned = false;
-    switch (setColor) {
-        case (Brown):
-            if (game->board[MediteraneanAvenue].data.property.owner == owner &&
-                game->board[BalticAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (LightBlue):
-            if (game->board[OrientalAvenue].data.property.owner == owner &&
-                game->board[VermontAvenue].data.property.owner == owner &&
-                game->board[ConnecticutAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (Pink):
-            if (game->board[StCharlesPlace].data.property.owner == owner &&
-                game->board[StatesAvenue].data.property.owner == owner &&
-                game->board[VirginiaAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (Orange):
-            if (game->board[StJamesPlace].data.property.owner == owner &&
-                game->board[TennesseeAvenue].data.property.owner == owner &&
-                game->board[NewYorkAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (Red):
-            if (game->board[KentuckyAvenue].data.property.owner == owner &&
-                game->board[IndianaAvenue].data.property.owner == owner &&
-                game->board[IllinoisAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (Yellow):
-            if (game->board[AtlanticAvenue].data.property.owner == owner &&
-                game->board[VentnorAvenue].data.property.owner == owner &&
-                game->board[MarvinGardens].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (Green):
-            if (game->board[PacificAvenue].data.property.owner == owner &&
-                game->board[NorthCarolinaAvenue].data.property.owner == owner &&
-                game->board[PennsylvaniaAvenue].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        case (DarkBlue):
-            if (game->board[ParkPlace].data.property.owner == owner &&
-                game->board[Boardwalk].data.property.owner == owner) {
-                setOwned = true;
-            }
-            break;
-        default:
-            printf("Error: Color not recognized\n");
-            break;
+    switch (setColor)
+    {
+    case (Brown):
+        if (game->board[MediteraneanAvenue].data.property.owner == owner &&
+            game->board[BalticAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (LightBlue):
+        if (game->board[OrientalAvenue].data.property.owner == owner &&
+            game->board[VermontAvenue].data.property.owner == owner &&
+            game->board[ConnecticutAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (Pink):
+        if (game->board[StCharlesPlace].data.property.owner == owner &&
+            game->board[StatesAvenue].data.property.owner == owner &&
+            game->board[VirginiaAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (Orange):
+        if (game->board[StJamesPlace].data.property.owner == owner &&
+            game->board[TennesseeAvenue].data.property.owner == owner &&
+            game->board[NewYorkAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (Red):
+        if (game->board[KentuckyAvenue].data.property.owner == owner &&
+            game->board[IndianaAvenue].data.property.owner == owner &&
+            game->board[IllinoisAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (Yellow):
+        if (game->board[AtlanticAvenue].data.property.owner == owner &&
+            game->board[VentnorAvenue].data.property.owner == owner &&
+            game->board[MarvinGardens].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (Green):
+        if (game->board[PacificAvenue].data.property.owner == owner &&
+            game->board[NorthCarolinaAvenue].data.property.owner == owner &&
+            game->board[PennsylvaniaAvenue].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    case (DarkBlue):
+        if (game->board[ParkPlace].data.property.owner == owner &&
+            game->board[Boardwalk].data.property.owner == owner)
+        {
+            setOwned = true;
+        }
+        break;
+    default:
+        printf("Error: Color not recognized\n");
+        break;
     }
-    if (setOwned) {
+    if (setOwned)
+    {
         printf("Player %d owns the set, rent is doubled!\n", OWNER_TO_PLAYER(owner));
         rent *= 2;
     }
@@ -339,68 +393,85 @@ void payColorSetRent(player* player, square* square, gamestate* game){
     payPlayer(player, &game->players[owner], rent);
 }
 
-void payUtilityRent(player* player, square* square, gamestate* game){
+void payUtilityRent(player *player, square *square, gamestate *game)
+{
     enum Owners utilityOwner = square->data.property.owner;
     enum Owners otherUtilityOwner;
-    if (square->squareName == ElectricCompany) {
+    if (square->squareName == ElectricCompany)
+    {
         otherUtilityOwner = game->board[WaterWorks].data.property.owner;
-    } else if (square->squareName == WaterWorks) {
+    }
+    else if (square->squareName == WaterWorks)
+    {
         otherUtilityOwner = game->board[ElectricCompany].data.property.owner;
-    } else {
+    }
+    else
+    {
         printf("Error: Utility square not recognized\n");
         return;
     }
     int rent;
-    if (utilityOwner == otherUtilityOwner) {
-            printf("Both utilities owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
-            rent = 10 * game->lastDiceRoll;
-    } else {
-            printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
-            rent = 4 * game->lastDiceRoll;
+    if (utilityOwner == otherUtilityOwner)
+    {
+        printf("Both utilities owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+        rent = 10 * game->lastDiceRoll;
+    }
+    else
+    {
+        printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+        rent = 4 * game->lastDiceRoll;
     }
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
     payPlayer(player, &game->players[utilityOwner], rent);
 }
 
-void payRailroadRent(player* player, square* square, gamestate* game){
+void payRailroadRent(player *player, square *square, gamestate *game)
+{
     enum Owners railroadOwner = square->data.property.owner;
     int railRoadsOwned = 0;
-    if (game->board[ReadingRailRoad].data.property.owner == railroadOwner) {
+    if (game->board[ReadingRailRoad].data.property.owner == railroadOwner)
+    {
         railRoadsOwned++;
     }
-    if (game->board[PennsylvaniaRailRoad].data.property.owner == railroadOwner) {
+    if (game->board[PennsylvaniaRailRoad].data.property.owner == railroadOwner)
+    {
         railRoadsOwned++;
     }
-    if (game->board[BAndORailRoad].data.property.owner == railroadOwner) {
+    if (game->board[BAndORailRoad].data.property.owner == railroadOwner)
+    {
         railRoadsOwned++;
     }
-    if (game->board[ShortLine].data.property.owner == railroadOwner) {
+    if (game->board[ShortLine].data.property.owner == railroadOwner)
+    {
         railRoadsOwned++;
     }
     int rent;
-    switch (railRoadsOwned) {
-        case (1):
-            rent = 25;
-            break;
-        case (2):
-            rent = 50;
-            break;
-        case (3):
-            rent = 100;
-            break;
-        case (4):
-            rent = 200;
-            break;
-        default:
-            printf("Error: Wrong Number of railroads owned\n");
-            break;
+    switch (railRoadsOwned)
+    {
+    case (1):
+        rent = 25;
+        break;
+    case (2):
+        rent = 50;
+        break;
+    case (3):
+        rent = 100;
+        break;
+    case (4):
+        rent = 200;
+        break;
+    default:
+        printf("Error: Wrong Number of railroads owned\n");
+        break;
     }
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
     payPlayer(player, &game->players[railroadOwner], rent);
 }
 
-void buyProperty(player* player, square* square){
-    if (player->money < square->data.property.price) {
+void buyProperty(player *player, square *square)
+{
+    if (player->money < square->data.property.price)
+    {
         printf("Error: Player %d does not have enough money to buy %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
@@ -411,8 +482,10 @@ void buyProperty(player* player, square* square){
     player->owned_properties_count++;
 }
 
-void sellProperty(player* player, square* square){
-    if (square->data.property.owner != player->owner) {
+void sellProperty(player *player, square *square)
+{
+    if (square->data.property.owner != player->owner)
+    {
         printf("Error: Player %d does not own %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
@@ -420,12 +493,15 @@ void sellProperty(player* player, square* square){
     square->data.property.owner = Bank;
     printf("Player %d sold %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
     bool found = false;
-    for (int i = 0; i < player->owned_properties_count; i++) {
-        if (player->owned_properties[i] == square) {
+    for (int i = 0; i < player->owned_properties_count; i++)
+    {
+        if (player->owned_properties[i] == square)
+        {
             player->owned_properties[i] = NULL;
             found = true;
         }
-        if (found && i < player->owned_properties_count - 1) {
+        if (found && i < player->owned_properties_count - 1)
+        {
             player->owned_properties[i] = player->owned_properties[i + 1];
         }
     }
@@ -435,19 +511,24 @@ void sellProperty(player* player, square* square){
 /**************************************
  * Payment
  **************************************/
-void payPlayer(player* payer, player* payee, int amount){
+void payPlayer(player *payer, player *payee, int amount)
+{
     printf("Player %d is paying player %d $%d\n", OWNER_TO_PLAYER(payer->owner), OWNER_TO_PLAYER(payee->owner), amount);
     int moneyPaid = payMoney(payer, amount);
     receiveMoney(payee, moneyPaid);
 }
 
-int payMoney(player* player, int amount){
-    if (player->money < amount){
+int payMoney(player *player, int amount)
+{
+    if (player->money < amount)
+    {
         printf("You don't have enough money to pay!\n");
-        if (sellAssets(player, amount)){
+        if (sellAssets(player, amount))
+        {
             printf("You sold enough assets to pay!\n");
         }
-        else{
+        else
+        {
             printf("You don't have enough money to pay!\n");
             amount = player->money;
             player->money = 0;
@@ -461,45 +542,53 @@ int payMoney(player* player, int amount){
     return amount;
 }
 
-void receiveMoney(player* player, int amount){
+void receiveMoney(player *player, int amount)
+{
     player->money += amount;
     printf("Player %d received $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 }
 
-bool sellAssets(player* player, int amount){
-    //Selling to other players no implemented
+bool sellAssets(player *player, int amount)
+{
+    // Selling to other players no implemented
     printf("Not implemented yet!\n");
     return false;
 }
 
-
 /**************************************
  * Player in jail
  **************************************/
-void playerInJail(player* player, gamestate* game){
+void playerInJail(player *player, gamestate *game)
+{
     player->jailTime++;
     printf("It is player %d %d turn in jail!\n", OWNER_TO_PLAYER(player->owner), player->jailTime);
     bool getOutOfJail = false;
-    //TODO: Implement get out of jail free cards
-    if (player->jailTime < 3 && player->money >= 50){
-        //Check if player would like to pay jail fine
+    // TODO: Implement get out of jail free cards
+    if (player->jailTime < 3 && player->money >= 50)
+    {
+        // Check if player would like to pay jail fine
         printf("Would you like to pay $50 to get out of jail? (y/n)\n");
         char input;
         scanf(" %c", &input);
-        if (input == 'y'){
+        if (input == 'y')
+        {
             payMoney(player, 50);
             getOutOfJail = true;
         }
     }
     diceRoll roll = rollDice(game);
-    if (roll.doubles || getOutOfJail){
+    if (roll.doubles || getOutOfJail)
+    {
         printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
         player->jailTime = 0;
         player->inJail = false;
         moveToSquare(player, roll, game);
-    } else if (player->jailTime == 3){
+    }
+    else if (player->jailTime == 3)
+    {
         printf("Player %d has been in jail for 3 turns and must pay $50 to get out!\n", OWNER_TO_PLAYER(player->owner));
-        if (payJailFine(player)){
+        if (payJailFine(player))
+        {
             printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
             player->jailTime = 0;
             player->inJail = false;
@@ -508,50 +597,60 @@ void playerInJail(player* player, gamestate* game){
     }
 }
 
-bool payJailFine(player* player){
+bool payJailFine(player *player)
+{
     int moneyPaid = payMoney(player, 50);
-    if (moneyPaid == 50){
+    if (moneyPaid == 50)
+    {
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
 /**************************************
  * Miscellaneous
  **************************************/
-void passGo(player* player){
+void passGo(player *player)
+{
     printf("Player %d passed go!\n", OWNER_TO_PLAYER(player->owner));
     receiveMoney(player, 200);
 }
 
-void bankruptPlayer(player* player){
+void bankruptPlayer(player *player)
+{
     printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
     player->bankrupt = true;
-    //TODO: Return all properties to bank, or auction them off
+    // TODO: Return all properties to bank, or auction them off
     printf("Not implemented yet!\n");
 }
 
-void waitForNextTurn(){
+void waitForNextTurn()
+{
     printf("Press enter to continue...\n");
-    while (getchar() != '\n');
+    while (getchar() != '\n')
+        ;
     getchar();
 }
-
 
 /**************************************
  * Main
  **************************************/
-int main (void){
+int main(void)
+{
     printf("Welcome to Monopoly!\n");
     /*Make it not random for debugging*/
-    //srand(time(NULL));
+    // srand(time(NULL));
     gamestate game;
     initGame(&game);
     gameStart(&game);
 
-    while (true){
+    while (true)
+    {
         playerTurn(&game.players[game.turn], &game);
-        if (turnEnd(&game)){
+        if (turnEnd(&game))
+        {
             break;
         }
         waitForNextTurn();
