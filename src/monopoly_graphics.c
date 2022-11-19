@@ -36,9 +36,11 @@ void plot_monochrome_bitmap(char bitmap[], int x, int y, int height, int colour)
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
 void draw_dialogue(char *question, int num_options, char **options);
 
+char water[256] = "c7ffffffbbffffffbbffffffbbffffffbbffffffd7ffffffefffffffffffffff87ffffffb7fdffffb7fdffffb801ffffbffdffffdffdffffe001ffffffbdffffffbdfffffe0fffff";
 char parking[128] = "ffffffffffffffffffffffffdd5545a3cc4ced2bd554ecafcecd45b3ffffffffffffffffffffffffff7511ffff7577ffff1333ffff7577ffff1311ffffffffff";
 char gotojail[128] = "f1ed830ff5edef7ffde1ef7ffdedef7ffdedef7ff073837fffffffffffffffffffffffffffffffff8387f787bb33f733b37bf77bbf7bf77bbb33f733c387c187";
 char paytax[128] = "b55fffffb55fffffb1bfffffb55fffff1b5fffffffffffffffffffffffffffff75bfffff75bfffff11bfffff555fffff1b5fffffffffffff";
+char lightbulb[128] = "fffffffdfffffff3ffff07effffcf9fffff3feffffceff7ff0317fbff28fbfb0f10fbfbff0317fbfffceff7ffff3fefffffcf9ffffff07effffffff3fffffffd";
 char choice_symbols[46] = "1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./";
 
 void write_char(int x, int y, char c)
@@ -290,9 +292,11 @@ void clear_screen()
 	draw_chest(32, 71, 0, 89, 2);
 	draw_chest(209, 89, 240, 71, 4);
 
-	plot_monochrome_bitmap(parking, 0, 5, 16, BLACK);
-	plot_monochrome_bitmap(gotojail, 209, 5, 16, BLACK);
-	plot_monochrome_bitmap(paytax, 131, 215, 14, BLACK);
+	plot_monochrome_bitmap(water, 167, 5, 18, BLACK);
+ 	plot_monochrome_bitmap(parking, 0, 5, 16, BLACK);
+        plot_monochrome_bitmap(gotojail, 209, 5, 16, BLACK);
+        plot_monochrome_bitmap(paytax, 131, 215, 14, BLACK);
+	plot_monochrome_bitmap(lightbulb, 0, 167, 16, BLACK);
 }
 
 void plot_monochrome_bitmap(char bitmap[], int x, int y, int height, int colour)
