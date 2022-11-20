@@ -32,17 +32,20 @@ void draw_vertical(int x, int y_start, int y_end, int thickness, int color);
 void draw_chance(int x, int y, int orientation);
 void draw_chest(int x1, int y1, int x2, int y2, int orientation);
 void plot_bitmap_row(char hex, int x, int y, int colour);
-void plot_monochrome_bitmap(char bitmap[], int x, int y, int height, int colour);
+void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, int colour);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
 void draw_dialogue(char *question, int num_options, char **options);
 
 char water[256] = "c7ffffffbbffffffbbffffffbbffffffbbffffffd7ffffffefffffffffffffff87ffffffb7fdffffb7fdffffb801ffffbffdffffdffdffffe001ffffffbdffffffbdfffffe0fffff";
+char water_blue[256] = "ffffffffc7ffffffc7ffffffc7ffffffc7ffffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 char parking[128] = "ffffffffffffffffffffffffdd5545a3cc4ced2bd554ecafcecd45b3ffffffffffffffffffffffffff7511ffff7577ffff1333ffff7577ffff1311ffffffffff";
 char gotojail[128] = "f1ed830ff5edef7ffde1ef7ffdedef7ffdedef7ff073837fffffffffffffffffffffffffffffffff8387f787bb33f733b37bf77bbf7bf77bbb33f733c387c187";
+char jail[48] = "ffffffffc6a23fffd6b6fffff636fffff6b6ffffc362ffff";
 char paytax[128] = "b55fffffb55fffffb1bfffffb55fffff1b5fffffffffffffffffffffffffffff75bfffff75bfffff11bfffff555fffff1b5fffffffffffff";
-char lightbulb[128] = "fffffffdfffffff3ffff07effffcf9fffff3feffffceff7ff0317fbff28fbfb0f10fbfbff0317fbfffceff7ffff3fefffffcf9ffffff07effffffff3fffffffd";
+char lightbulb[128] = "ffffffffffffffffffff07fffffcf9fffff3feffffceff7ff0317fbff28fbfbff10fbfbff0317fbfffceff7ffff3fefffffcf9ffffff07ffffffffffffffffff";
+char lightbulb_yellow[128] = "ffffffffffffffffffffffffffff07fffffc01fffff100ffffce807ffd70407ffef0407fffce807ffff100fffffc01ffffff07ffffffffffffffffffffffffff";
 char choice_symbols[46] = "1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./";
-
+char monopoly_text[800] = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc71c7f03f8fc7f03f8fffc0fe003f8ffffffffffc71c7c00f8f87c00f8fff003e003f8ffffffffffc60c787878f8787878ffe1e1e3fff8ffffffffffc64c78fc78f078fc78ffe3f1e3fff8ffffffffffc64c71fe38f071fe38ffc7f8e3fff8ffffffffffc64c71fe38e471fe38ffc7f8e3fff8ffffffffffc44471fe38e471fe3803c7f8e3fff07fffffffffc4e471fe38cc71fe3801c7f8e3fff07fffffffffc4e471fe38cc71fe38f0c7f8e3ffe23fffffffffc4e471fe389c71fe38f8c7f8e3ffe23fffffffffc0e071fe389c71fe38f8c7f8e3ffc71fffffffffc0e078fc783c78fc78f8e3f1e3ffc71fffffffffc1f07878783c787878f0e1e1e3ff870fffffffffc1f07c00f87c7c00f801f003e3ff8f8fffffffffc1f07f03f87c7f03f803fc0fe3ff8f8fffffffffffffffffffffffffffffffffffffffffffff";
 void write_char(int x, int y, char c)
 {
 	// VGA character buffer
@@ -292,31 +295,38 @@ void clear_screen()
 	draw_chest(32, 71, 0, 89, 2);
 	draw_chest(209, 89, 240, 71, 4);
 
-	plot_monochrome_bitmap(water, 167, 5, 18, BLACK);
- 	plot_monochrome_bitmap(parking, 0, 5, 16, BLACK);
-        plot_monochrome_bitmap(gotojail, 209, 5, 16, BLACK);
-        plot_monochrome_bitmap(paytax, 131, 215, 14, BLACK);
-	plot_monochrome_bitmap(lightbulb, 0, 167, 16, BLACK);
+	plot_monochrome_bitmap(jail, 12, 225, 32, 6, BLACK);
+	plot_monochrome_bitmap(water, 167, 5, 32, 18, BLACK);
+	plot_monochrome_bitmap(water_blue, 167, 5, 32, 18, LIGHT_BLUE);
+ 	plot_monochrome_bitmap(parking, 0, 5, 32, 16, BLACK);
+        plot_monochrome_bitmap(gotojail, 209, 5, 32, 16, BLACK);
+        plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
+	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
+	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
+	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
 }
 
-void plot_monochrome_bitmap(char bitmap[], int x, int y, int height, int colour)
+void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, int colour)
 {
 	// Take in an array of hex values of a bitmap to be plotted
 	// bitmap should have width of 32 px
 	// x, y are the upper-left coordinates
 	// Read from the start to end of the char array, plot bottom to top
-	int length = 8 * height;
+	// length refers to the array size of bitmap
+	// length must be a multiple of 32 
+	int length = width * height / 4;
 	int row = height - 1;
 	// row=0
 	// row=1
 	// row=2
 	int col = 0;
+	int num_cols = width / 4;
 	// Each col represents a row of 4 pixels
 	for (int i = 0; i < length; i++)
 	{
 		plot_bitmap_row(bitmap[i], x + col * 4, y + row, colour);
 		col += 1;
-		if (col == 8)
+		if (col == num_cols)
 		{
 			col = 0;
 			row -= 1;
@@ -793,3 +803,4 @@ void wait_for_vsync()
 
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
+	
