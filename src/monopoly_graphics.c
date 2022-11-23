@@ -23,7 +23,6 @@ void wait_for_vsync();
 void plot_pixel(int x, int y, short int color);
 void draw_rectangle(int x1, int y1, int x2, int y2, int color);
 void draw_railroad(int x1, int y1, int x2, int y2, int orientation);
-void draw_text(char *text, int x_position, int y_position);
 void draw_jail();
 void draw_go();
 void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int thickness, int color);
@@ -33,8 +32,10 @@ void draw_chance(int x, int y, int orientation);
 void draw_chest(int x1, int y1, int x2, int y2, int orientation);
 void plot_bitmap_row(char hex, int x, int y, int colour);
 void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, int colour);
+
+void draw_text(char *text, int x_position, int y_position);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
-void draw_dialogue(char *question, int num_options, char **options);
+void draw_dialogue(char *question, int num_options, char **options, bool chance, bool community_chest);
 
 char water[256] = "c7ffffffbbffffffbbffffffbbffffffbbffffffd7ffffffefffffffffffffff87ffffffb7fdffffb7fdffffb801ffffbffdffffdffdffffe001ffffffbdffffffbdfffffe0fffff";
 char water_blue[256] = "ffffffffc7ffffffc7ffffffc7ffffffc7ffffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
@@ -298,9 +299,9 @@ void clear_screen()
 	plot_monochrome_bitmap(jail, 12, 225, 32, 6, BLACK);
 	plot_monochrome_bitmap(water, 167, 5, 32, 18, BLACK);
 	plot_monochrome_bitmap(water_blue, 167, 5, 32, 18, LIGHT_BLUE);
- 	plot_monochrome_bitmap(parking, 0, 5, 32, 16, BLACK);
-        plot_monochrome_bitmap(gotojail, 209, 5, 32, 16, BLACK);
-        plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
+	plot_monochrome_bitmap(parking, 0, 5, 32, 16, BLACK);
+	plot_monochrome_bitmap(gotojail, 209, 5, 32, 16, BLACK);
+	plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
@@ -313,7 +314,7 @@ void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, 
 	// x, y are the upper-left coordinates
 	// Read from the start to end of the char array, plot bottom to top
 	// length refers to the array size of bitmap
-	// length must be a multiple of 32 
+	// length must be a multiple of 32
 	int length = width * height / 4;
 	int row = height - 1;
 	// row=0
@@ -714,6 +715,24 @@ void draw_rectangle(int x1, int y1, int x2, int y2, int color)
 	draw_vertical(x_max, y_min - 1, y_max, 1, BLACK);
 }
 
+void wait_for_vsync()
+{
+	volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
+	register int status;
+
+	*pixel_ctrl_ptr = 1; // start synchronization (write to buffer register)
+	status = *(pixel_ctrl_ptr + 3);
+
+	while ((status & 0x01) != 0)
+	{ // wait for S to be 0
+		status = *(pixel_ctrl_ptr + 3);
+	}
+
+	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// text module
 void draw_text(char *text, int x_position, int y_position)
 {
 	int x = x_position;
@@ -769,7 +788,12 @@ int write_string(char *line, int max_x, int max_y, int start_x, int start_y)
 	return y;
 }
 
-void draw_dialogue(char *question, int num_options, char **options)
+// display an options dialogue box with the question and key for each option
+void display_options_box(char *question,
+						 int num_options,
+						 char **options,
+						 bool chance,
+						 bool community_chest)
 {
 	// consts
 	int LINE_START = 14, LINE_END = 46;
@@ -777,30 +801,26 @@ void draw_dialogue(char *question, int num_options, char **options)
 	// background
 	draw_rectangle(32 + 15, 32 + 15, 209 - 15, 209 - 15, BLACK);
 
-	int last_y = write_string(question, LINE_END, LINE_END, LINE_START, LINE_START);
-	last_y += 2; // leave a space between question and options
+	int last_y = LINE_START;
+
+	if (chance)
+	{
+		last_y = write_string("CHANCE", LINE_END, LINE_END, LINE_START, last_y);
+		last_y = write_string("------", LINE_END, LINE_END, LINE_START, last_y + 1);
+	}
+	else if (community_chest)
+	{
+		last_y = write_string("COMMUNITY CHEST", LINE_END, LINE_END, LINE_START, last_y);
+		last_y = write_string("---------------", LINE_END, LINE_END, LINE_START, last_y + 1);
+	}
+
+	// leave a space after the question
+	last_y = write_string(question, LINE_END, LINE_END, LINE_START, last_y + 2) + 2;
 
 	for (int i = 0; i < num_options; i++)
 	{
 		char str[8 + strlen(options[i]) + 1];
-		sprintf(str, "\"%c\" - %s", choice_symbols[i], options[i]);
+		sprintf(str, "<%c> - %s", choice_symbols[i], options[i]);
 		last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2);
 	}
 }
-
-void wait_for_vsync()
-{
-	volatile int *pixel_ctrl_ptr = (int *)0xFF203020;
-	register int status;
-
-	*pixel_ctrl_ptr = 1; // start synchronization (write to buffer register)
-	status = *(pixel_ctrl_ptr + 3);
-
-	while ((status & 0x01) != 0)
-	{ // wait for S to be 0
-		status = *(pixel_ctrl_ptr + 3);
-	}
-
-	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
-}
-	

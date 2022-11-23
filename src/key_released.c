@@ -3,169 +3,10 @@
 #include <string.h>
 #include <stdbool.h>
 
-///////////////////////////////////////////////////////////////////////////////
-// copied for cpulator testing //
-#define MAX_PLAYERS 4
-#define MAX_SQUARES 40
-
-enum SquareNames
-{
-	Go,
-	MediteraneanAvenue,
-	CommunityChest1,
-	BalticAvenue,
-	IncomeTax,
-	ReadingRailRoad,
-	OrientalAvenue,
-	Chance1,
-	VermontAvenue,
-	ConnecticutAvenue,
-	JustVisiting,
-	StCharlesPlace,
-	ElectricCompany,
-	StatesAvenue,
-	VirginiaAvenue,
-	PennsylvaniaRailRoad,
-	StJamesPlace,
-	CommunityChest2,
-	TennesseeAvenue,
-	NewYorkAvenue,
-	FreeParking,
-	KentuckyAvenue,
-	Chance2,
-	IndianaAvenue,
-	IllinoisAvenue,
-	BAndORailRoad,
-	AtlanticAvenue,
-	VentnorAvenue,
-	WaterWorks,
-	MarvinGardens,
-	GoToJail,
-	PacificAvenue,
-	NorthCarolinaAvenue,
-	CommunityChest3,
-	PennsylvaniaAvenue,
-	ShortLine,
-	Chance3,
-	ParkPlace,
-	LuxuryTax,
-	Boardwalk
-};
-
-enum SquareType
-{
-	Property,
-	Action
-};
-
-enum PropertyType
-{
-	Colored,
-	RailRoad,
-	Utility
-};
-
-enum ActionType
-{
-	ChanceAction,
-	CommunityChestAction,
-	IncomeTaxAction,
-	LuxuryTaxAction,
-	GoToJailAction,
-	GoAction,
-	FreeParkingAction,
-	JailAction
-};
-
-enum Colors
-{
-	Brown,
-	LightBlue,
-	Pink,
-	Orange,
-	Red,
-	Yellow,
-	Green,
-	DarkBlue
-};
-
-enum Owners
-{
-	Player1,
-	Player2,
-	Player3,
-	Player4,
-	Bank
-};
-
-typedef struct ColoredProperty
-{
-	enum Colors color;
-	int houseCost;
-	int hotelCost;
-	int houseCount;
-	int hotelCount;
-	int rent[6];
-} coloredProperty;
-
-typedef struct propertySquare
-{
-	enum PropertyType type;
-	enum Owners owner;
-	int price;
-	bool mortgaged;
-	coloredProperty coloredPropety;
-} propertySquare;
-
-typedef struct square
-{
-	char name[20];
-	enum SquareType type;
-	enum SquareNames squareName;
-	union Square
-	{
-		propertySquare property;
-		enum ActionType action;
-	} data;
-} square;
-
-typedef struct player
-{
-	char name[20]; /*Not implementing name yet, just called players 1-4*/
-	enum Owners owner;
-	int money;
-	enum SquareNames position;
-	int jailTime;
-	bool inJail;
-	bool bankrupt;
-	square *owned_properties[28];
-	int owned_properties_count;
-} player;
-
-typedef struct gamestate
-{
-	square board[40];
-	player players[4];
-	int player_count;
-	int turn;
-	/*Doubles not implemented, does not lead to extra turn*/
-	int doubles; // TODO: Reset to 0 after player turn ends
-	bool gameOver;
-	/*Houses and hotels not implemented*/
-	int houses;
-	int hotels;
-	/*Current this is only used for paying utility rent*/
-	int lastDiceRoll; // TODO: Save last dice roll in game loop
-} gamestate;
-
-typedef struct diceRoll
-{
-	int die1;
-	int die2;
-	bool doubles;
-} diceRoll;
-
-///////////////////////////////////////////////////////////////////////////////
+#include "Gamestate.h"
+#include "Players.h"
+#include "Squares.h"
+#include "monopoly_graphics.c"
 
 #define QUEUE_TYPE KeyReleased
 
@@ -716,157 +557,62 @@ void print_options(int num_options, char **options)
 {
 	for (int i = 0; i < num_options; i++)
 	{
-		printf(" [");
+		printf(" <");
 		print_key(i);
-		printf("] %s ", options[i]);
+		printf("> - %s ", options[i]);
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// substitutes for graphics functions
-void display_start_screen(int num_options, char **options)
-{
-	printf("Showing title screen: ");
-	print_options(num_options, options);
-	printf("\n");
-}
-
-void option_select_box(char *question, int num_options, char **options, bool chance, bool community_chest)
-{
-	printf("%s  ", question);
-	printf("There are %d options: ", num_options);
-
-	for (int i = 0; i < num_options; i++)
-	{
-		printf(" [");
-		print_key(i);
-		printf("] %s ", options[i]);
-	}
-	printf("\n");
-	if (chance)
-		printf("This is a chance card.\n");
-	if (community_chest)
-		printf("This is a community chest card.\n");
-}
-
-void display_player_turn(int player)
-{
-	printf("It is player %d's turn\n", player + 1);
-}
-
-void display_player_cash(int player, int cash)
-{
-	printf("Player %d has %d in cash\n", player, cash);
-}
-
-void init_graphics(int num_players)
-{
-	printf("Displaying base board\n");
-
-	printf("Players shown at start location:\n");
-	for (int i = 0; i < num_players; i++)
-		printf("Player %d\n", i + 1);
-
-	display_player_turn(0);
-
-	for (int i = 0; i < num_players; i++)
-		display_player_cash(i, 1500);
-}
-
-void dice_roll(int num1, int num2)
-{
-	printf("Your dice results are %d and %d\n", num1, num2);
-}
-
-void move_player(int from, int to, bool to_jail, int player)
-{
-	printf("Player %d just moved from %d to %d\n", player, from, to);
-	if (to_jail)
-		printf("Player %d is now in jail\n", player);
-}
-
-void free_player_from_jail(int player)
-{
-	printf("Player %d is now just visiting jail\n", player);
-}
-
-void remove_player_from_game(int from, int player)
-{
-	printf("Player %d has been removed from %d\n", player, from);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface impl
-int show_title_menu_get_choice(int num_options, char **options)
-{
-	display_start_screen(num_options, options);
-	return get_choice(num_options);
-}
-
 int show_dialogue_get_choice(char *question, int num_options, char **options, bool chance, bool community_chest)
 {
-	option_select_box(question, num_options, options, chance, community_chest);
+	display_options_box(question, num_options, options, chance, community_chest);
 	return get_choice(num_options);
-}
-
-void show_dice_roll_animation(diceRoll dr)
-{
-	dice_roll(dr.die1, dr.die2);
-}
-
-void show_move_player(enum SquareNames from, enum SquareNames to, bool to_jail, player *p)
-{
-	move_player(from, to, to_jail, p->owner);
-}
-
-void show_player_removed_from_game(player *p)
-{
-	remove_player_from_game(p->position, p->owner);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Demo //
-int main()
-{
-	// while(1) {
-	// 	KeyReleased next_key = read_next_key();
-	// 	print_key(next_key);
-	// 	printf("\n");
-	// }
-	// Queue q = create_queue(5);
-	// int cnt = 0;
-	// while(cnt < 5) {
-	// 	KeyReleased next_key = read_next_key();
-	// 	if (next_key == NUM_KEYS) continue;
+// int main()
+// {
+// while(1) {
+// 	KeyReleased next_key = read_next_key();
+// 	print_key(next_key);
+// 	printf("\n");
+// }
+// Queue q = create_queue(5);
+// int cnt = 0;
+// while(cnt < 5) {
+// 	KeyReleased next_key = read_next_key();
+// 	if (next_key == NUM_KEYS) continue;
 
-	// 	queue_enqueue(&q, next_key);
-	// 	print_key_released_queue(q);
-	// 	cnt += 1;
-	// }
+// 	queue_enqueue(&q, next_key);
+// 	print_key_released_queue(q);
+// 	cnt += 1;
+// }
 
-	// printf("\nNow pop the objects one by one:\n");
+// printf("\nNow pop the objects one by one:\n");
 
-	// for (int i = 0; i < 5; i++) {
-	// 	print_key(queue_dequeue(&q));
-	// }
+// for (int i = 0; i < 5; i++) {
+// 	print_key(queue_dequeue(&q));
+// }
 
-	///////////////////////////////////////////////////////////////////////////
-	// Graphic interface testing
+///////////////////////////////////////////////////////////////////////////
+// Graphic interface testing
 
-	// char* start_options[2] = {"Start", "Quit"};
-	// KeyReleased k = show_title_menu_get_choice(
-	// 	sizeof(start_options) / sizeof(start_options[0]),
-	// 	start_options );
-	// printf(!k ? "can begin\n" : "quit now\n\n");
+// char* start_options[2] = {"Start", "Quit"};
+// KeyReleased k = show_title_menu_get_choice(
+// 	sizeof(start_options) / sizeof(start_options[0]),
+// 	start_options );
+// printf(!k ? "can begin\n" : "quit now\n\n");
 
-	// char* ramen_options[3] = {"Yes", "No", "Maybe"};
-	// k = show_dialogue_get_choice(	"Do you like ramen?",
-	// 								sizeof(ramen_options) / sizeof(ramen_options[0]),
-	// 								ramen_options,
-	// 								false,
-	// 								false );
-	// printf("'%s' was chosen\n\n", ramen_options[k]);
+// char* ramen_options[3] = {"Yes", "No", "Maybe"};
+// k = show_dialogue_get_choice(	"Do you like ramen?",
+// 								sizeof(ramen_options) / sizeof(ramen_options[0]),
+// 								ramen_options,
+// 								false,
+// 								false );
+// printf("'%s' was chosen\n\n", ramen_options[k]);
 
-	show_players_start();
-	return 0;
-}
+// 	return 0;
+// }
