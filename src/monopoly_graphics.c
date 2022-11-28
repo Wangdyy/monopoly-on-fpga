@@ -22,6 +22,7 @@ void clear_screen();
 void wait_for_vsync();
 void plot_pixel(int x, int y, short int color);
 void draw_rectangle(int x1, int y1, int x2, int y2, int color);
+void draw_circle(int x, int y, int r, int color);
 void draw_railroad(int x1, int y1, int x2, int y2, int orientation);
 void draw_jail();
 void draw_go();
@@ -36,6 +37,9 @@ void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, 
 void draw_text(char *text, int x_position, int y_position);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
 void draw_dialogue(char *question, int num_options, char **options, bool chance, bool community_chest);
+void draw_dice(int x, int y, int num);
+
+void roll_dice(int r1, int r2);
 
 char water[256] = "c7ffffffbbffffffbbffffffbbffffffbbffffffd7ffffffefffffffffffffff87ffffffb7fdffffb7fdffffb801ffffbffdffffdffdffffe001ffffffbdffffffbdfffffe0fffff";
 char water_blue[256] = "ffffffffc7ffffffc7ffffffc7ffffffc7ffffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
@@ -76,6 +80,13 @@ int max(int a, int b)
 	{
 		return b;
 	}
+}
+
+int abs(int x){
+	if (x < 0){
+		x *= -1;
+	}
+	return x;
 }
 
 // global variables
@@ -132,14 +143,15 @@ int main(void)
 		}
 	}
 
-	clear_screen();
-
-	wait_for_vsync(); // swap buffers
-
 	// set up the swapped back buffer drawing
 	clear_screen();
 
 	wait_for_vsync(); // swap buffers
+
+	//TESTING GRAPHIC FUNCTIONS
+	roll_dice(2,3);
+
+
 	// char buffer variables
 	int x;
 	// char* text;
@@ -305,6 +317,54 @@ void clear_screen()
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
+
+}
+
+void roll_dice(int r1, int r2){
+	//dice are 40 x 40
+	clear_screen();
+	draw_dice(70,130,r1);
+	draw_dice(130,130,r2);
+	wait_for_vsync();
+	
+}
+
+void draw_dice(int x, int y, int num){
+	draw_rectangle(x, y, x+40, y+40, WHITE);
+	if (num == 1){
+		draw_circle(x+20, y+20, 4, BLACK);
+	}
+	else if (num == 2){
+		draw_circle(x+10, y+10, 4, BLACK);
+		draw_circle(x+30, y+30, 4, BLACK);	
+	}
+	else if (num == 3){
+		draw_circle(x+10, y+10, 4, BLACK);
+		draw_circle(x+20, y+20, 4, BLACK);
+		draw_circle(x+30, y+30, 4, BLACK);
+	}
+	else if (num == 4){
+		draw_circle(x+10, y+10, 4, BLACK);
+		draw_circle(x+30, y+30, 4, BLACK);
+		draw_circle(x+10, y+30, 4, BLACK);
+		draw_circle(x+30, y+10, 4, BLACK);
+	}
+	else if (num == 5){
+		draw_circle(x+10, y+10, 4, BLACK);
+		draw_circle(x+30, y+30, 4, BLACK);
+		draw_circle(x+10, y+30, 4, BLACK);
+		draw_circle(x+30, y+10, 4, BLACK);
+		draw_circle(x+20, y+20, 4, BLACK);
+
+	}
+	else if (num == 6){
+		draw_circle(x+10, y+10, 3, BLACK);
+		draw_circle(x+30, y+30, 3, BLACK);
+		draw_circle(x+10, y+30, 3, BLACK);
+		draw_circle(x+30, y+10, 3, BLACK);
+		draw_circle(x+20, y+10, 3, BLACK);
+		draw_circle(x+20, y+30, 3, BLACK);
+	}
 }
 
 void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, int colour)
@@ -713,6 +773,16 @@ void draw_rectangle(int x1, int y1, int x2, int y2, int color)
 	draw_horizontal(x_min - 1, x_max, y_max, 1, BLACK);
 	draw_vertical(x_min - 1, y_min - 1, y_max, 1, BLACK);
 	draw_vertical(x_max, y_min - 1, y_max, 1, BLACK);
+}
+
+void draw_circle(int x, int y, int r, int color){
+	for (int c_x = x - r; c_x <= x + r; c_x++){
+		for (int c_y = y - r; c_y <= y + r; c_y++){
+			if ((pow(abs(c_x - x),2) + pow(abs(c_y - y),2)) <= pow(r,2)){
+				plot_pixel(c_x, c_y, color);
+			}
+		}
+	}
 }
 
 void wait_for_vsync()
