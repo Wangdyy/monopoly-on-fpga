@@ -17,6 +17,7 @@
 #define GREEN 0x1D8B
 #define DARK_BLUE 0x0397
 #define WHITE 0xffff
+#define CREAM 0xEF5B
 
 void clear_screen();
 void set_square_structs();
@@ -54,6 +55,16 @@ char lightbulb[128] = "ffffffffffffffffffff07fffffcf9fffff3feffffceff7ff0317fbff
 char lightbulb_yellow[128] = "ffffffffffffffffffffffffffff07fffffc01fffff100ffffce807ffd70407ffef0407fffce807ffff100fffffc01ffffff07ffffffffffffffffffffffffff";
 char choice_symbols[46] = "1234567890-=qwertyuiop[]asdfghjkl;'zxcvbnm,./";
 char monopoly_text[800] = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc71c7f03f8fc7f03f8fffc0fe003f8ffffffffffc71c7c00f8f87c00f8fff003e003f8ffffffffffc60c787878f8787878ffe1e1e3fff8ffffffffffc64c78fc78f078fc78ffe3f1e3fff8ffffffffffc64c71fe38f071fe38ffc7f8e3fff8ffffffffffc64c71fe38e471fe38ffc7f8e3fff8ffffffffffc44471fe38e471fe3803c7f8e3fff07fffffffffc4e471fe38cc71fe3801c7f8e3fff07fffffffffc4e471fe38cc71fe38f0c7f8e3ffe23fffffffffc4e471fe389c71fe38f8c7f8e3ffe23fffffffffc0e071fe389c71fe38f8c7f8e3ffc71fffffffffc0e078fc783c78fc78f8e3f1e3ffc71fffffffffc1f07878783c787878f0e1e1e3ff870fffffffffc1f07c00f87c7c00f801f003e3ff8f8fffffffffc1f07f03f87c7f03f803fc0fe3ff8f8fffffffffffffffffffffffffffffffffffffffffffff";
+char player1[196] = "3f8139e7c067cf033f8139e7c0678f033f9f39e7cfe79fcf3f9f39e7cfe71fcf3f9f01e7cfe73fcf039f01e7c0603fcf019f39c3c0601fcf399f39c3cfe79fcf399f9399cfe79f4f399f9399cfe79f0f019fc73cc0601f8f039fc73cc0603fcf";
+char zero[98] = "87ffffff03ffffff33ffffff33ffffff33ffffff33ffffff33ffffff33ffffff33ffffff33ffffff03ffffff87ffffffzz";
+char one[98] = "c0ffffffc0fffffff3fffffff3fffffff3fffffff3fffffff3fffffff3ffffffd3ffffffc3ffffffe3fffffff3ffffffzz";
+char two[98] = "03ffffff03ffffff3fffffff1fffffff8fffffffc7ffffffe3fffffff3ffffff33ffffff33ffffff03ffffff87ffffffzz";
+char three[98] = "c3ffffff81ffffff99ffffff99fffffff9ffffffe1ffffffe3fffffff9ffffff99ffffff99ffffff81ffffffc3ffffffzz";
+char four[96] = "f9fffffff9fffffff9fffffff9ffffff80ffffff80ffffff99ffffff89ffffffc1ffffffe1fffffff1fffffff9ffffff";
+char five[96] = "87ffffff03ffffff33ffffff33fffffff3fffffff3ffffff03ffffff03ffffff3fffffff3fffffff03ffffff03ffffff";
+char dollar_sign[98]="efffffff83ffffff01ffffff29ffffffe9ffffff81ffffff03ffffff2fffffff29ffffff81ffffff83ffffffefffffffzz";
+char bank[212]="8079f33f19f9ffff8039f33f19f9ffff9f99f33e19f3ffff9f99f33c19e3ffff9f98033c99c7ffff9f98033998cfffff8038e331981fffff8018e333981fffff9f98e327998fffff9f9c470799c7ffff9f9e0f0f99e3ffff803e0f1f99f1ffff807f1f1f99f9ffffzzzz";
+
 void write_char(int x, int y, char c)
 {
 	// VGA character buffer
@@ -285,12 +296,12 @@ void clear_screen()
 			}
 		}
 	}
-	// temporarily black area on right
+	// temporarily cream area on right
 	for (int x = 240; x < 320; x++)
 	{
 		for (int y = 0; y < 240; y++)
 		{
-			plot_pixel(x, y, BLACK);
+			plot_pixel(x, y, CREAM);
 		}
 	}
 	// draw bordes for each edge box
@@ -417,6 +428,36 @@ void clear_screen()
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
+	 plot_monochrome_bitmap(player1, 248, 10, 64, 12, BLACK);
+        plot_monochrome_bitmap(bank, 255, 55, 64, 13, BLACK);
+        //player values
+        plot_monochrome_bitmap(one, 243, 80, 32, 12, BLACK);
+        plot_monochrome_bitmap(dollar_sign, 258, 80, 32, 12, BLACK);
+        plot_monochrome_bitmap(one, 265, 80, 32, 12, BLACK);
+        plot_monochrome_bitmap(five, 274, 80, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 282, 80, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 290, 80, 32, 12, BLACK);
+        
+        plot_monochrome_bitmap(two, 244, 100, 32, 12, BLACK);
+        plot_monochrome_bitmap(dollar_sign, 258, 100, 32, 12, BLACK);
+        plot_monochrome_bitmap(one, 265, 100, 32, 12, BLACK);
+        plot_monochrome_bitmap(five, 274, 100, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 282, 100, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 290, 100, 32, 12, BLACK);
+        
+        plot_monochrome_bitmap(three, 244, 120, 32, 12, BLACK);
+        plot_monochrome_bitmap(dollar_sign, 258, 120, 32, 12, BLACK);
+        plot_monochrome_bitmap(one, 265, 120, 32, 12, BLACK);
+        plot_monochrome_bitmap(five, 274, 120, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 282, 120, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 290, 120, 32, 12, BLACK);
+        
+        plot_monochrome_bitmap(four, 243, 140, 32, 12, BLACK);
+        plot_monochrome_bitmap(dollar_sign, 258, 140, 32, 12, BLACK);
+        plot_monochrome_bitmap(one, 265, 140, 32, 12, BLACK);
+        plot_monochrome_bitmap(five, 274, 140, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 282, 140, 32, 12, BLACK);
+        plot_monochrome_bitmap(zero, 290, 140, 32, 12, BLACK);
 
 }
 
