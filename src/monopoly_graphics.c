@@ -19,6 +19,7 @@
 #define WHITE 0xffff
 
 void clear_screen();
+void set_square_structs();
 void wait_for_vsync();
 void plot_pixel(int x, int y, short int color);
 void draw_rectangle(int x1, int y1, int x2, int y2, int color);
@@ -38,8 +39,10 @@ void draw_text(char *text, int x_position, int y_position);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
 void draw_dialogue(char *question, int num_options, char **options, bool chance, bool community_chest);
 void draw_dice(int x, int y, int num);
+void draw_player(int x, int y, int player);
 
 void roll_dice(int r1, int r2);
+void move_player(int from, int to, bool to_jail, int player);
 
 char water[256] = "c7ffffffbbffffffbbffffffbbffffffbbffffffd7ffffffefffffffffffffff87ffffffb7fdffffb7fdffffb801ffffbffdffffdffdffffe001ffffffbdffffffbdfffffe0fffff";
 char water_blue[256] = "ffffffffc7ffffffc7ffffffc7ffffffc7ffffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
@@ -93,8 +96,9 @@ int abs(int x){
 volatile int pixel_buffer_start;
 volatile int *pixel_ctrl_ptr;
 
-struct Property
+struct Square
 {
+	char *type;
 	int x1;
 	int x2;
 	int y1;
@@ -102,6 +106,55 @@ struct Property
 	int color;
 	int orientation;
 };
+
+struct Square squares[40];
+//bottom row structures
+struct Square go = {"Go", 208, 240, 208, 240, WHITE, 1};
+struct Square b1 = {"Property", 185, 208, 208, 240, BROWN, 1};
+struct Square chest1 = {"Chest", 166, 184, 208, 240, WHITE, 1};
+struct Square b2 = {"Property", 147, 165, 208, 240, BROWN, 1};
+struct Square tax = {"Tax", 128, 146, 208, 240, WHITE, 1};
+struct Square rail1 = {"Railroad", 109, 127, 208, 240, WHITE, 1};
+struct Square lb1 = {"Property", 90, 108, 208, 240, WHITE, 1};
+struct Square chance1 = {"Chance", 71, 89, 208, 240, WHITE, 1};
+struct Square lb2 = {"Property", 52, 70, 208, 240, WHITE, 1};
+struct Square lb3 = {"Property", 33, 51, 208, 240, WHITE, 1};
+
+//left structures
+struct Square jail1 = {"Jail", 0, 32, 208, 240, WHITE, 2};
+struct Square p1 = {"Property", 0, 32, 185, 208, PINK, 2};
+struct Square electric = {"Utility", 0, 32, 166, 184, WHITE, 2};
+struct Square p2 = {"Property", 0, 32, 147, 165, PINK, 2};
+struct Square p3 = {"Property", 0, 32, 128, 146, PINK, 2};
+struct Square rail2 = {"Railroad", 0, 32, 109, 127, WHITE, 2};
+struct Square o1 = {"Property", 0, 32, 90, 108, ORANGE, 2};
+struct Square chest2 = {"Chest", 0, 32, 71, 89, WHITE, 2};
+struct Square o2 = {"Property", 0, 32, 52, 70, ORANGE, 2};
+struct Square o3 = {"Property", 0, 32, 33, 51, ORANGE, 2};
+
+//top row structures
+struct Square freeparking = {"Parking", 0, 32, 0, 32, WHITE, 3};
+struct Square r1 = {"Property", 33, 51, 0, 32, RED, 3};
+struct Square chance2 = {"Chance", 52, 70, 0, 32, WHITE, 3};
+struct Square r2 = {"Property", 71, 89, 0, 32, RED, 3};
+struct Square r3 = {"Property", 90, 108, 0, 32, RED, 3};
+struct Square rail3 = {"Railroad", 109, 127, 0, 32, WHITE, 3};
+struct Square yel1 = {"Property", 128, 146, 0, 32, YELLOW, 3};
+struct Square yel2 = {"Property", 147, 165, 0, 32, YELLOW, 3};
+struct Square waterworks = {"Utility", 166, 184, 0, 32, WHITE, 3};
+struct Square yel3 = {"Property", 185, 208, 0, 32, YELLOW, 3};
+
+//right structures
+struct Square gojail = {"Go to Jail", 208, 240, 0, 32, WHITE, 4};
+struct Square g1 = {"Property", 208, 240, 33, 51, GREEN, 4};
+struct Square g2 = {"Property", 208, 240, 52, 70, GREEN, 4};
+struct Square chest3 = {"Chest", 208, 240, 71, 89, WHITE, 4};
+struct Square g3 = {"Property", 208, 240, 90, 108, GREEN, 4};
+struct Square rail4 = {"Railroad", 208, 240, 109, 127, WHITE, 4};
+struct Square space = {"Empty", 208, 240, 128, 146, WHITE, 4};
+struct Square db1 = {"Property", 208, 240, 147, 165, DARK_BLUE, 4};
+struct Square chance3 = {"Chance", 208, 240, 166, 184, WHITE, 4};
+struct Square db2 = {"Property", 208, 240, 185, 208, DARK_BLUE, 4};
 
 int main(void)
 {
@@ -124,10 +177,8 @@ int main(void)
 
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
 
-	// initialize properties;
-	// property properties[22];
-	// light blue properties
-	struct Property lb1 = {33, 209, 51, 216, LIGHT_BLUE, 1};
+	// initialize properties
+	set_square_structs();
 	// set up the back buffer drawing
 	// clear character buffer
 	for (int x = 0; x < 80; x++)
@@ -150,6 +201,8 @@ int main(void)
 
 	//TESTING GRAPHIC FUNCTIONS
 	roll_dice(2,3);
+	move_player(3, 5, false, 2);
+	move_player(5, 7, false, 2);
 
 
 	// char buffer variables
@@ -161,6 +214,53 @@ void plot_pixel(int x, int y, short int color)
 {
 	*(short int *)(pixel_buffer_start + (y << 10) + (x << 1)) = color;
 }
+
+void set_square_structs(){
+	squares[0] = go;
+	squares[1] = b1;
+	squares[2] = chest1;
+	squares[3] = b2;
+	squares[4] = tax;
+	squares[5] = rail1;
+	squares[6] = lb1;
+	squares[7] = chance1;
+	squares[8] = lb2;
+	squares[9] = lb3;
+
+	squares[10] = jail1;
+	squares[11] = p1;
+	squares[12] = electric;
+	squares[13] = p2;
+	squares[14] = p3;
+	squares[15] = rail2;
+	squares[16] = o1;
+	squares[17] = chest2;
+	squares[18] = o2;
+	squares[19] = o3;
+
+	squares[20] = freeparking;
+	squares[21] = r1;
+	squares[22] = chance2;
+	squares[23] = r2;
+	squares[24] = r3;
+	squares[25] = rail3;
+	squares[26] = yel1;
+	squares[27] = yel2;
+	squares[28] = waterworks;
+	squares[29] = yel3;
+
+	squares[30] = gojail;
+	squares[31] = g1;
+	squares[32] = g2;
+	squares[33] = chest3;
+	squares[34] = g3;
+	squares[35] = rail4;
+	squares[36] = space;
+	squares[37] = db1;
+	squares[38] = chance3;
+	squares[39] = db2;
+}
+
 
 void clear_screen()
 {
@@ -318,6 +418,73 @@ void clear_screen()
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
 
+}
+
+void move_player(int from, int to, bool to_jail, int player){
+
+	clear_screen();
+	draw_1player(to, player);
+	wait_for_vsync();
+}
+
+void draw_1player(int square, int player){
+	int x = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/2);
+	int y = squares[square].y1 + ((squares[square].y2 - squares[square].y1)/2);
+
+	draw_player(x, y, player);
+}
+
+void draw_2player(int square, int player1, int player2){
+	int x1 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/2);
+	int y1 = squares[square].y1 + ((squares[square].y2 - squares[square].y1)/3);
+
+	int x2 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/2);
+	int y2 = squares[square].y1 + (2*(squares[square].y2 - squares[square].y1)/3);
+
+	draw_player(x1, y1, player1);
+	draw_player(x2, y2, player2);
+}
+
+void draw_3player(int square, int player1, int player2, int player3){
+	int x1 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/2);
+	int y1 = squares[square].y1 + ((squares[square].y2 - squares[square].y1)/3);
+
+	int x2 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/3);
+	int y2 = squares[square].y1 + (2*(squares[square].y2 - squares[square].y1)/3);
+
+	int x3 = squares[square].x1 + (2*(squares[square].x2 - squares[square].x1)/3);
+	int y3 = squares[square].y1 + (2*(squares[square].y2 - squares[square].y1)/3);
+
+	draw_player(x1, y1, player1);
+	draw_player(x2, y2, player2);
+	draw_player(x3, y3, player3);
+
+}
+
+void draw_4player(int square, int player1, int player2, int player3, int player4){
+	int x1 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/3);
+	int y1 = squares[square].y1 + ((squares[square].y2 - squares[square].y1)/3);
+
+	int x2 = squares[square].x1 + (2*(squares[square].x2 - squares[square].x1)/3);
+	int y2 = squares[square].y1 + ((squares[square].y2 - squares[square].y1)/3);
+
+	int x3 = squares[square].x1 + ((squares[square].x2 - squares[square].x1)/3);
+	int y3 = squares[square].y1 + (2*(squares[square].y2 - squares[square].y1)/3);
+
+	int x4 = squares[square].x1 + (2*(squares[square].x2 - squares[square].x1)/3);
+	int y4 = squares[square].y1 + (2*(squares[square].y2 - squares[square].y1)/3);
+
+	draw_player(x1, y1, player1);
+	draw_player(x2, y2, player2);
+	draw_player(x3, y3, player3);
+	draw_player(x4, y4, player4);
+}
+
+void draw_player(int x, int y, int player){
+	int color;
+	int colors[] = {DARK_BLUE, GREEN, YELLOW, RED, PINK, ORANGE};
+	color = colors[player - 1];
+	draw_circle(x, y, 3, color);
 }
 
 void roll_dice(int r1, int r2){
