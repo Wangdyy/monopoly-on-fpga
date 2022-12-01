@@ -20,6 +20,7 @@
 #define CREAM 0xEF5B
 
 void init_graphics(int num_players);
+void draw_bank_balance(int player, int value);
 void set_square_structs();
 void wait_for_vsync();
 void plot_pixel(int x, int y, short int color);
@@ -62,6 +63,12 @@ char two[98] = "03ffffff03ffffff3fffffff1fffffff8fffffffc7ffffffe3fffffff3ffffff
 char three[98] = "c3ffffff81ffffff99ffffff99fffffff9ffffffe1ffffffe3fffffff9ffffff99ffffff99ffffff81ffffffc3ffffffzz";
 char four[96] = "f9fffffff9fffffff9fffffff9ffffff80ffffff80ffffff99ffffff89ffffffc1ffffffe1fffffff1fffffff9ffffff";
 char five[96] = "87ffffff03ffffff33ffffff33fffffff3fffffff3ffffff03ffffff03ffffff3fffffff3fffffff03ffffff03ffffff";
+char six[96] = "87ffffff03ffffff33ffffff33ffffff33ffffff03ffffff07ffffff3fffffff3fffffff33ffffff03ffffff87ffffff";
+char seven[96] = "3fffffff3fffffff9fffffff9fffffffcfffffffcfffffffcfffffffe7ffffffe7fffffff3ffffff03ffffff03ffffff";
+char eight[98] = "87ffffff87ffffff33ffffff33ffffff33ffffff03ffffff87ffffff33ffffff33ffffff33ffffff87ffffff87ffffffzz";
+char nine[98] = "87ffffff03ffffff33fffffff3fffffff3ffffff83ffffff03ffffff33ffffff33ffffff33ffffff03ffffff87ffffffzz";
+
+
 char dollar_sign[98]="efffffff83ffffff01ffffff29ffffffe9ffffff81ffffff03ffffff2fffffff29ffffff81ffffff83ffffffefffffffzz";
 char bank[212]="8079f33f19f9ffff8039f33f19f9ffff9f99f33e19f3ffff9f99f33c19e3ffff9f98033c99c7ffff9f98033998cfffff8038e331981fffff8018e333981fffff9f98e327998fffff9f9c470799c7ffff9f9e0f0f99e3ffff803e0f1f99f1ffff807f1f1f99f9ffffzzzz";
 
@@ -429,54 +436,92 @@ void init_graphics(int num_players)
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
-	 plot_monochrome_bitmap(player1, 248, 10, 64, 12, BLACK);
-        plot_monochrome_bitmap(bank, 255, 55, 64, 13, BLACK);
-        //player values
-        plot_monochrome_bitmap(one, 243, 80, 32, 12, BLACK);
-        plot_monochrome_bitmap(dollar_sign, 258, 80, 32, 12, BLACK);
-        plot_monochrome_bitmap(one, 265, 80, 32, 12, BLACK);
-        plot_monochrome_bitmap(five, 274, 80, 32, 12, BLACK);
-        plot_monochrome_bitmap(zero, 282, 80, 32, 12, BLACK);
-        plot_monochrome_bitmap(zero, 290, 80, 32, 12, BLACK);
-        
-        plot_monochrome_bitmap(two, 244, 100, 32, 12, BLACK);
-        plot_monochrome_bitmap(dollar_sign, 258, 100, 32, 12, BLACK);
-        plot_monochrome_bitmap(one, 265, 100, 32, 12, BLACK);
-        plot_monochrome_bitmap(five, 274, 100, 32, 12, BLACK);
-        plot_monochrome_bitmap(zero, 282, 100, 32, 12, BLACK);
-        plot_monochrome_bitmap(zero, 290, 100, 32, 12, BLACK);
-        
-	    if (num_players == 2){
-			draw_2player(0,1,2);
-		}
-		else if (num_players==3){
-			draw_3player(0,1,2,3);
-      	  	plot_monochrome_bitmap(three, 244, 120, 32, 12, BLACK);
-        	plot_monochrome_bitmap(dollar_sign, 258, 120, 32, 12, BLACK);
-	        plot_monochrome_bitmap(one, 265, 120, 32, 12, BLACK);
-    	    plot_monochrome_bitmap(five, 274, 120, 32, 12, BLACK);
-        	plot_monochrome_bitmap(zero, 282, 120, 32, 12, BLACK);
-  		    plot_monochrome_bitmap(zero, 290, 120, 32, 12, BLACK);
-		}
-		else{
-			draw_4player(0,1,2,3,4);
-			plot_monochrome_bitmap(three, 244, 120, 32, 12, BLACK);
-        	plot_monochrome_bitmap(dollar_sign, 258, 120, 32, 12, BLACK);
-	        plot_monochrome_bitmap(one, 265, 120, 32, 12, BLACK);
-    	    plot_monochrome_bitmap(five, 274, 120, 32, 12, BLACK);
-        	plot_monochrome_bitmap(zero, 282, 120, 32, 12, BLACK);
-  		    plot_monochrome_bitmap(zero, 290, 120, 32, 12, BLACK);
-			
-  		    plot_monochrome_bitmap(four, 243, 140, 32, 12, BLACK);
-        	plot_monochrome_bitmap(dollar_sign, 258, 140, 32, 12, BLACK);
-        	plot_monochrome_bitmap(one, 265, 140, 32, 12, BLACK);
-        	plot_monochrome_bitmap(five, 274, 140, 32, 12, BLACK);
-        	plot_monochrome_bitmap(zero, 282, 140, 32, 12, BLACK);
-        	plot_monochrome_bitmap(zero, 290, 140, 32, 12, BLACK);
-		}
+	plot_monochrome_bitmap(player1, 248, 10, 64, 12, BLACK);
+    plot_monochrome_bitmap(bank, 255, 55, 64, 13, BLACK);
 	
+	//draw inital player positions on GO
+	if (num_players == 2){
+		draw_2player(0,1,2);
+	}
+	else if (num_players ==3){
+		draw_3player(0,1,2,3);
+	}
+	else{
+		draw_4player(0,1,2,3,4);
+	}
+	
+	//BANK
+	//draw player numbers for bank
+	plot_monochrome_bitmap(one, 243, 80, 32, 12, BLACK);
+	plot_monochrome_bitmap(two, 244, 100, 32, 12, BLACK);
+	
+	if(num_players>2){
+		plot_monochrome_bitmap(three, 244, 120, 32, 12, BLACK);
+	}
+	if (num_players ==4){
+		plot_monochrome_bitmap(four, 244, 140, 32, 12, BLACK);
+	}
+	
+	//draw inital bank balance of $1500
+	for (int i = 1; i<num_players+1; i++){
+		int y = 60 + i*20;
+		plot_monochrome_bitmap(dollar_sign, 256, y, 32, 12, BLACK);
+		draw_bank_balance(i, 1500);
 		
-		
+	}	
+}
+
+void draw_bank_balance(int player, int value){
+    
+    //set y value higher of balance based on player
+    //balances are 20 px apart and 60 px from top
+    int y = player*20+60;
+    //set x value of first number to 264, will increment by 8 px each time
+    int x = 264;
+
+    //convert int to string, 7 is max number of digits
+    char val[7];
+    sprintf(val, "%d", value);
+    //iterate through value and print number accordingly
+    for (int i = 0; i< strlen(val); i++){
+        switch (val[i])
+	    {
+	    case '0':
+            plot_monochrome_bitmap(zero, x, y, 32, 12, BLACK);
+			break;
+    	case '1'   :
+            plot_monochrome_bitmap(one, x, y, 32, 12, BLACK);
+			break;
+    	case '2':
+            plot_monochrome_bitmap(two, x, y, 32, 12, BLACK);
+			break;
+	    case '3':
+            plot_monochrome_bitmap(three, x, y, 32, 12, BLACK);
+			break;
+	    case '4':
+            plot_monochrome_bitmap(four, x, y, 32, 12, BLACK);
+			break;
+	    case '5':
+            plot_monochrome_bitmap(five, x, y, 32, 12, BLACK);
+			break;
+	    case '6':
+            plot_monochrome_bitmap(six, x, y, 32, 12, BLACK);
+			break;
+	    case '7':
+            plot_monochrome_bitmap(seven, x, y, 32, 12, BLACK);
+			break;
+	    case '8':
+            plot_monochrome_bitmap(eight, x, y, 32, 12, BLACK);
+			break;
+	    case '9':
+            plot_monochrome_bitmap(nine, x, y, 32, 12, BLACK);
+			break;
+	    }
+		x+=8;
+    }
+    
+    
+
 }
 
 void move_player(int from, int to, bool to_jail, int player){
@@ -547,8 +592,8 @@ void draw_player(int x, int y, int player){
 }
 
 void roll_dice(int r1, int r2){
+    init_graphics(4);
 	//dice are 40 x 40
-	init_graphics(4);
 	draw_dice(70,130,r1);
 	draw_dice(130,130,r2);
 	wait_for_vsync();
