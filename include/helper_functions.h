@@ -32,11 +32,11 @@ void doPropertySquare(player *player, square *square, gamestate *game);
 /**************************************
  * Action Squares
  **************************************/
-void payIncomeTax(player *player);
+void payIncomeTax(player *player, gamestate *game);
 
-void payLuxuryTax(player *player);
+void payLuxuryTax(player *player, gamestate *game);
 
-void goToJail(player *player);
+void goToJail(player *player, gamestate *game);
 
 /**************************************
  * Property Squares
@@ -49,23 +49,23 @@ void payUtilityRent(player *player, square *square, gamestate *game);
 
 void payRailroadRent(player *player, square *square, gamestate *game);
 
-void buyProperty(player *player, square *square);
+void buyProperty(player *player, square *square, gamestate *game);
 
-void sellProperty(player *player, square *square);
+void sellProperty(player *player, square *square, gamestate *game);
 
 /**************************************
  * Payment
  **************************************/
-void payPlayer(player *payer, player *payee, int amount);
+void payPlayer(player *payer, player *payee, int amount, gamestate *game);
 
 /*Returns how much money was actually paid, useful in checking how much
 rent was actually paid, also bankrupts them if they can't sell assets*/
-int payMoney(player *player, int amount);
+int payMoney(player *player, int amount, gamestate *game);
 
-void receiveMoney(player *player, int amount);
+void receiveMoney(player *player, int amount, gamestate *game);
 
 /*Returns true if after selling assets the player can pay the amount, false otherwise */
-bool sellAssets(player *player, int amount);
+bool sellAssets(player *player, int amount, gamestate *game);
 
 /**************************************
  * Player in jail
@@ -73,14 +73,14 @@ bool sellAssets(player *player, int amount);
 void playerInJail(player *player, gamestate *game);
 
 /*Called when player forced to pay jail fine, if they can't, they go bankrupt*/
-bool payJailFine(player *player);
+bool payJailFine(player *player, gamestate *game);
 
 /**************************************
  * Miscellaneous
  **************************************/
-void passGo(player *player);
+void passGo(player *player, gamestate *game);
 
-void bankruptPlayer(player *player);
+void bankruptPlayer(player *player, gamestate *game);
 
 void waitForNextTurn();
 

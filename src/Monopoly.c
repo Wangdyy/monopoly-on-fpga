@@ -8,6 +8,8 @@
 #include "Players.h"
 #include "Gamestate.h"
 #include "helper_functions.h"
+#include "monopoly_graphics.c"
+#include "key_released.c"
 
 #define OWNER_TO_PLAYER(player) (player + 1)
 
@@ -88,20 +90,29 @@ void gameStart(gamestate *game)
 bool checkForGameOver(gamestate *game)
 {
     int playersLeft = 0;
+    int winningPlayer = -1;
+
     for (int i = 0; i < MAX_PLAYERS; i++)
     {
         if (!game->players[i].bankrupt)
         {
             playersLeft++;
+            winningPlayer = i + 1;
         }
     }
+
     if (playersLeft > 1)
     {
         return false;
     }
     else
     {
-        printf("Game Over!\n");
+        printf("Game Over! The winner is player %d.\n", winningPlayer);
+
+        char winStmt[128];
+        sprintf(winStmt, "Game Over! The winner is player %d.", winningPlayer);
+        drawseq_normal_confirm(winningPlayer, game, winStmt);
+
         return true;
     }
 }
@@ -139,13 +150,19 @@ void playerTurn(player *player, gamestate *game)
     printf("You are currently located at %s\n", game->board[player->position].name);
     printf("You currently have $%d\n", player->money);
     printf("**************************************/\n");
+
+    drawseq_turn_start(OWNER_TO_PLAYER(player->owner), game);
+
     if (player->inJail)
     {
         playerInJail(player, game);
     }
     else
     {
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, "Roll dice to move.");
         diceRoll roll = rollDice(game);
+        drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+
         moveToSquare(player, roll, game);
     }
 }
@@ -158,18 +175,19 @@ bool turnEnd(gamestate *game)
     return checkForGameOver(game);
 }
 
-void moveToSquare(player *player, struct diceRoll diceRoll, gamestate *game)
+void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
 {
-    int diceTotal = diceRoll.die1 + diceRoll.die2;
-    if (player->position + diceTotal >= MAX_SQUARES)
+    int diceTotal = roll.die1 + roll.die2;
+    int newPositionRaw = player->position + diceTotal;
+
+    // this function call changes position of player
+    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, diceTotal);
+
+    if (newPositionRaw >= MAX_SQUARES)
     {
-        player->position = (player->position + diceTotal) - MAX_SQUARES;
-        passGo(player);
+        passGo(player, game);
     }
-    else
-    {
-        player->position = player->position + diceTotal;
-    }
+
     landOnSquare(player, &game->board[player->position], game);
 }
 
@@ -195,13 +213,13 @@ void doActionSquare(player *player, square *square, gamestate *game)
     switch (square->data.action)
     {
     case (GoToJailAction):
-        goToJail(player);
+        goToJail(player, game);
         break;
     case (IncomeTaxAction):
-        payIncomeTax(player);
+        payIncomeTax(player, game);
         break;
     case (LuxuryTaxAction):
-        payLuxuryTax(player);
+        payLuxuryTax(player, game);
         break;
     case (ChanceAction):
         printf("Not implemented yet!\n");
@@ -236,20 +254,34 @@ void doPropertySquare(player *player, square *square, gamestate *game)
         printf("This property is unowned!\n");
         if (player->money >= square->data.property.price)
         {
-            printf("Would you like to buy %s for $%d? (y/n)\n", square->name, square->data.property.price);
-            char input = 'n';
-            scanf(" %c", &input);
-            if (input == 'y')
+            char query[256];
+            sprintf(query,
+                    "%s is unowned. Would you like to buy it for $%d?",
+                    square->name,
+                    square->data.property.price);
+
+            if (drawseq_dialogue_yes_no(OWNER_TO_PLAYER(player->owner), game, query))
             {
-                buyProperty(player, square);
+                printf("You chose to buy the property.\n");
+                buyProperty(player, square, game);
             }
             else
             {
-                printf("You chose not to buy %s\n", square->name);
+                printf("You did not buy the property.\n");
             }
         }
         else
         {
+            char query[256];
+            sprintf(query,
+                    "You don't have enough money to buy %s (need %d).\n",
+                    square->name,
+                    square->data.property.price);
+
+            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                                   game,
+                                   query);
+
             printf("You don't have enough money to buy this property\n");
             // Not implemented: Auctioning
         }
@@ -267,21 +299,29 @@ void doPropertySquare(player *player, square *square, gamestate *game)
 /**************************************
  * Action Squares
  **************************************/
-void payIncomeTax(player *player)
+void payIncomeTax(player *player, gamestate *game)
 {
     /*Players should get to decide whether to pay 200 or 10% of net worth
     but for now, we will only implement paying 200*/
     printf("Paying $200 income tax...\n");
-    payMoney(player, 200);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "You must pay $200 income tax.");
+
+    payMoney(player, 200, game);
 }
 
-void payLuxuryTax(player *player)
+void payLuxuryTax(player *player, gamestate *game)
 {
     printf("Paying $100 luxury tax...\n");
-    payMoney(player, 100);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "You must pay $200 luxury tax.");
+
+    payMoney(player, 100, game);
 }
 
-void goToJail(player *player)
+void goToJail(player *player, gamestate *game)
 {
     printf("Going to jail...\n");
     player->position = JustVisiting;
@@ -389,8 +429,17 @@ void payColorSetRent(player *player, square *square, gamestate *game)
         printf("Player %d owns the set, rent is doubled!\n", OWNER_TO_PLAYER(owner));
         rent *= 2;
     }
+
+    char payConfirm[256];
+    sprintf(payConfirm,
+            "You landed on %s, which is owned by player %d. You must pay them $%d.",
+            square->name,
+            OWNER_TO_PLAYER(owner),
+            rent);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
-    payPlayer(player, &game->players[owner], rent);
+    payPlayer(player, &game->players[owner], rent, game);
 }
 
 void payUtilityRent(player *player, square *square, gamestate *game)
@@ -421,8 +470,17 @@ void payUtilityRent(player *player, square *square, gamestate *game)
         printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
         rent = 4 * game->lastDiceRoll;
     }
+
+    char payConfirm[256];
+    sprintf(payConfirm,
+            "You landed on %s, which is owned by player %d. You must pay them $%d.",
+            square->name,
+            OWNER_TO_PLAYER(utilityOwner),
+            rent);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
-    payPlayer(player, &game->players[utilityOwner], rent);
+    payPlayer(player, &game->players[utilityOwner], rent, game);
 }
 
 void payRailroadRent(player *player, square *square, gamestate *game)
@@ -464,34 +522,74 @@ void payRailroadRent(player *player, square *square, gamestate *game)
         printf("Error: Wrong Number of railroads owned\n");
         break;
     }
+
+    char payConfirm[256];
+    sprintf(payConfirm,
+            "You landed on %s, which is owned by player %d. You must pay them $%d.",
+            square->name,
+            OWNER_TO_PLAYER(railroadOwner),
+            rent);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
-    payPlayer(player, &game->players[railroadOwner], rent);
+    payPlayer(player, &game->players[railroadOwner], rent, game);
 }
 
-void buyProperty(player *player, square *square)
+void buyProperty(player *player, square *square, gamestate *game)
 {
     if (player->money < square->data.property.price)
     {
+        char message[256];
+        sprintf(message, "You do not have enough money to buy %s.\n", square->name);
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               message);
+
         printf("Error: Player %d does not have enough money to buy %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
     player->money -= square->data.property.price;
     square->data.property.owner = player->owner;
-    printf("Player %d bought %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
     player->owned_properties[player->owned_properties_count] = square;
     player->owned_properties_count++;
+
+    char message[256];
+    sprintf(message, "Player %d successfully bought %s for $%d.",
+            OWNER_TO_PLAYER(player->owner),
+            square->name,
+            square->data.property.price);
+
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           message);
+
+    printf("Player %d bought %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
 }
 
-void sellProperty(player *player, square *square)
+void sellProperty(player *player, square *square, gamestate *game)
 {
     if (square->data.property.owner != player->owner)
     {
+        char message[256];
+        sprintf(message, "You do not own %s and cannot sell it.\n", square->name);
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               message);
+
         printf("Error: Player %d does not own %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
+
     player->money += square->data.property.price;
     square->data.property.owner = Bank;
     printf("Player %d sold %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
+
+    char message[256];
+    sprintf(message, "You sold %s for $%d.", square->name, square->data.property.price);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           message);
+
     bool found = false;
     for (int i = 0; i < player->owned_properties_count; i++)
     {
@@ -511,29 +609,46 @@ void sellProperty(player *player, square *square)
 /**************************************
  * Payment
  **************************************/
-void payPlayer(player *payer, player *payee, int amount)
+void payPlayer(player *payer, player *payee, int amount, gamestate *game)
 {
     printf("Player %d is paying player %d $%d\n", OWNER_TO_PLAYER(payer->owner), OWNER_TO_PLAYER(payee->owner), amount);
-    int moneyPaid = payMoney(payer, amount);
-    receiveMoney(payee, moneyPaid);
+    int moneyPaid = payMoney(payer, amount, game);
+    receiveMoney(payee, moneyPaid, game);
 }
 
-int payMoney(player *player, int amount)
+int payMoney(player *player, int amount, gamestate *game)
 {
     if (player->money < amount)
     {
         printf("You don't have enough money to pay!\n");
-        if (sellAssets(player, amount))
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               "You do not have enough money to pay and must sell assets to continue.");
+
+        if (sellAssets(player, amount, game))
         {
             printf("You sold enough assets to pay!\n");
+            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                                   game,
+                                   "You have sold enough assets to pay.");
         }
         else
         {
             printf("You don't have enough money to pay!\n");
             amount = player->money;
             player->money = 0;
-            bankruptPlayer(player);
+            bankruptPlayer(player, game);
             printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
+
+            char *bankruptInfo[128];
+            sprintf(bankruptInfo,
+                    "Player %d paid $%d before declaring bankruptcy.",
+                    OWNER_TO_PLAYER(player->owner),
+                    amount);
+            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                                   game,
+                                   bankruptInfo);
+
             return amount;
         }
     }
@@ -542,13 +657,13 @@ int payMoney(player *player, int amount)
     return amount;
 }
 
-void receiveMoney(player *player, int amount)
+void receiveMoney(player *player, int amount, gamestate *game)
 {
     player->money += amount;
     printf("Player %d received $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 }
 
-bool sellAssets(player *player, int amount)
+bool sellAssets(player *player, int amount, gamestate *game)
 {
     // Selling to other players no implemented
     printf("Not implemented yet!\n");
@@ -561,25 +676,49 @@ bool sellAssets(player *player, int amount)
 void playerInJail(player *player, gamestate *game)
 {
     player->jailTime++;
-    printf("It is player %d %d turn in jail!\n", OWNER_TO_PLAYER(player->owner), player->jailTime);
+    printf("It is player %d's turn #%d in jail!\n", OWNER_TO_PLAYER(player->owner), player->jailTime);
+
+    char jailInfo[128];
+
+    sprintf(jailInfo,
+            "It is player %d's turn #%d in jail.",
+            OWNER_TO_PLAYER(player->owner),
+            player->jailTime);
+
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, jailInfo);
+
     bool getOutOfJail = false;
     // TODO: Implement get out of jail free cards
     if (player->jailTime < 3 && player->money >= 50)
     {
         // Check if player would like to pay jail fine
         printf("Would you like to pay $50 to get out of jail? (y/n)\n");
-        char input;
-        scanf(" %c", &input);
-        if (input == 'y')
+
+        bool choice = drawseq_dialogue_yes_no(OWNER_TO_PLAYER(player->owner),
+                                              game,
+                                              "Would you like to pay $50 to get out of jail?");
+
+        if (choice)
         {
-            payMoney(player, 50);
+            payMoney(player, 50, game);
             getOutOfJail = true;
         }
     }
+
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "If you did not pay, you may still get out if you roll doubles.");
+
     diceRoll roll = rollDice(game);
+    drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+
     if (roll.doubles || getOutOfJail)
     {
         printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               "You got out of jail!");
+
         player->jailTime = 0;
         player->inJail = false;
         moveToSquare(player, roll, game);
@@ -587,9 +726,17 @@ void playerInJail(player *player, gamestate *game)
     else if (player->jailTime == 3)
     {
         printf("Player %d has been in jail for 3 turns and must pay $50 to get out!\n", OWNER_TO_PLAYER(player->owner));
-        if (payJailFine(player))
+        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               "You have been in jail for three turns. You must pay $50 now to get out.");
+
+        if (payJailFine(player, game))
         {
             printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
+            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                                   game,
+                                   "You got out of jail!");
+
             player->jailTime = 0;
             player->inJail = false;
             moveToSquare(player, roll, game);
@@ -597,9 +744,9 @@ void playerInJail(player *player, gamestate *game)
     }
 }
 
-bool payJailFine(player *player)
+bool payJailFine(player *player, gamestate *game)
 {
-    int moneyPaid = payMoney(player, 50);
+    int moneyPaid = payMoney(player, 50, game);
     if (moneyPaid == 50)
     {
         return true;
@@ -612,15 +759,23 @@ bool payJailFine(player *player)
 /**************************************
  * Miscellaneous
  **************************************/
-void passGo(player *player)
+void passGo(player *player, gamestate *game)
 {
     printf("Player %d passed go!\n", OWNER_TO_PLAYER(player->owner));
-    receiveMoney(player, 200);
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "You passes Go! You get $200.");
+
+    receiveMoney(player, 200, game);
 }
 
-void bankruptPlayer(player *player)
+void bankruptPlayer(player *player, gamestate *game)
 {
     printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "You are bankrupt and out of the game.");
+
     player->bankrupt = true;
     // TODO: Return all properties to bank, or auction them off
     printf("Not implemented yet!\n");
@@ -641,19 +796,22 @@ int main(void)
 {
     printf("Welcome to Monopoly!\n");
     /*Make it not random for debugging*/
-    // srand(time(NULL));
+    srand(time(NULL));
     gamestate game;
     initGame(&game);
     gameStart(&game);
 
+    init_graphics();
+
     while (true)
     {
         playerTurn(&game.players[game.turn], &game);
+
         if (turnEnd(&game))
         {
             break;
         }
-        waitForNextTurn();
+        // waitForNextTurn();
     }
     return 0;
 }

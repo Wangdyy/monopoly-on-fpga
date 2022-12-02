@@ -565,26 +565,160 @@ void print_options(int num_options, char **options)
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface impl
-int show_dialogue_get_choice(char *question, int num_options, char **options, bool chance, bool community_chest)
+bool location_has_players[MAX_SQUARES][MAX_PLAYERS];
+
+void draw_player_pieces_on_board(gamestate *game)
 {
-	display_options_box(question, num_options, options, chance, community_chest);
-	return get_choice(num_options);
+	// figure out who is where
+	for (int i = 0; i < MAX_SQUARES; i++)
+	{
+		for (int j = 0; j < MAX_PLAYERS; j++)
+		{
+			location_has_players[i][j] = 0;
+		}
+	}
+	location_has_players[game->players[0].position][0] = 1;
+	location_has_players[game->players[1].position][1] = 1;
+	location_has_players[game->players[2].position][2] = 1;
+	location_has_players[game->players[3].position][3] = 1;
+
+	// draw the players on the board
+	for (int square_i = 0; square_i < MAX_SQUARES; square_i++)
+	{
+		int players_cnt = 0;
+		int players_here[4];
+
+		if (location_has_players[square_i][0])
+		{
+			players_here[players_cnt++] = 1;
+		}
+
+		if (location_has_players[square_i][1])
+		{
+			players_here[players_cnt++] = 2;
+		}
+
+		if (location_has_players[square_i][2])
+		{
+			players_here[players_cnt++] = 3;
+		}
+
+		if (location_has_players[square_i][3])
+		{
+			players_here[players_cnt++] = 4;
+		}
+
+		if (players_cnt == 1)
+		{
+			draw_1_player(square_i, players_here[0]);
+		}
+		else if (players_cnt == 2)
+		{
+			draw_2_player(square_i, players_here[0], players_here[1]);
+		}
+		else if (players_cnt == 3)
+		{
+			draw_3_player(square_i, players_here[0], players_here[1], players_here[2]);
+		}
+		else if (players_cnt == 4)
+		{
+			draw_4_player(square_i, players_here[0], players_here[1], players_here[2], players_here[3]);
+		}
+	}
+}
+
+void draw_all_player_cash(gamestate *game)
+{
+	draw_bank_balance(1, game->players[0].money);
+	draw_bank_balance(2, game->players[1].money);
+	draw_bank_balance(3, game->players[2].money);
+	draw_bank_balance(4, game->players[3].money);
+}
+
+void draw_basic_setup(int curr_player, gamestate *game)
+{
+	clear_text_buffer();
+	draw_plain_board();
+	draw_player_turn(curr_player);
+	draw_all_player_cash(game);
+	draw_player_pieces_on_board(game);
+}
+
+void drawseq_turn_start(int curr_player, gamestate *game)
+{
+	draw_basic_setup(curr_player, game);
+	wait_for_vsync();
+}
+
+int drawseq_dialogue_get_choice(int curr_player,
+								gamestate *game,
+								char *question,
+								int num_options,
+								char **options,
+								bool chance,
+								bool community_chest)
+{
+	// draw the dialogue
+	draw_basic_setup(curr_player, game);
+	draw_options_box(question, num_options, options, chance, community_chest);
+	wait_for_vsync();
+
+	int choice = get_choice(num_options);
+
+	// now remove the dialogue
+	draw_basic_setup(curr_player, game);
+	wait_for_vsync();
+
+	return choice;
+}
+
+void drawseq_normal_confirm(int curr_player, gamestate *game, char *question)
+{
+	char *options[1] = {"Confirm"};
+	drawseq_dialogue_get_choice(curr_player, game, question, 1, options, false, false);
+}
+
+bool drawseq_dialogue_yes_no(int curr_player, gamestate *game, char *question)
+{
+	char *options[2] = {"Yes", "No"};
+	return !drawseq_dialogue_get_choice(curr_player, game, question, 2, options, false, false);
+}
+
+void drawseq_roll_dice(int curr_player, gamestate *game, diceRoll dice_roll)
+{
+	draw_basic_setup(curr_player, game);
+	draw_dice_roll(dice_roll.die1, dice_roll.die2);
+	wait_for_vsync();
+}
+
+void drawseq_move_player(int curr_player, gamestate *game, int total)
+{
+	for (int i = 0; i < total; i++)
+	{
+		game->players[curr_player - 1].position =
+			(game->players[curr_player - 1].position + 1) % MAX_SQUARES;
+
+		drawseq_turn_start(curr_player, game);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Demo //
 // int main()
 // {
-// while(1) {
+// while (1)
+// {
 // 	KeyReleased next_key = read_next_key();
 // 	print_key(next_key);
 // 	printf("\n");
 // }
 // Queue q = create_queue(5);
 // int cnt = 0;
-// while(cnt < 5) {
+// while (cnt < 5)
+// {
 // 	KeyReleased next_key = read_next_key();
-// 	if (next_key == NUM_KEYS) continue;
+// 	if (next_key == NUM_KEYS)
+// 		continue;
 
 // 	queue_enqueue(&q, next_key);
 // 	print_key_released_queue(q);
@@ -593,26 +727,35 @@ int show_dialogue_get_choice(char *question, int num_options, char **options, bo
 
 // printf("\nNow pop the objects one by one:\n");
 
-// for (int i = 0; i < 5; i++) {
+// for (int i = 0; i < 5; i++)
+// {
 // 	print_key(queue_dequeue(&q));
 // }
 
-///////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 // Graphic interface testing
 
-// char* start_options[2] = {"Start", "Quit"};
+// char *start_options[2] = {"Start", "Quit"};
 // KeyReleased k = show_title_menu_get_choice(
 // 	sizeof(start_options) / sizeof(start_options[0]),
-// 	start_options );
+// 	start_options);
 // printf(!k ? "can begin\n" : "quit now\n\n");
 
-// char* ramen_options[3] = {"Yes", "No", "Maybe"};
-// k = show_dialogue_get_choice(	"Do you like ramen?",
-// 								sizeof(ramen_options) / sizeof(ramen_options[0]),
-// 								ramen_options,
-// 								false,
-// 								false );
-// printf("'%s' was chosen\n\n", ramen_options[k]);
+// 	char *ramen_options[3] = {"Yes", "No", "Maybe"};
+// 	KeyReleased k = show_dialogue_get_choice("Do you like ramen?",
+// 											 sizeof(ramen_options) / sizeof(ramen_options[0]),
+// 											 ramen_options,
+// 											 false,
+// 											 false);
+// 	printf("'%s' was chosen\n\n", ramen_options[k]);
+
+// 	char *fried_rice_options[3] = {"Hmm", "I guess", "yeah!"};
+// 	KeyReleased k = show_dialogue_get_choice("Then do you like fried rice?",
+// 											 sizeof(fried_rice_options) / sizeof(fried_rice_options[0]),
+// 											 fried_rice_options,
+// 											 false,
+// 											 false);
+// 	printf("'%s' was chosen\n\n", fried_rice_options[k]);
 
 // 	return 0;
 // }
