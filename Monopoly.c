@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 
+#include "stdbool.h"
 #include "Squares.h"
 #include "Players.h"
 #include "Gamestate.h"
 #include "helper_functions.h"
-#include "monopoly_graphics.c"
-#include "key_released.c"
+#include "graphics.h"
+#include "interface.h"
 
 #define OWNER_TO_PLAYER(player) (player + 1)
 
@@ -644,7 +644,7 @@ int payMoney(player *player, int amount, gamestate *game)
             bankruptPlayer(player, game);
             printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 
-            char *bankruptInfo[128];
+            char bankruptInfo[128];
             sprintf(bankruptInfo,
                     "Player %d paid $%d before declaring bankruptcy.",
                     OWNER_TO_PLAYER(player->owner),

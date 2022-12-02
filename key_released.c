@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
+#include "stdbool.h"
 #include "Gamestate.h"
 #include "Players.h"
 #include "Squares.h"
-#include "monopoly_graphics.c"
+#include "interface.h"
+#include "graphics.h"
 
 #define QUEUE_TYPE KeyReleased
 
@@ -744,31 +745,6 @@ void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll)
 // {
 // 	print_key(queue_dequeue(&q));
 // }
-
-/////////////////////////////////////////////////////////////////////////
-// Graphic interface testing
-
-// char *start_options[2] = {"Start", "Quit"};
-// KeyReleased k = show_title_menu_get_choice(
-// 	sizeof(start_options) / sizeof(start_options[0]),
-// 	start_options);
-// printf(!k ? "can begin\n" : "quit now\n\n");
-
-// 	char *ramen_options[3] = {"Yes", "No", "Maybe"};
-// 	KeyReleased k = show_dialogue_get_choice("Do you like ramen?",
-// 											 sizeof(ramen_options) / sizeof(ramen_options[0]),
-// 											 ramen_options,
-// 											 false,
-// 											 false);
-// 	printf("'%s' was chosen\n\n", ramen_options[k]);
-
-// 	char *fried_rice_options[3] = {"Hmm", "I guess", "yeah!"};
-// 	KeyReleased k = show_dialogue_get_choice("Then do you like fried rice?",
-// 											 sizeof(fried_rice_options) / sizeof(fried_rice_options[0]),
-// 											 fried_rice_options,
-// 											 false,
-// 											 false);
-// 	printf("'%s' was chosen\n\n", fried_rice_options[k]);
 
 // 	return 0;
 // }
