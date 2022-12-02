@@ -7,3 +7,7 @@ go to https://cpulator.01xz.net/?sys=arm-de1soc
 select language c
 upload the file
 press continue to run
+
+To run (in lab):
+add -std=c99 to compiler add on
+add -lm to linker
