@@ -650,6 +650,13 @@ void drawseq_turn_start(int curr_player, gamestate *game)
 	wait_for_vsync();
 }
 
+void drawseq_board_frame(gamestate *game)
+{
+	draw_board_frame();
+	draw_player_pieces_on_board(game);
+	wait_for_vsync();
+}
+
 int drawseq_dialogue_get_choice(int curr_player,
 								gamestate *game,
 								char *question,
@@ -665,8 +672,8 @@ int drawseq_dialogue_get_choice(int curr_player,
 
 	int choice = get_choice(num_options);
 
-	// now remove the dialogue
-	draw_basic_setup(curr_player, game);
+	// now remove the dialogue	// the backside should just be the normal setup
+	// draw_basic_setup(curr_player, game);
 	wait_for_vsync();
 
 	return choice;
@@ -691,14 +698,20 @@ void drawseq_roll_dice(int curr_player, gamestate *game, diceRoll dice_roll)
 	wait_for_vsync();
 }
 
-void drawseq_move_player(int curr_player, gamestate *game, int total)
+void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll)
 {
+	// should always enter from the dice roll animation
+	// draw the same dice on this screen so they stay while player moves
+	draw_dice_roll(dice_roll.die1, dice_roll.die2);
+
+	int total = dice_roll.die1 + dice_roll.die2;
+
 	for (int i = 0; i < total; i++)
 	{
 		game->players[curr_player - 1].position =
 			(game->players[curr_player - 1].position + 1) % MAX_SQUARES;
 
-		drawseq_turn_start(curr_player, game);
+		drawseq_board_frame(game);
 	}
 }
 

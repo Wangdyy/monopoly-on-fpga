@@ -181,7 +181,7 @@ void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
     int newPositionRaw = player->position + diceTotal;
 
     // this function call changes position of player
-    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, diceTotal);
+    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, roll);
 
     if (newPositionRaw >= MAX_SQUARES)
     {
@@ -324,6 +324,10 @@ void payLuxuryTax(player *player, gamestate *game)
 void goToJail(player *player, gamestate *game)
 {
     printf("Going to jail...\n");
+    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+                           game,
+                           "Go to jail! Do not pass Go. Do not collect $200.");
+
     player->position = JustVisiting;
     player->inJail = true;
 }

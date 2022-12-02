@@ -680,6 +680,147 @@ void draw_plain_board()
 	plot_monochrome_bitmap(dollar_sign, 256, 140, 32, 12, BLACK);
 }
 
+void draw_board_frame()
+{
+	// draw background
+	draw_rectangle(BOARD_MIN_X,
+				   BOARD_MIN_Y,
+				   BOARD_MAX_X,
+				   MIN_CORNER_LINE,
+				   BACKGROUND_COLOUR);
+
+	draw_rectangle(BOARD_MIN_X,
+				   MIN_CORNER_LINE + 1,
+				   MIN_CORNER_LINE,
+				   BOARD_MAX_Y,
+				   BACKGROUND_COLOUR);
+
+	draw_rectangle(MAX_CORNER_LINE + 1,
+				   MIN_CORNER_LINE + 1,
+				   BOARD_MAX_X,
+				   BOARD_MAX_Y,
+				   BACKGROUND_COLOUR);
+
+	draw_rectangle(MIN_CORNER_LINE + 1,
+				   MAX_CORNER_LINE + 1,
+				   MAX_CORNER_LINE - 1,
+				   BOARD_MAX_Y,
+				   BACKGROUND_COLOUR);
+
+	// draw border horizontal and vertical lines and background color
+	draw_horizontal(BOARD_MIN_X, BOARD_MAX_X, MIN_CORNER_LINE, 1, BLACK);
+	draw_horizontal(BOARD_MIN_X, BOARD_MAX_X, MAX_CORNER_LINE, 1, BLACK);
+	draw_vertical(MIN_CORNER_LINE, BOARD_MIN_Y, BOARD_MAX_Y, 1, BLACK);
+	draw_vertical(MAX_CORNER_LINE, BOARD_MIN_Y, BOARD_MAX_Y, 1, BLACK);
+
+	// draw borders for each edge box
+	for (int x = SQ_SEP_LOC_START; x < SQ_SEP_LOC_END; x += SQ_SEP_LOC_GAP)
+	{
+		draw_vertical(x, SQ_SEP_START1, SQ_SEP_END1, 1, BLACK);
+		draw_vertical(x, SQ_SEP_START2, SQ_SEP_END2, 1, BLACK);
+	}
+
+	for (int y = SQ_SEP_LOC_START; y < SQ_SEP_LOC_END; y += SQ_SEP_LOC_GAP)
+	{
+		draw_horizontal(SQ_SEP_START1, SQ_SEP_END1, y, 1, BLACK);
+		draw_horizontal(SQ_SEP_START2, SQ_SEP_END2, y, 1, BLACK);
+	}
+
+	// // properties
+
+	// bottom edge properties
+
+	// light blue properties
+	//#1: x1=33, y1=209, x2=51, y2 = 216
+	draw_rectangle_with_border(33, 209, 51, 216, LIGHT_BLUE);
+	//#2: x1=52, y1=209, x2=70, y2 = 216
+	draw_rectangle_with_border(52, 209, 70, 216, LIGHT_BLUE);
+	//#3: x1=90, y1=209, x2=108, y2 = 216
+	draw_rectangle_with_border(90, 209, 108, 216, LIGHT_BLUE);
+
+	// brown properties
+	//#1: x1=147, y1=209, x2=165, y2 = 216
+	draw_rectangle_with_border(147, 209, 165, 216, BROWN);
+	//#2: x1=185, y1=209, x2=208, y2 = 216
+	draw_rectangle_with_border(185, 209, 208, 216, BROWN);
+
+	// red properties
+	//#1 x1=33, y1=24, x2=51, y2 = 31
+	draw_rectangle_with_border(33, 24, 51, 32, RED);
+	//#2: x1=52, y1=24, x2=70, y2 = 31
+	draw_rectangle_with_border(71, 24, 89, 32, RED);
+	//#3: x1=90, y1=24, x2=108, y2 = 31
+	draw_rectangle_with_border(90, 24, 108, 32, RED);
+
+	// yellow properties
+	//#1: x1=128, y1=24, x2=146, y2 = 31
+	draw_rectangle_with_border(128, 24, 146, 32, YELLOW);
+	//#2: x1=147, y1=24, x2=165, y2 = 31
+	draw_rectangle_with_border(147, 24, 165, 32, YELLOW);
+	//#3: x1=185, y1=24, x2=208, y2 = 31
+	draw_rectangle_with_border(185, 24, 208, 32, YELLOW);
+
+	// orange properties
+	//#1: x1=25, y1=33, x2=32, y2 = 51
+	draw_rectangle_with_border(25, 33, 32, 51, ORANGE);
+	draw_rectangle_with_border(25, 52, 32, 70, ORANGE);
+	draw_rectangle_with_border(25, 90, 32, 108, ORANGE);
+
+	// pink properties
+	draw_rectangle_with_border(25, 128, 32, 146, PINK);
+	draw_rectangle_with_border(25, 147, 32, 165, PINK);
+	draw_rectangle_with_border(25, 185, 32, 208, PINK);
+
+	// green properties
+	draw_rectangle_with_border(209, 33, 216, 51, GREEN);
+	draw_rectangle_with_border(209, 52, 216, 70, GREEN);
+	draw_rectangle_with_border(209, 90, 216, 108, GREEN);
+
+	// pink properties
+	draw_rectangle_with_border(209, 147, 216, 165, DARK_BLUE);
+	draw_rectangle_with_border(209, 185, 216, 208, DARK_BLUE);
+
+	// draw railroads
+	// bottom railroad
+	draw_railroad(109, 212, 127, 219, 1);
+	// top railroad
+	draw_railroad(109, 21, 127, 28, 1);
+	// left railroad
+	draw_railroad(21, 109, 28, 127, 2);
+	// right railroad
+	draw_railroad(212, 109, 219, 127, 2);
+
+	// Go to jail square x: 208-240, y: 0-32
+	// text = "GO TO JAIL";
+	// draw_text("GO TO", 54, 2);
+	//	draw_text("JAIL", 54, 4);
+
+	// Jail square x:0-32, y: 208-240
+	draw_jail();
+
+	// Go square x:208-240, y: 208-240
+	draw_go();
+
+	// chance draw_squares
+	draw_chance(71, 209, 0);
+	draw_chance(70, 32, 2);
+	draw_chance(209, 185, 3);
+
+	// community chests
+	draw_chest(166, 209, 184, 216, 1);
+	draw_chest(32, 71, 0, 89, 2);
+	draw_chest(209, 89, 240, 71, 4);
+
+	plot_monochrome_bitmap(jail, 12, 225, 32, 6, BLACK);
+	plot_monochrome_bitmap(water, 167, 5, 32, 18, BLACK);
+	plot_monochrome_bitmap(water_blue, 167, 5, 32, 18, LIGHT_BLUE);
+	plot_monochrome_bitmap(parking, 0, 5, 32, 16, BLACK);
+	plot_monochrome_bitmap(gotojail, 209, 5, 32, 16, BLACK);
+	plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
+	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
+	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
+}
+
 void draw_bank_balance(int player, int value)
 {
 
@@ -800,7 +941,6 @@ void draw_4_player(int square, int player1, int player2, int player3, int player
 
 void draw_dice_roll(int r1, int r2)
 {
-	init_graphics(4);
 	// dice are 40 x 40
 	draw_dice(70, 130, r1);
 	draw_dice(130, 130, r2);
