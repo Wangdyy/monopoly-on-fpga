@@ -674,7 +674,7 @@ int drawseq_dialogue_get_choice(int curr_player,
 	int choice = get_choice(num_options);
 
 	// now remove the dialogue	// the backside should just be the normal setup
-	// draw_basic_setup(curr_player, game);
+	clear_text_buffer();
 	wait_for_vsync();
 
 	return choice;
