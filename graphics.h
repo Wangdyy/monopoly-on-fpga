@@ -1,4 +1,7 @@
 #pragma once
+
+#include "stdbool.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 // struct definitions
 struct DrawSquare
@@ -33,11 +36,25 @@ void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, 
 void draw_dice(int x, int y, int num);
 void draw_single_player(int x, int y, int player);
 
+void init_graphics();
+void draw_plain_board();
 void draw_bank_balance(int player, int value);
 void draw_dice_roll(int r1, int r2);
+void draw_1_player(int square, int player);
+void draw_2_player(int square, int player1, int player2);
+void draw_3_player(int square, int player1, int player2, int player3);
+void draw_4_player(int square, int player1, int player2, int player3, int player4);
 
+void clear_text_buffer();
 void draw_text(char *text, int x_position, int y_position);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
 void draw_dialogue(char *question, int num_options, char **options, bool chance, bool community_chest);
+void draw_player_turn(int player);
+void draw_board_frame();
+void draw_options_box(char *question,
+                      int num_options,
+                      char **options,
+                      bool chance,
+                      bool community_chest);
 
 void wait_for_vsync();
