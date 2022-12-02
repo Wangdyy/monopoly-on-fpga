@@ -768,6 +768,8 @@ void playerInJail(player *player, gamestate *game)
                                game,
                                "You got out of jail!");
 
+        drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+
         player->jailTime = 0;
         player->inJail = false;
         moveToSquare(player, roll, game);
