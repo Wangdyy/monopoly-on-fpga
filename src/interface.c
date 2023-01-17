@@ -565,6 +565,10 @@ void print_options(int num_options, char **options)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// interface constants
+int MAX_OPTS_PER_PAGE = 12;
+
+///////////////////////////////////////////////////////////////////////////////
 // interface impl
 bool location_has_players[MAX_SQUARES][MAX_PLAYERS];
 
@@ -668,12 +672,88 @@ int drawseq_dialogue_get_choice(int curr_player,
 {
 	// draw the dialogue
 	draw_basic_setup(curr_player, game);
-	draw_options_box(question, num_options, options, chance, community_chest);
-	wait_for_vsync();
 
-	int choice = get_choice(num_options);
+	int choice = -1;
+
+	if (num_options <= MAX_OPTS_PER_PAGE)
+	{
+		draw_options_box(question, num_options, options, chance, community_chest);
+		wait_for_vsync();
+		choice = get_choice(num_options);
+	}
+	else
+	{
+		int page = 0;
+		char *prev_page_option = "Previous Page";
+		char *next_page_option = "Next Page";
+
+		while (choice == -1)
+		{
+			char *page_options[MAX_OPTS_PER_PAGE];
+			int n_options = MAX_OPTS_PER_PAGE;
+			int n_options_with_page_changes = MAX_OPTS_PER_PAGE;
+
+			// check for next page/////////////////////////////////////////////
+			int total_options_before_page = 0, total_options_so_far = 0;
+
+			// first page can hold 11 options, since it has next pag ebut no prev page
+			if (page > 0)
+				total_options_before_page += 11;
+
+			// all the pages before this one (after the first) can hold 10 items
+			if (page > 1)
+				total_options_before_page += (page - 1) * 10;
+
+			// this page can hold 11 items if it is the last page
+			total_options_so_far = total_options_before_page;
+			total_options_so_far += 11;
+
+			if (total_options_so_far < num_options)
+			{
+				n_options -= 1;
+				page_options[n_options] = next_page_option;
+			}
+			else
+			{
+				// the last page may have less than 11 items
+				// initialize them to the same value, only n_options will be updated
+				n_options = num_options - total_options_before_page + 1;
+				n_options_with_page_changes = n_options;
+			}
+
+			// check for previous page/////////////////////////////////////////
+			if (page > 0)
+			{
+				n_options -= 1;
+				page_options[n_options] = prev_page_option;
+			}
+
+			// now fill in all the actual options//////////////////////////////
+			for (int i = 0; i < n_options; i++)
+			{
+				page_options[i] = options[total_options_before_page + i];
+			}
+
+			clear_text_buffer();
+			draw_options_box(question, n_options_with_page_changes, page_options, chance, community_chest);
+			wait_for_vsync();
+			choice = get_choice(num_options);
+
+			if (page_options[choice] == prev_page_option)
+			{
+				choice = -1;
+				page -= 1;
+			}
+			else if (page_options[choice] == next_page_option)
+			{
+				choice = -1;
+				page += 1;
+			}
+		}
+	}
 
 	// now remove the dialogue	// the backside should just be the normal setup
+	draw_basic_setup(curr_player, game);
 	clear_text_buffer();
 	wait_for_vsync();
 
@@ -697,6 +777,37 @@ void drawseq_roll_dice(int curr_player, gamestate *game, diceRoll dice_roll)
 	draw_basic_setup(curr_player, game);
 	draw_dice_roll(dice_roll.die1, dice_roll.die2);
 	wait_for_vsync();
+}
+
+int drawseq_mortgage_property(player *curr_player_struct, gamestate *game)
+{
+	char *question = "Which property would you like to mortgage?";
+	int num_props = curr_player_struct->owned_properties_count;
+	char *all_opts[num_props];
+
+	for (int i = 0; i < num_props; i++)
+	{
+		all_opts[i] = malloc(256);
+		sprintf(all_opts[i],
+				"%s for $%d",
+				curr_player_struct->owned_properties[i]->name,
+				curr_player_struct->owned_properties[i]->data.property.price);
+	}
+
+	int ret = drawseq_dialogue_get_choice(curr_player_struct->owner,
+										  game,
+										  question,
+										  num_props,
+										  all_opts,
+										  false,
+										  false);
+
+	for (int i = 0; i < num_props; i++)
+	{
+		free(all_opts[i]);
+	}
+
+	return ret;
 }
 
 void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll)
