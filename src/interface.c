@@ -566,15 +566,17 @@ void print_options(int num_options, char **options)
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface constants
-int MAX_OPTS_PER_PAGE = 12;
+int MAX_OPTS_PER_PAGE = 6;
+int MAX_HOUSES_ON_PROPERTY = 4;
+int MAX_HOTELS_ON_PROPERTY = 1;
+int NUM_SQUARES = 40;
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface impl
 bool location_has_players[MAX_SQUARES][MAX_PLAYERS];
 
-void draw_player_pieces_on_board(gamestate *game)
+void fill_location_has_players_with_gamestate(gamestate *game)
 {
-	// figure out who is where
 	for (int i = 0; i < MAX_SQUARES; i++)
 	{
 		for (int j = 0; j < MAX_PLAYERS; j++)
@@ -582,11 +584,26 @@ void draw_player_pieces_on_board(gamestate *game)
 			location_has_players[i][j] = 0;
 		}
 	}
-	location_has_players[game->players[0].position][0] = 1;
-	location_has_players[game->players[1].position][1] = 1;
-	location_has_players[game->players[2].position][2] = 1;
-	location_has_players[game->players[3].position][3] = 1;
 
+	for (int i = 0; i < MAX_PLAYERS; i++)
+		location_has_players[game->players[i].position][i] = 1;
+}
+
+void fill_location_has_players_with_values(int *positions)
+{
+	for (int i = 0; i < MAX_SQUARES; i++)
+	{
+		for (int j = 0; j < MAX_PLAYERS; j++)
+		{
+			location_has_players[i][j] = 0;
+		}
+	}
+	for (int i = 0; i < MAX_PLAYERS; i++)
+		location_has_players[positions[i]][i] = 1;
+}
+
+void draw_player_pieces(gamestate *game)
+{
 	// draw the players on the board
 	for (int square_i = 0; square_i < MAX_SQUARES; square_i++)
 	{
@@ -632,6 +649,31 @@ void draw_player_pieces_on_board(gamestate *game)
 	}
 }
 
+void draw_player_pieces_with_gamestate(gamestate *game)
+{
+	fill_location_has_players_with_gamestate(game);
+	draw_player_pieces(game);
+}
+
+void draw_player_pieces_with_update(gamestate *game, int player, int pos)
+{
+	for (int i = 0; i < MAX_SQUARES; i++)
+	{
+		for (int j = 0; j < MAX_PLAYERS; j++)
+		{
+			location_has_players[i][j] = 0;
+		}
+	}
+
+	for (int i = 0; i < MAX_PLAYERS; i++)
+		if (i != player)
+			location_has_players[game->players[i].position][i] = 1;
+		else
+			location_has_players[pos][i] = 1;
+
+	draw_player_pieces(game);
+}
+
 void draw_all_player_cash(gamestate *game)
 {
 	draw_bank_balance(1, game->players[0].money);
@@ -646,7 +688,7 @@ void draw_basic_setup(int curr_player, gamestate *game)
 	draw_plain_board();
 	draw_player_turn(curr_player);
 	draw_all_player_cash(game);
-	draw_player_pieces_on_board(game);
+	draw_player_pieces_with_gamestate(game);
 }
 
 void drawseq_turn_start(int curr_player, gamestate *game)
@@ -658,7 +700,7 @@ void drawseq_turn_start(int curr_player, gamestate *game)
 void drawseq_board_frame(gamestate *game)
 {
 	draw_board_frame();
-	draw_player_pieces_on_board(game);
+	draw_player_pieces_with_gamestate(game);
 	wait_for_vsync();
 }
 
@@ -696,17 +738,18 @@ int drawseq_dialogue_get_choice(int curr_player,
 			// check for next page/////////////////////////////////////////////
 			int total_options_before_page = 0, total_options_so_far = 0;
 
-			// first page can hold 11 options, since it has next pag ebut no prev page
+			// first page can hold MAX_OPTS_PER_PAGE - 1 options
+			// since it has next page but no prev page
 			if (page > 0)
-				total_options_before_page += 11;
+				total_options_before_page += MAX_OPTS_PER_PAGE - 1;
 
 			// all the pages before this one (after the first) can hold 10 items
 			if (page > 1)
-				total_options_before_page += (page - 1) * 10;
+				total_options_before_page += (page - 1) * (MAX_OPTS_PER_PAGE - 2);
 
-			// this page can hold 11 items if it is the last page
+			// this page can hold MAX_OPTS_PER_PAGE - 1 items if it is the last page
 			total_options_so_far = total_options_before_page;
-			total_options_so_far += 11;
+			total_options_so_far += MAX_OPTS_PER_PAGE - 1;
 
 			if (total_options_so_far < num_options)
 			{
@@ -715,7 +758,7 @@ int drawseq_dialogue_get_choice(int curr_player,
 			}
 			else
 			{
-				// the last page may have less than 11 items
+				// the last page may have less than MAX_OPTS_PER_PAGE - 1 items
 				// initialize them to the same value, only n_options will be updated
 				n_options = num_options - total_options_before_page + 1;
 				n_options_with_page_changes = n_options;
@@ -783,7 +826,7 @@ int drawseq_mortgage_property(player *curr_player_struct, gamestate *game)
 {
 	char *question = "Which property would you like to mortgage?";
 	int num_props = curr_player_struct->owned_properties_count;
-	char *all_opts[num_props];
+	char *all_opts[num_props + 1]; // last option is for cancel
 
 	for (int i = 0; i < num_props; i++)
 	{
@@ -794,10 +837,12 @@ int drawseq_mortgage_property(player *curr_player_struct, gamestate *game)
 				curr_player_struct->owned_properties[i]->data.property.price);
 	}
 
+	all_opts[num_props] = "Cancel";
+
 	int ret = drawseq_dialogue_get_choice(curr_player_struct->owner,
 										  game,
 										  question,
-										  num_props,
+										  num_props + 1,
 										  all_opts,
 										  false,
 										  false);
@@ -810,7 +855,60 @@ int drawseq_mortgage_property(player *curr_player_struct, gamestate *game)
 	return ret;
 }
 
-void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll)
+int drawseq_buy_house_on_property(player *curr_player_struct, gamestate *game)
+{
+	char *question = "What would you like to buy?";
+	int total_props = curr_player_struct->owned_properties_count;
+	char *all_opts[total_props + 1]; // last option is for cancel
+
+	int num_props = 0;
+	for (int i = 0; i < total_props; i++)
+	{
+		if (curr_player_struct->owned_properties[i]->data.property.type == Colored)
+		{
+			coloredProperty *cp = &curr_player_struct->owned_properties[i]->data.property.coloredPropety;
+			if (cp->houseCount < MAX_HOUSES_ON_PROPERTY)
+			{
+				all_opts[i] = malloc(256);
+				sprintf(all_opts[i],
+						"A house on %s for $%d",
+						curr_player_struct->owned_properties[i]->name,
+						cp->houseCost);
+
+				num_props += 1;
+			}
+			else if (cp->hotelCount < MAX_HOTELS_ON_PROPERTY)
+			{
+				all_opts[i] = malloc(256);
+				sprintf(all_opts[i],
+						"A hotel on %s for $%d",
+						curr_player_struct->owned_properties[i]->name,
+						cp->houseCost);
+
+				num_props += 1;
+			}
+		}
+	}
+
+	all_opts[num_props] = "Cancel";
+
+	int ret = drawseq_dialogue_get_choice(curr_player_struct->owner,
+										  game,
+										  question,
+										  num_props + 1,
+										  all_opts,
+										  false,
+										  false);
+
+	for (int i = 0; i < num_props; i++)
+	{
+		free(all_opts[i]);
+	}
+
+	return ret;
+}
+
+void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, int old_pos, int new_pos)
 {
 	// should always enter from the dice roll animation
 	// draw the same dice on this screen so they stay while player moves
@@ -818,12 +916,11 @@ void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll)
 
 	int total = dice_roll.die1 + dice_roll.die2;
 
-	for (int i = 0; i < total; i++)
+	for (int i = 0; i < (new_pos + NUM_SQUARES - old_pos) % NUM_SQUARES; i++)
 	{
-		game->players[curr_player - 1].position =
-			(game->players[curr_player - 1].position + 1) % MAX_SQUARES;
-
-		drawseq_board_frame(game);
+		draw_board_frame();
+		draw_player_pieces_with_update(game, curr_player - 1, (old_pos + i + 1) % NUM_SQUARES);
+		wait_for_vsync();
 	}
 }
 

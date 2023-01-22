@@ -534,37 +534,37 @@ void draw_plain_board()
 	// bottom edge properties
 
 	// light blue properties
-	//#1: x1=33, y1=209, x2=51, y2 = 216
+	// #1: x1=33, y1=209, x2=51, y2 = 216
 	draw_rectangle_with_border(33, 209, 51, 216, LIGHT_BLUE);
-	//#2: x1=52, y1=209, x2=70, y2 = 216
+	// #2: x1=52, y1=209, x2=70, y2 = 216
 	draw_rectangle_with_border(52, 209, 70, 216, LIGHT_BLUE);
-	//#3: x1=90, y1=209, x2=108, y2 = 216
+	// #3: x1=90, y1=209, x2=108, y2 = 216
 	draw_rectangle_with_border(90, 209, 108, 216, LIGHT_BLUE);
 
 	// brown properties
-	//#1: x1=147, y1=209, x2=165, y2 = 216
+	// #1: x1=147, y1=209, x2=165, y2 = 216
 	draw_rectangle_with_border(147, 209, 165, 216, BROWN);
-	//#2: x1=185, y1=209, x2=208, y2 = 216
+	// #2: x1=185, y1=209, x2=208, y2 = 216
 	draw_rectangle_with_border(185, 209, 208, 216, BROWN);
 
 	// red properties
-	//#1 x1=33, y1=24, x2=51, y2 = 31
+	// #1 x1=33, y1=24, x2=51, y2 = 31
 	draw_rectangle_with_border(33, 24, 51, 32, RED);
-	//#2: x1=52, y1=24, x2=70, y2 = 31
+	// #2: x1=52, y1=24, x2=70, y2 = 31
 	draw_rectangle_with_border(71, 24, 89, 32, RED);
-	//#3: x1=90, y1=24, x2=108, y2 = 31
+	// #3: x1=90, y1=24, x2=108, y2 = 31
 	draw_rectangle_with_border(90, 24, 108, 32, RED);
 
 	// yellow properties
-	//#1: x1=128, y1=24, x2=146, y2 = 31
+	// #1: x1=128, y1=24, x2=146, y2 = 31
 	draw_rectangle_with_border(128, 24, 146, 32, YELLOW);
-	//#2: x1=147, y1=24, x2=165, y2 = 31
+	// #2: x1=147, y1=24, x2=165, y2 = 31
 	draw_rectangle_with_border(147, 24, 165, 32, YELLOW);
-	//#3: x1=185, y1=24, x2=208, y2 = 31
+	// #3: x1=185, y1=24, x2=208, y2 = 31
 	draw_rectangle_with_border(185, 24, 208, 32, YELLOW);
 
 	// orange properties
-	//#1: x1=25, y1=33, x2=32, y2 = 51
+	// #1: x1=25, y1=33, x2=32, y2 = 51
 	draw_rectangle_with_border(25, 33, 32, 51, ORANGE);
 	draw_rectangle_with_border(25, 52, 32, 70, ORANGE);
 	draw_rectangle_with_border(25, 90, 32, 108, ORANGE);
@@ -691,37 +691,37 @@ void draw_board_frame()
 	// bottom edge properties
 
 	// light blue properties
-	//#1: x1=33, y1=209, x2=51, y2 = 216
+	// #1: x1=33, y1=209, x2=51, y2 = 216
 	draw_rectangle_with_border(33, 209, 51, 216, LIGHT_BLUE);
-	//#2: x1=52, y1=209, x2=70, y2 = 216
+	// #2: x1=52, y1=209, x2=70, y2 = 216
 	draw_rectangle_with_border(52, 209, 70, 216, LIGHT_BLUE);
-	//#3: x1=90, y1=209, x2=108, y2 = 216
+	// #3: x1=90, y1=209, x2=108, y2 = 216
 	draw_rectangle_with_border(90, 209, 108, 216, LIGHT_BLUE);
 
 	// brown properties
-	//#1: x1=147, y1=209, x2=165, y2 = 216
+	// #1: x1=147, y1=209, x2=165, y2 = 216
 	draw_rectangle_with_border(147, 209, 165, 216, BROWN);
-	//#2: x1=185, y1=209, x2=208, y2 = 216
+	// #2: x1=185, y1=209, x2=208, y2 = 216
 	draw_rectangle_with_border(185, 209, 208, 216, BROWN);
 
 	// red properties
-	//#1 x1=33, y1=24, x2=51, y2 = 31
+	// #1 x1=33, y1=24, x2=51, y2 = 31
 	draw_rectangle_with_border(33, 24, 51, 32, RED);
-	//#2: x1=52, y1=24, x2=70, y2 = 31
+	// #2: x1=52, y1=24, x2=70, y2 = 31
 	draw_rectangle_with_border(71, 24, 89, 32, RED);
-	//#3: x1=90, y1=24, x2=108, y2 = 31
+	// #3: x1=90, y1=24, x2=108, y2 = 31
 	draw_rectangle_with_border(90, 24, 108, 32, RED);
 
 	// yellow properties
-	//#1: x1=128, y1=24, x2=146, y2 = 31
+	// #1: x1=128, y1=24, x2=146, y2 = 31
 	draw_rectangle_with_border(128, 24, 146, 32, YELLOW);
-	//#2: x1=147, y1=24, x2=165, y2 = 31
+	// #2: x1=147, y1=24, x2=165, y2 = 31
 	draw_rectangle_with_border(147, 24, 165, 32, YELLOW);
-	//#3: x1=185, y1=24, x2=208, y2 = 31
+	// #3: x1=185, y1=24, x2=208, y2 = 31
 	draw_rectangle_with_border(185, 24, 208, 32, YELLOW);
 
 	// orange properties
-	//#1: x1=25, y1=33, x2=32, y2 = 51
+	// #1: x1=25, y1=33, x2=32, y2 = 51
 	draw_rectangle_with_border(25, 33, 32, 51, ORANGE);
 	draw_rectangle_with_border(25, 52, 32, 70, ORANGE);
 	draw_rectangle_with_border(25, 90, 32, 108, ORANGE);
@@ -1257,7 +1257,7 @@ void draw_options_box(char *question,
 	{
 		char str[8 + strlen(options[i]) + 1];
 		sprintf(str, "<%c> - %s", choice_symbols[i], options[i]);
-		last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2);
+		last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2) + 1;
 	}
 }
 

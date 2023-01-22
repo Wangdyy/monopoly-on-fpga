@@ -222,11 +222,12 @@ bool turnEnd(gamestate *game)
 
 void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
 {
-    int diceTotal = roll.die1 + roll.die2;
-    int newPositionRaw = player->position + diceTotal;
+    int oldPosition = player->position;
+    int newPositionRaw = player->position + roll.die1 + roll.die2;
 
-    // this function call changes position of player
-    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, roll);
+    player->position = newPositionRaw;
+
+    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, roll, oldPosition, newPositionRaw);
 
     if (newPositionRaw >= MAX_SQUARES)
     {

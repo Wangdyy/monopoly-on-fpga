@@ -23,6 +23,8 @@ bool drawseq_dialogue_yes_no(int curr_player, gamestate *game, char *question);
 
 int drawseq_mortgage_property(player *curr_player_struct, gamestate *game);
 
+int drawseq_buy_house_on_property(player *curr_player_struct, gamestate *game);
+
 void drawseq_roll_dice(int curr_player, gamestate *game, diceRoll dice_roll);
 
-void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll);
+void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, int old_pos, int new_pos);
