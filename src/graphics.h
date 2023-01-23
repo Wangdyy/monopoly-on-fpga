@@ -46,6 +46,7 @@ void draw_3_player(int square, int player1, int player2, int player3);
 void draw_4_player(int square, int player1, int player2, int player3, int player4);
 void draw_owned_property(int player, int property);
 void draw_houses(int property, int num_houses);
+void draw_hotel(int property);
 
 void clear_text_buffer();
 void draw_text(char *text, int x_position, int y_position);

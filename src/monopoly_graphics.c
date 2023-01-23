@@ -893,6 +893,41 @@ void draw_houses(int property, int num_houses)
 	}
 }
 
+void draw_hotel(int property)
+{
+	int x1, x2, y1, y2;
+
+	switch (draw_squares[property].orientation)
+	{
+		case 1:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y1 + 8;
+			break;
+		case 2:
+			x1 = draw_squares[property].x2 - 8;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			break;
+		case 3:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y2 - 8;
+			y2 = draw_squares[property].y2;
+			break;
+		case 4:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x1 + 8;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			break;
+	}
+
+	draw_rectangle(x1 + 2, y1 + 2, x2 - 1, y2 - 1, DARK_RED);
+}
+
 void draw_owned_property(int player, int property)
 {	
 	int x1, x2, y1, y2;
