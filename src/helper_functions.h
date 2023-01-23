@@ -103,7 +103,3 @@ void sellHouseorHotelSet(player *player, propertySquare *property, gamestate *ga
 // void unmortgageProperty(player* player, propertySquare* property);
 
 // void tradeProperty(player* player, propertySquare* property);
-
-// void communityChest(player* player);
-
-// void chance(player* player);

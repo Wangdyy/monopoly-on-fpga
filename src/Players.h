@@ -16,4 +16,6 @@ typedef struct player
     bool bankrupt;
     square *owned_properties[28];
     int owned_properties_count;
+    int getOutOfJailFreeCards;
+
 } player;
