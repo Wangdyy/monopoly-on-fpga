@@ -835,6 +835,43 @@ void draw_bank_balance(int player, int value)
 	}
 }
 
+void draw_owned_property(int player, int property)
+{	
+	int x1, x2, y1, y2;
+
+	switch (draw_squares[property].orientation)
+	{
+		case 1:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y2 - 10;
+			y2 = draw_squares[property].y2;
+			break;
+		case 2:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x1 + 10;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			break;
+		case 3:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y1 + 10;
+			break;
+		case 4:
+			x1 = draw_squares[property].x2 - 10;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			break;
+	}
+
+	int colors[] = {DARK_BLUE, GREEN, YELLOW, RED, PINK, ORANGE};
+	printf("%d %d %d %d\n", x1, x2, y1, y2);
+	draw_rectangle(x1, y1, x2, y2, colors[player - 1]);
+}
+
 void draw_single_player(int x, int y, int player)
 {
 	int color;
