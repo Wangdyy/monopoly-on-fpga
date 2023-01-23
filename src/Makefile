@@ -1,4 +1,4 @@
-IDIR =../include
+IDIR =.
 CC=gcc
 CFLAGS=-I$(IDIR) -Wall -W -pedantic -Wno-unused-parameter
 

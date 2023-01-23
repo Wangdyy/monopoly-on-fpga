@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
-#include "stdbool.h"
 #include "Squares.h"
 #include "Players.h"
 #include "Gamestate.h"
@@ -12,51 +12,82 @@
 #include "interface.h"
 
 #define OWNER_TO_PLAYER(player) (player + 1)
+#ifdef GRAPHICS_ENABLED
+#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) drawseq_normal_confirm(curr_player, game, question)
+#define DRAWSEQ_TURN_START(curr_player, game) drawseq_turn_start(curr_player, game)
+#define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll) drawseq_roll_dice(curr_player, game, diceRoll)
+#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll) drawseq_move_player(curr_player, game, diceRoll)
+#define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) drawseq_dialogue_yes_no(curr_player, game, question)
+#else
+#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) printf("%s\n", question)
+#define DRAWSEQ_TURN_START(curr_player, game)
+#define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll)
+#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll)
+#define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) userInput(curr_player, game, question)
+#endif
+
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+int userInput(int curr_player, gamestate *game, char *question)
+{
+    printf("%s\n", question);
+    char input;
+    scanf(" %c", &input);
+    if (input == 'y' || input == 'Y')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 /****************************************************************************************
  * Stores square data object to be copied into the gamestate
  *****************************************************************************************/
 
 square square_Go = {"Go", Action, Go, .data.action = GoAction};
-square square_MediterraneanAvenue = {"Mediterranean Avenue", Property, MediteraneanAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredPropety = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {2, 10, 30, 90, 160, 250}}}};
+square square_MediterraneanAvenue = {"Mediterranean Avenue", Property, MediteraneanAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {2, 10, 30, 90, 160, 250}}}};
 square square_CommunityChest1 = {"Community Chest", Action, CommunityChest1, .data.action = CommunityChestAction};
-square square_BalticAvenue = {"Baltic Avenue", Property, BalticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredPropety = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {4, 20, 60, 180, 320, 450}}}};
+square square_BalticAvenue = {"Baltic Avenue", Property, BalticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {4, 20, 60, 180, 320, 450}}}};
 square square_IncomeTax = {"Income Tax", Action, IncomeTaxAction, .data.action = IncomeTaxAction};
 square square_ReadingRailRoad = {"Reading Rail Road", Property, ReadingRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_OrientalAvenue = {"Oriental Avenue", Property, OrientalAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredPropety = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
+square square_OrientalAvenue = {"Oriental Avenue", Property, OrientalAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
 square square_Chance1 = {"Chance", Action, Chance1, .data.action = ChanceAction};
-square square_VermontAvenue = {"Vermont Avenue", Property, VermontAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredPropety = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
-square square_ConnecticutAvenue = {"Connecticut Avenue", Property, ConnecticutAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 120, .mortgageValue = 60, .mortgaged = false, .coloredPropety = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {8, 40, 100, 300, 450, 600}}}};
+square square_VermontAvenue = {"Vermont Avenue", Property, VermontAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
+square square_ConnecticutAvenue = {"Connecticut Avenue", Property, ConnecticutAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 120, .mortgageValue = 60, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {8, 40, 100, 300, 450, 600}}}};
 square square_JustVisiting = {"Just Visiting", Action, JustVisiting, .data.action = FreeParkingAction};
-square square_StCharlesPlace = {"St. Charles Place", Property, StCharlesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredPropety = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
+square square_StCharlesPlace = {"St. Charles Place", Property, StCharlesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
 square square_ElectricCompany = {"Electric Company", Property, ElectricCompany, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
-square square_StatesAvenue = {"States Avenue", Property, StatesAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredPropety = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
-square square_VirginiaAvenue = {"Virginia Avenue", Property, VirginiaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 160, .mortgageValue = 80, .mortgaged = false, .coloredPropety = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {12, 60, 180, 500, 700, 900}}}};
+square square_StatesAvenue = {"States Avenue", Property, StatesAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
+square square_VirginiaAvenue = {"Virginia Avenue", Property, VirginiaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 160, .mortgageValue = 80, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {12, 60, 180, 500, 700, 900}}}};
 square square_PennsylvaniaRailRoad = {"Pennsylvania Rail Road", Property, PennsylvaniaRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_StJamesPlace = {"St. James Place", Property, StJamesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredPropety = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
+square square_StJamesPlace = {"St. James Place", Property, StJamesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
 square square_CommunityChest2 = {"Community Chest", Action, CommunityChest2, .data.action = CommunityChestAction};
-square square_TennesseeAvenue = {"Tennessee Avenue", Property, TennesseeAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredPropety = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
-square square_NewYorkAvenue = {"New York Avenue", Property, NewYorkAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false, .coloredPropety = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {16, 80, 220, 600, 800, 1000}}}};
+square square_TennesseeAvenue = {"Tennessee Avenue", Property, TennesseeAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
+square square_NewYorkAvenue = {"New York Avenue", Property, NewYorkAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {16, 80, 220, 600, 800, 1000}}}};
 square square_FreeParking = {"Free Parking", Action, FreeParking, .data.action = FreeParkingAction};
-square square_KentuckyAvenue = {"Kentucky Avenue", Property, KentuckyAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredPropety = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
+square square_KentuckyAvenue = {"Kentucky Avenue", Property, KentuckyAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
 square square_Chance2 = {"Chance", Action, Chance2, .data.action = ChanceAction};
-square square_IndianaAvenue = {"Indiana Avenue", Property, IndianaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredPropety = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
-square square_IllinoisAvenue = {"Illinois Avenue", Property, IllinoisAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 240, .mortgageValue = 120, .mortgaged = false, .coloredPropety = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {20, 100, 300, 750, 925, 1100}}}};
+square square_IndianaAvenue = {"Indiana Avenue", Property, IndianaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
+square square_IllinoisAvenue = {"Illinois Avenue", Property, IllinoisAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 240, .mortgageValue = 120, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {20, 100, 300, 750, 925, 1100}}}};
 square square_BAndO_RailRoad = {"B & O Rail Road", Property, BAndORailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_AtlanicAvenue = {"Atlantic Avenue", Property, AtlanticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
-square square_VentnorAvenue = {"Ventnor Avenue", Property, VentnorAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
+square square_AtlanicAvenue = {"Atlantic Avenue", Property, AtlanticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
+square square_VentnorAvenue = {"Ventnor Avenue", Property, VentnorAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
 square square_WaterWorks = {"Water Works", Property, WaterWorks, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
-square square_MarvinGardens = {"Marvin Gardens", Property, MarvinGardens, .data.property = {.type = Colored, .owner = Bank, .price = 280, .mortgageValue = 140, .mortgaged = false, .coloredPropety = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {24, 120, 360, 850, 1025, 1200}}}};
+square square_MarvinGardens = {"Marvin Gardens", Property, MarvinGardens, .data.property = {.type = Colored, .owner = Bank, .price = 280, .mortgageValue = 140, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {24, 120, 360, 850, 1025, 1200}}}};
 square square_GoToJail = {"Go To Jail", Action, GoToJail, .data.action = GoToJailAction};
-square square_PacificAvenue = {"Pacific Avenue", Property, PacificAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredPropety = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
-square square_NorthCarolinaAvenue = {"North Carolina Avenue", Property, NorthCarolinaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredPropety = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
+square square_PacificAvenue = {"Pacific Avenue", Property, PacificAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
+square square_NorthCarolinaAvenue = {"North Carolina Avenue", Property, NorthCarolinaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
 square square_CommunityChest3 = {"Community Chest", Action, CommunityChest3, .data.action = CommunityChestAction};
-square square_PennsylvaniaAvenue = {"Pennsylvania Avenue", Property, PennsylvaniaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 320, .mortgageValue = 160, .mortgaged = false, .coloredPropety = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {28, 150, 450, 1000, 1200, 1400}}}};
+square square_PennsylvaniaAvenue = {"Pennsylvania Avenue", Property, PennsylvaniaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 320, .mortgageValue = 160, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {28, 150, 450, 1000, 1200, 1400}}}};
 square square_ShortLine = {"Short Line", Property, ShortLine, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
 square square_Chance3 = {"Chance", Action, Chance3, .data.action = ChanceAction};
-square square_ParkPlace = {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredPropety = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
+square square_ParkPlace = {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
 square square_LuxuryTax = {"Luxury Tax", Action, LuxuryTax, .data.action = LuxuryTaxAction};
-square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredPropety = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
+square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
 
 /*Function defs*/
 
@@ -152,11 +183,9 @@ bool checkForGameOver(gamestate *game)
     }
     else
     {
-        printf("Game Over! The winner is player %d.\n", winningPlayer);
-
         char winStmt[128];
         sprintf(winStmt, "Game Over! The winner is player %d.", winningPlayer);
-        drawseq_normal_confirm(winningPlayer, game, winStmt);
+        DRAWSEQ_NORMAL_CONFIRM(winningPlayer, game, winStmt);
 
         return true;
     }
@@ -196,7 +225,7 @@ void playerTurn(player *player, gamestate *game)
     printf("You currently have $%d\n", player->money);
     printf("**************************************/\n");
 
-    drawseq_turn_start(OWNER_TO_PLAYER(player->owner), game);
+    DRAWSEQ_TURN_START(OWNER_TO_PLAYER(player->owner), game);
 
     if (player->inJail)
     {
@@ -204,11 +233,16 @@ void playerTurn(player *player, gamestate *game)
     }
     else
     {
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, "Roll dice to move.");
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "Roll dice to move.");
         diceRoll roll = rollDice(game);
-        drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+        DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
 
         moveToSquare(player, roll, game);
+    }
+
+    if (DRAWSEQ_DIALOGUE_YES_NO(player->owner, game, "Would you like to buy a house or hotel? (y/n)"))
+    {
+        checkForMonopoly(player, game);
     }
 }
 
@@ -223,16 +257,25 @@ bool turnEnd(gamestate *game)
 void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
 {
     int diceTotal = roll.die1 + roll.die2;
+    if (player->position + diceTotal >= MAX_SQUARES)
+    {
+        player->position = (player->position + diceTotal) - MAX_SQUARES;
+        passGo(player, game);
+    }
+    else
+    {
+        player->position += diceTotal;
+    }
+
+#ifdef GRAPHICS_ENABLED
     int newPositionRaw = player->position + diceTotal;
-
     // this function call changes position of player
-    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, roll);
-
+    DRAWSEQ_MOVE_PLAYER(OWNER_TO_PLAYER(player->owner), game, roll);
     if (newPositionRaw >= MAX_SQUARES)
     {
         passGo(player, game);
     }
-
+#endif
     landOnSquare(player, &game->board[player->position], game);
 }
 
@@ -296,7 +339,6 @@ void doPropertySquare(player *player, square *square, gamestate *game)
 {
     if (square->data.property.owner == Bank)
     {
-        printf("This property is unowned!\n");
         if (player->money >= square->data.property.price)
         {
             char query[256];
@@ -305,7 +347,7 @@ void doPropertySquare(player *player, square *square, gamestate *game)
                     square->name,
                     square->data.property.price);
 
-            if (drawseq_dialogue_yes_no(OWNER_TO_PLAYER(player->owner), game, query))
+            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
             {
                 printf("You chose to buy the property.\n");
                 buyProperty(player, square, game);
@@ -323,11 +365,10 @@ void doPropertySquare(player *player, square *square, gamestate *game)
                     square->name,
                     square->data.property.price);
 
-            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
                                    query);
 
-            printf("You don't have enough money to buy this property\n");
             // Not implemented: Auctioning
         }
     }
@@ -348,8 +389,7 @@ void payIncomeTax(player *player, gamestate *game)
 {
     /*Players should get to decide whether to pay 200 or 10% of net worth
     but for now, we will only implement paying 200*/
-    printf("Paying $200 income tax...\n");
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "You must pay $200 income tax.");
 
@@ -358,8 +398,7 @@ void payIncomeTax(player *player, gamestate *game)
 
 void payLuxuryTax(player *player, gamestate *game)
 {
-    printf("Paying $100 luxury tax...\n");
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "You must pay $200 luxury tax.");
 
@@ -368,8 +407,7 @@ void payLuxuryTax(player *player, gamestate *game)
 
 void goToJail(player *player, gamestate *game)
 {
-    printf("Going to jail...\n");
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "Go to jail! Do not pass Go. Do not collect $200.");
 
@@ -402,8 +440,8 @@ void payRent(player *player, square *square, gamestate *game)
 void payColorSetRent(player *player, square *square, gamestate *game)
 {
     enum Owners owner = square->data.property.owner;
-    int rent = square->data.property.coloredPropety.rent[0];
-    enum Colors setColor = square->data.property.coloredPropety.color;
+    int rent = square->data.property.coloredProperty.rent[0];
+    enum Colors setColor = square->data.property.coloredProperty.color;
     bool setOwned = false;
     switch (setColor)
     {
@@ -485,7 +523,7 @@ void payColorSetRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(owner),
             rent);
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
     payPlayer(player, &game->players[owner], rent, game);
@@ -526,7 +564,7 @@ void payUtilityRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(utilityOwner),
             rent);
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
     payPlayer(player, &game->players[utilityOwner], rent, game);
@@ -578,7 +616,7 @@ void payRailroadRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(railroadOwner),
             rent);
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
     payPlayer(player, &game->players[railroadOwner], rent, game);
@@ -590,11 +628,10 @@ void buyProperty(player *player, square *square, gamestate *game)
     {
         char message[256];
         sprintf(message, "You do not have enough money to buy %s.\n", square->name);
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                message);
 
-        printf("Error: Player %d does not have enough money to buy %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
     player->money -= square->data.property.price;
@@ -608,11 +645,9 @@ void buyProperty(player *player, square *square, gamestate *game)
             square->name,
             square->data.property.price);
 
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            message);
-
-    printf("Player %d bought %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
 }
 
 void sellProperty(player *player, square *square, gamestate *game)
@@ -621,21 +656,19 @@ void sellProperty(player *player, square *square, gamestate *game)
     {
         char message[256];
         sprintf(message, "You do not own %s and cannot sell it.\n", square->name);
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                message);
 
-        printf("Error: Player %d does not own %s!\n", OWNER_TO_PLAYER(player->owner), square->name);
         return;
     }
 
     player->money += square->data.property.price;
     square->data.property.owner = Bank;
-    printf("Player %d sold %s for $%d\n", OWNER_TO_PLAYER(player->owner), square->name, square->data.property.price);
 
     char message[256];
     sprintf(message, "You sold %s for $%d.", square->name, square->data.property.price);
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            message);
 
@@ -669,15 +702,13 @@ int payMoney(player *player, int amount, gamestate *game)
 {
     if (player->money < amount)
     {
-        printf("You don't have enough money to pay!\n");
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "You do not have enough money to pay and must sell assets to continue.");
 
         if (sellAssets(player, amount, game))
         {
-            printf("You sold enough assets to pay!\n");
-            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
                                    "You have sold enough assets to pay.");
         }
@@ -694,7 +725,7 @@ int payMoney(player *player, int amount, gamestate *game)
                     "Player %d paid $%d before declaring bankruptcy.",
                     OWNER_TO_PLAYER(player->owner),
                     amount);
-            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
                                    bankruptInfo);
 
@@ -725,7 +756,6 @@ bool sellAssets(player *player, int amount, gamestate *game)
 void playerInJail(player *player, gamestate *game)
 {
     player->jailTime++;
-    printf("It is player %d's turn #%d in jail!\n", OWNER_TO_PLAYER(player->owner), player->jailTime);
 
     char jailInfo[128];
 
@@ -734,16 +764,15 @@ void playerInJail(player *player, gamestate *game)
             OWNER_TO_PLAYER(player->owner),
             player->jailTime);
 
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner), game, jailInfo);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, jailInfo);
 
     bool getOutOfJail = false;
     // TODO: Implement get out of jail free cards
     if (player->jailTime < 3 && player->money >= 50)
     {
         // Check if player would like to pay jail fine
-        printf("Would you like to pay $50 to get out of jail? (y/n)\n");
 
-        bool choice = drawseq_dialogue_yes_no(OWNER_TO_PLAYER(player->owner),
+        bool choice = DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner),
                                               game,
                                               "Would you like to pay $50 to get out of jail?");
 
@@ -754,21 +783,20 @@ void playerInJail(player *player, gamestate *game)
         }
     }
 
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "If you did not pay, you may still get out if you roll doubles.");
 
     diceRoll roll = rollDice(game);
-    drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+    DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
 
     if (roll.doubles || getOutOfJail)
     {
-        printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "You got out of jail!");
 
-        drawseq_roll_dice(OWNER_TO_PLAYER(player->owner), game, roll);
+        DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
 
         player->jailTime = 0;
         player->inJail = false;
@@ -776,15 +804,13 @@ void playerInJail(player *player, gamestate *game)
     }
     else if (player->jailTime == 3)
     {
-        printf("Player %d has been in jail for 3 turns and must pay $50 to get out!\n", OWNER_TO_PLAYER(player->owner));
-        drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "You have been in jail for three turns. You must pay $50 now to get out.");
 
         if (payJailFine(player, game))
         {
-            printf("Player %d got out of jail!\n", OWNER_TO_PLAYER(player->owner));
-            drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
                                    "You got out of jail!");
 
@@ -812,8 +838,7 @@ bool payJailFine(player *player, gamestate *game)
  **************************************/
 void passGo(player *player, gamestate *game)
 {
-    printf("Player %d passed go!\n", OWNER_TO_PLAYER(player->owner));
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "You passes Go! You get $200.");
 
@@ -822,8 +847,7 @@ void passGo(player *player, gamestate *game)
 
 void bankruptPlayer(player *player, gamestate *game)
 {
-    printf("Player %d is bankrupt!\n", OWNER_TO_PLAYER(player->owner));
-    drawseq_normal_confirm(OWNER_TO_PLAYER(player->owner),
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "You are bankrupt and out of the game.");
 
@@ -841,6 +865,291 @@ void waitForNextTurn()
 }
 
 /**************************************
+ * Houses and Hotels
+ **************************************/
+void checkForMonopoly(player *player, gamestate *game)
+{
+    for (int setColor = 0; setColor < NUM_COLORS; setColor++)
+    {
+        bool setOwned = false;
+        switch (setColor)
+        {
+        case (Brown):
+            if (game->board[MediteraneanAvenue].data.property.owner == player->owner &&
+                game->board[BalticAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (LightBlue):
+            if (game->board[OrientalAvenue].data.property.owner == player->owner &&
+                game->board[VermontAvenue].data.property.owner == player->owner &&
+                game->board[ConnecticutAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Pink):
+            if (game->board[StCharlesPlace].data.property.owner == player->owner &&
+                game->board[StatesAvenue].data.property.owner == player->owner &&
+                game->board[VirginiaAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Orange):
+            if (game->board[StJamesPlace].data.property.owner == player->owner &&
+                game->board[TennesseeAvenue].data.property.owner == player->owner &&
+                game->board[NewYorkAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Red):
+            if (game->board[KentuckyAvenue].data.property.owner == player->owner &&
+                game->board[IndianaAvenue].data.property.owner == player->owner &&
+                game->board[IllinoisAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Yellow):
+            if (game->board[AtlanticAvenue].data.property.owner == player->owner &&
+                game->board[VentnorAvenue].data.property.owner == player->owner &&
+                game->board[MarvinGardens].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Green):
+            if (game->board[PacificAvenue].data.property.owner == player->owner &&
+                game->board[NorthCarolinaAvenue].data.property.owner == player->owner &&
+                game->board[PennsylvaniaAvenue].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (DarkBlue):
+            if (game->board[ParkPlace].data.property.owner == player->owner &&
+                game->board[Boardwalk].data.property.owner == player->owner)
+            {
+                setOwned = true;
+            }
+            break;
+        default:
+            printf("Error: Color not recognized\n");
+            break;
+        }
+        if (setOwned)
+        {
+            char query[256];
+            sprintf(query, "You own a monopoly on %s! Would you like to buy houses or hotels?", colorStrings[setColor]);
+            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+            {
+                buyHouseorHotelSet(player, setColor, game);
+            }
+        }
+    }
+}
+
+void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
+{
+    enum SquareNames squareName1 = 0, squareName2 = 0, squareName3 = 0;
+    int propertiesInSet = 0;
+
+    switch (setColor)
+    {
+    case (Brown):
+        squareName1 = MediteraneanAvenue;
+        squareName2 = BalticAvenue;
+        propertiesInSet = 2;
+        break;
+    case (LightBlue):
+        squareName1 = OrientalAvenue;
+        squareName2 = VermontAvenue;
+        squareName3 = ConnecticutAvenue;
+        propertiesInSet = 3;
+        break;
+    case (Pink):
+        squareName1 = StCharlesPlace;
+        squareName2 = StatesAvenue;
+        squareName3 = VirginiaAvenue;
+        propertiesInSet = 3;
+        break;
+    case (Orange):
+        squareName1 = StJamesPlace;
+        squareName2 = TennesseeAvenue;
+        squareName3 = NewYorkAvenue;
+        propertiesInSet = 3;
+        break;
+    case (Red):
+        squareName1 = KentuckyAvenue;
+        squareName2 = IndianaAvenue;
+        squareName3 = IllinoisAvenue;
+        propertiesInSet = 3;
+        break;
+    case (Yellow):
+        squareName1 = AtlanticAvenue;
+        squareName2 = VentnorAvenue;
+        squareName3 = MarvinGardens;
+        propertiesInSet = 3;
+        break;
+    case (Green):
+        squareName1 = PacificAvenue;
+        squareName2 = NorthCarolinaAvenue;
+        squareName3 = PennsylvaniaAvenue;
+        propertiesInSet = 3;
+        break;
+    case (DarkBlue):
+        squareName1 = ParkPlace;
+        squareName2 = Boardwalk;
+        propertiesInSet = 2;
+        break;
+
+    default:
+        printf("Error: Color not recognized\n");
+        break;
+    }
+    if (propertiesInSet == 2)
+    {
+        if (game->board[squareName1].data.property.coloredProperty.houseCount < 4 ||
+            game->board[squareName2].data.property.coloredProperty.houseCount < 4)
+        { // Buying houses
+            for (int i = 0; i < 2; i++)
+            {
+                if (game->board[squareName1].data.property.coloredProperty.houseCount < 4)
+                {
+                    char query[256];
+                    sprintf(query, "Would you like to buy a house on %s?", game->board[squareName1].name);
+                    if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                    {
+                        if (player->money >= game->board[squareName1].data.property.coloredProperty.houseCost)
+                        { // Check for money
+                            if (MIN(game->board[squareName1].data.property.coloredProperty.houseCount, game->board[squareName2].data.property.coloredProperty.houseCount) != game->board[squareName1].data.property.coloredProperty.houseCount)
+                            { // Check for house number difference
+                                payMoney(player, game->board[squareName1].data.property.coloredProperty.houseCost, game);
+                                game->board[squareName1].data.property.coloredProperty.houseCount++;
+                            }
+                            else
+                            {
+                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!");
+                            }
+                        }
+                        else
+                        {
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!");
+                        }
+                    }
+                }
+                enum SquareNames temp = squareName1;
+                squareName1 = squareName2;
+                squareName2 = temp;
+            }
+        }
+        else
+        { // Buying hotels
+            for (int i = 0; i < 2; i++)
+            {
+                char query[256];
+                sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareName1].name);
+                if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                {
+                    if (player->money >= game->board[squareName1].data.property.coloredProperty.hotelCost)
+                    { // Check for money
+                        if (game->board[squareName1].data.property.coloredProperty.hotelCount != 0)
+                        { // Check for hotel number difference
+                            payMoney(player, game->board[squareName1].data.property.coloredProperty.hotelCost, game);
+                            game->board[squareName1].data.property.coloredProperty.hotelCount++;
+                        }
+                        else
+                        {
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!");
+                        }
+                    }
+                    else
+                    {
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!");
+                    }
+                }
+                enum SquareNames temp = squareName1;
+                squareName1 = squareName2;
+                squareName2 = temp;
+            }
+        }
+        if (propertiesInSet == 3)
+        {
+            if (game->board[squareName1].data.property.coloredProperty.houseCount < 4 ||
+                game->board[squareName2].data.property.coloredProperty.houseCount < 4 ||
+                game->board[squareName3].data.property.coloredProperty.houseCount < 4)
+            { // Buying houses
+                for (int i = 0; i < 3; i++)
+                {
+                    if (game->board[squareName1].data.property.coloredProperty.houseCount < 4)
+                    {
+                        char query[256];
+                        sprintf(query, "Would you like to buy a house on %s?", game->board[squareName1].name);
+                        if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                        {
+                            if (player->money >= game->board[squareName1].data.property.coloredProperty.houseCost)
+                            { // Check for money
+                                if (MIN(game->board[squareName1].data.property.coloredProperty.houseCount, MIN(game->board[squareName2].data.property.coloredProperty.houseCount, game->board[squareName3].data.property.coloredProperty.houseCount)) != game->board[squareName1].data.property.coloredProperty.houseCount)
+                                { // Check for house number difference
+                                    payMoney(player, game->board[squareName1].data.property.coloredProperty.houseCost, game);
+                                    game->board[squareName1].data.property.coloredProperty.houseCount++;
+                                }
+                                else
+                                {
+                                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!");
+                                }
+                            }
+                            else
+                            {
+                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!");
+                            }
+                        }
+                    }
+                    enum SquareNames tmp = squareName1;
+                    squareName1 = squareName2;
+                    squareName2 = squareName3;
+                    squareName3 = tmp;
+                }
+            }
+        }
+        else
+        { // Buying hotels
+            for (int i = 0; i < 3; i++)
+            {
+                char query[256];
+                sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareName1].name);
+                if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                {
+                    if (player->money >= game->board[squareName1].data.property.coloredProperty.hotelCost)
+                    { // Check for money
+                        if (game->board[squareName1].data.property.coloredProperty.hotelCount != 0)
+                        { // Check for hotel number difference
+                            payMoney(player, game->board[squareName1].data.property.coloredProperty.hotelCost, game);
+                            game->board[squareName1].data.property.coloredProperty.hotelCount++;
+                        }
+                        else
+                        {
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!");
+                        }
+                    }
+                    else
+                    {
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!");
+                    }
+                }
+                enum SquareNames tmp = squareName1;
+                squareName1 = squareName2;
+                squareName2 = squareName3;
+                squareName3 = tmp;
+            }
+        }
+    }
+}
+
+/**************************************
  * Main
  **************************************/
 int main(void)
@@ -852,8 +1161,9 @@ int main(void)
     initGame(&game);
     gameStart(&game);
 
+#ifdef GRAPHICS_ENABLED
     init_graphics();
-
+#endif
     while (true)
     {
         playerTurn(&game.players[game.turn], &game);
@@ -862,7 +1172,9 @@ int main(void)
         {
             break;
         }
-        // waitForNextTurn();
+#ifndef GRAPHICS_ENABLED
+        waitForNextTurn();
+#endif
     }
     return 0;
 }

@@ -38,6 +38,10 @@ void payLuxuryTax(player *player, gamestate *game);
 
 void goToJail(player *player, gamestate *game);
 
+void communityChest(player *player, gamestate *game);
+
+void chance(player *player, gamestate *game);
+
 /**************************************
  * Property Squares
  **************************************/
@@ -84,13 +88,15 @@ void bankruptPlayer(player *player, gamestate *game);
 
 void waitForNextTurn();
 
-// void buyHouse(player* player, propertySquare* property);
+/**************************************
+ * Houses and Hotels
+ **************************************/
 
-// void sellHouse(player* player, propertySquare* property);
+void checkForMonopoly(player *player, gamestate *game);
 
-// void buyHotel(player* player, propertySquare* property);
+void buyHouseorHotelSet(player *player, enum Colors color, gamestate *game);
 
-// void sellHotel(player* player, propertySquare* property);
+void sellHouseorHotelSet(player *player, propertySquare *property, gamestate *game);
 
 // void mortgageProperty(player* player, propertySquare* property);
 

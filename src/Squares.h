@@ -4,8 +4,7 @@
  * which are either properties or action squares
  *****************************************************************************************/
 #pragma once
-
-#include "stdbool.h"
+#define MAX_PROPERTY_SET 3
 
 enum SquareType
 {
@@ -41,8 +40,19 @@ enum Colors
     Red,
     Yellow,
     Green,
-    DarkBlue
+    DarkBlue,
+    NUM_COLORS
 };
+
+char colorStrings[][20] = {
+    "Brown",
+    "Light Blue",
+    "Pink",
+    "Orange",
+    "Red",
+    "Yellow",
+    "Green",
+    "Dark Blue"};
 
 enum Owners
 {
@@ -115,7 +125,7 @@ typedef struct propertySquare
     int price;
     int mortgageValue;
     bool mortgaged;
-    coloredProperty coloredPropety;
+    coloredProperty coloredProperty;
 } propertySquare;
 
 typedef struct square
