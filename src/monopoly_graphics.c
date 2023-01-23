@@ -18,10 +18,12 @@
 #define LIGHT_BLUE 0xAF1F
 #define BROWN 0x92A6
 #define RED 0xE8C4
+#define DARK_RED 0x8800
 #define YELLOW 0xFF80
 #define ORANGE 0xF4A3
 #define PINK 0xD9D2
 #define GREEN 0x1D8B
+#define DARK_GREEN 0x01A0
 #define DARK_BLUE 0x0397
 #define WHITE 0xffff
 #define CREAM 0xEF5B
@@ -835,6 +837,62 @@ void draw_bank_balance(int player, int value)
 	}
 }
 
+void draw_houses(int property, int num_houses)
+{
+	int x1, x2, y1, y2, len, house_size;
+	switch (draw_squares[property].orientation)
+	{
+		case 1:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y1 + 8;
+			len = x2 - x1;
+			house_size = (len/4);
+	
+			for (int i = 0; i < num_houses; i++){
+				draw_rectangle(x1 + house_size*i + 1, y1 + 2, x1 + 1 + house_size*(i+1)-1, y2 - 1, DARK_GREEN);
+			}
+			break;
+		case 2:
+			x1 = draw_squares[property].x2 - 8;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			len = y2 - y1;
+			house_size = (len/4);
+	
+			for (int i = 0; i < num_houses; i++){
+				draw_rectangle(x1 + 2, y1 + house_size*i + 1, x2 - 1, y1 + 1 + house_size*(i+1)-1, DARK_GREEN);
+			}
+			break;
+		case 3:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x2;
+			y1 = draw_squares[property].y2 - 8;
+			y2 = draw_squares[property].y2;
+			len = x2 - x1;
+			house_size = (len/4);
+	
+			for (int i = 0; i < num_houses; i++){
+				draw_rectangle(x1 + house_size*i + 1, y1 + 2, x1 + 1 + house_size*(i+1)-1, y2 - 1, DARK_GREEN);
+			}
+			break;
+		case 4:
+			x1 = draw_squares[property].x1;
+			x2 = draw_squares[property].x1 + 8;
+			y1 = draw_squares[property].y1;
+			y2 = draw_squares[property].y2;
+			len = y2 - y1;
+			house_size = (len/4);
+	
+			for (int i = 0; i < num_houses; i++){
+				draw_rectangle(x1 + 2, y1 + house_size*i + 1, x2 - 1, y1 + 1 + house_size*(i+1)-1, DARK_GREEN);
+			}
+			break;
+	}
+}
+
 void draw_owned_property(int player, int property)
 {	
 	int x1, x2, y1, y2;
@@ -868,7 +926,6 @@ void draw_owned_property(int player, int property)
 	}
 
 	int colors[] = {DARK_BLUE, GREEN, YELLOW, RED, PINK, ORANGE};
-	printf("%d %d %d %d\n", x1, x2, y1, y2);
 	draw_rectangle(x1, y1, x2, y2, colors[player - 1]);
 }
 
