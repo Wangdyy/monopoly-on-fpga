@@ -57,6 +57,10 @@ void buyProperty(player *player, square *square, gamestate *game);
 
 void sellProperty(player *player, square *square, gamestate *game);
 
+void mortgageProperty(player *player, square *square, gamestate *game);
+
+void unmortgageProperty(player *player, square *square, gamestate *game);
+
 /**************************************
  * Payment
  **************************************/
@@ -97,9 +101,3 @@ void checkForMonopoly(player *player, gamestate *game);
 void buyHouseorHotelSet(player *player, enum Colors color, gamestate *game);
 
 void sellHouseorHotelSet(player *player, propertySquare *property, gamestate *game);
-
-// void mortgageProperty(player* player, propertySquare* property);
-
-// void unmortgageProperty(player* player, propertySquare* property);
-
-// void tradeProperty(player* player, propertySquare* property);

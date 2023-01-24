@@ -110,29 +110,29 @@ enum SquareNames
 
 typedef struct ColoredProperty
 {
-    enum Colors color;
-    int houseCost;
-    int hotelCost;
+    const enum Colors color;
+    const int houseCost;
+    const int hotelCost;
     int houseCount;
     int hotelCount;
-    int rent[6];
+    const int rent[6];
 } coloredProperty;
 
 typedef struct propertySquare
 {
-    enum PropertyType type;
+    const enum PropertyType type;
     enum Owners owner;
-    int price;
-    int mortgageValue;
+    const int price;
+    const int mortgageValue;
     bool mortgaged;
     coloredProperty coloredProperty;
 } propertySquare;
 
 typedef struct square
 {
-    char name[40];
-    enum SquareType type;
-    enum SquareNames squareName;
+    const char name[40];
+    const enum SquareType type;
+    const enum SquareNames squareName;
     union Square
     {
         propertySquare property;

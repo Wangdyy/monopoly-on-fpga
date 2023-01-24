@@ -16,13 +16,13 @@
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) drawseq_normal_confirm(curr_player, game, question)
 #define DRAWSEQ_TURN_START(curr_player, game) drawseq_turn_start(curr_player, game)
 #define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll) drawseq_roll_dice(curr_player, game, diceRoll)
-#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll) drawseq_move_player(curr_player, game, diceRoll)
+#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos) drawseq_move_player(curr_player, game, diceRoll, old_pos, new_pos)
 #define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) drawseq_dialogue_yes_no(curr_player, game, question)
 #else
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) printf("%s\n", question)
 #define DRAWSEQ_TURN_START(curr_player, game)
 #define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll)
-#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll)
+#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos)
 #define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) userInput(curr_player, game, question)
 #endif
 
@@ -47,48 +47,47 @@ int userInput(int curr_player, gamestate *game, char *question)
 /****************************************************************************************
  * Stores square data object to be copied into the gamestate
  *****************************************************************************************/
-
-square square_Go = {"Go", Action, Go, .data.action = GoAction};
-square square_MediterraneanAvenue = {"Mediterranean Avenue", Property, MediteraneanAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {2, 10, 30, 90, 160, 250}}}};
-square square_CommunityChest1 = {"Community Chest", Action, CommunityChest1, .data.action = CommunityChestAction};
-square square_BalticAvenue = {"Baltic Avenue", Property, BalticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {4, 20, 60, 180, 320, 450}}}};
-square square_IncomeTax = {"Income Tax", Action, IncomeTaxAction, .data.action = IncomeTaxAction};
-square square_ReadingRailRoad = {"Reading Rail Road", Property, ReadingRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_OrientalAvenue = {"Oriental Avenue", Property, OrientalAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
-square square_Chance1 = {"Chance", Action, Chance1, .data.action = ChanceAction};
-square square_VermontAvenue = {"Vermont Avenue", Property, VermontAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
-square square_ConnecticutAvenue = {"Connecticut Avenue", Property, ConnecticutAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 120, .mortgageValue = 60, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {8, 40, 100, 300, 450, 600}}}};
-square square_JustVisiting = {"Just Visiting", Action, JustVisiting, .data.action = FreeParkingAction};
-square square_StCharlesPlace = {"St. Charles Place", Property, StCharlesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
-square square_ElectricCompany = {"Electric Company", Property, ElectricCompany, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
-square square_StatesAvenue = {"States Avenue", Property, StatesAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
-square square_VirginiaAvenue = {"Virginia Avenue", Property, VirginiaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 160, .mortgageValue = 80, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {12, 60, 180, 500, 700, 900}}}};
-square square_PennsylvaniaRailRoad = {"Pennsylvania Rail Road", Property, PennsylvaniaRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_StJamesPlace = {"St. James Place", Property, StJamesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
-square square_CommunityChest2 = {"Community Chest", Action, CommunityChest2, .data.action = CommunityChestAction};
-square square_TennesseeAvenue = {"Tennessee Avenue", Property, TennesseeAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
-square square_NewYorkAvenue = {"New York Avenue", Property, NewYorkAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {16, 80, 220, 600, 800, 1000}}}};
-square square_FreeParking = {"Free Parking", Action, FreeParking, .data.action = FreeParkingAction};
-square square_KentuckyAvenue = {"Kentucky Avenue", Property, KentuckyAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
-square square_Chance2 = {"Chance", Action, Chance2, .data.action = ChanceAction};
-square square_IndianaAvenue = {"Indiana Avenue", Property, IndianaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
-square square_IllinoisAvenue = {"Illinois Avenue", Property, IllinoisAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 240, .mortgageValue = 120, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {20, 100, 300, 750, 925, 1100}}}};
-square square_BAndO_RailRoad = {"B & O Rail Road", Property, BAndORailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_AtlanicAvenue = {"Atlantic Avenue", Property, AtlanticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
-square square_VentnorAvenue = {"Ventnor Avenue", Property, VentnorAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
-square square_WaterWorks = {"Water Works", Property, WaterWorks, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
-square square_MarvinGardens = {"Marvin Gardens", Property, MarvinGardens, .data.property = {.type = Colored, .owner = Bank, .price = 280, .mortgageValue = 140, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {24, 120, 360, 850, 1025, 1200}}}};
-square square_GoToJail = {"Go To Jail", Action, GoToJail, .data.action = GoToJailAction};
-square square_PacificAvenue = {"Pacific Avenue", Property, PacificAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
-square square_NorthCarolinaAvenue = {"North Carolina Avenue", Property, NorthCarolinaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
-square square_CommunityChest3 = {"Community Chest", Action, CommunityChest3, .data.action = CommunityChestAction};
-square square_PennsylvaniaAvenue = {"Pennsylvania Avenue", Property, PennsylvaniaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 320, .mortgageValue = 160, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {28, 150, 450, 1000, 1200, 1400}}}};
-square square_ShortLine = {"Short Line", Property, ShortLine, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
-square square_Chance3 = {"Chance", Action, Chance3, .data.action = ChanceAction};
-square square_ParkPlace = {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
-square square_LuxuryTax = {"Luxury Tax", Action, LuxuryTax, .data.action = LuxuryTaxAction};
-square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
-
+const square square_Go = {"Go", Action, Go, .data.action = GoAction};
+const square square_MediterraneanAvenue = {"Mediterranean Avenue", Property, MediteraneanAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {2, 10, 30, 90, 160, 250}}}};
+const square square_CommunityChest1 = {"Community Chest", Action, CommunityChest1, .data.action = CommunityChestAction};
+const square square_BalticAvenue = {"Baltic Avenue", Property, BalticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {4, 20, 60, 180, 320, 450}}}};
+const square square_IncomeTax = {"Income Tax", Action, IncomeTaxAction, .data.action = IncomeTaxAction};
+const square square_ReadingRailRoad = {"Reading Rail Road", Property, ReadingRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
+const square square_OrientalAvenue = {"Oriental Avenue", Property, OrientalAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
+const square square_Chance1 = {"Chance", Action, Chance1, .data.action = ChanceAction};
+const square square_VermontAvenue = {"Vermont Avenue", Property, VermontAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
+const square square_ConnecticutAvenue = {"Connecticut Avenue", Property, ConnecticutAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 120, .mortgageValue = 60, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {8, 40, 100, 300, 450, 600}}}};
+const square square_JustVisiting = {"Just Visiting", Action, JustVisiting, .data.action = FreeParkingAction};
+const square square_StCharlesPlace = {"St. Charles Place", Property, StCharlesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
+const square square_ElectricCompany = {"Electric Company", Property, ElectricCompany, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
+const square square_StatesAvenue = {"States Avenue", Property, StatesAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 140, .mortgageValue = 70, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {10, 50, 150, 450, 625, 750}}}};
+const square square_VirginiaAvenue = {"Virginia Avenue", Property, VirginiaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 160, .mortgageValue = 80, .mortgaged = false, .coloredProperty = {.color = Pink, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {12, 60, 180, 500, 700, 900}}}};
+const square square_PennsylvaniaRailRoad = {"Pennsylvania Rail Road", Property, PennsylvaniaRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
+const square square_StJamesPlace = {"St. James Place", Property, StJamesPlace, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
+const square square_CommunityChest2 = {"Community Chest", Action, CommunityChest2, .data.action = CommunityChestAction};
+const square square_TennesseeAvenue = {"Tennessee Avenue", Property, TennesseeAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 180, .mortgageValue = 90, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {14, 70, 200, 550, 750, 950}}}};
+const square square_NewYorkAvenue = {"New York Avenue", Property, NewYorkAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false, .coloredProperty = {.color = Orange, .houseCost = 100, .hotelCost = 100, .houseCount = 0, .hotelCount = 0, .rent = {16, 80, 220, 600, 800, 1000}}}};
+const square square_FreeParking = {"Free Parking", Action, FreeParking, .data.action = FreeParkingAction};
+const square square_KentuckyAvenue = {"Kentucky Avenue", Property, KentuckyAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
+const square square_Chance2 = {"Chance", Action, Chance2, .data.action = ChanceAction};
+const square square_IndianaAvenue = {"Indiana Avenue", Property, IndianaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 220, .mortgageValue = 110, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {18, 90, 250, 700, 875, 1050}}}};
+const square square_IllinoisAvenue = {"Illinois Avenue", Property, IllinoisAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 240, .mortgageValue = 120, .mortgaged = false, .coloredProperty = {.color = Red, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {20, 100, 300, 750, 925, 1100}}}};
+const square square_BAndO_RailRoad = {"B & O Rail Road", Property, BAndORailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
+const square square_AtlanticAvenue = {"Atlantic Avenue", Property, AtlanticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
+const square square_VentnorAvenue = {"Ventnor Avenue", Property, VentnorAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 260, .mortgageValue = 130, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {22, 110, 330, 800, 975, 1150}}}};
+const square square_WaterWorks = {"Water Works", Property, WaterWorks, .data.property = {.type = Utility, .owner = Bank, .price = 150, .mortgageValue = 75, .mortgaged = false}};
+const square square_MarvinGardens = {"Marvin Gardens", Property, MarvinGardens, .data.property = {.type = Colored, .owner = Bank, .price = 280, .mortgageValue = 140, .mortgaged = false, .coloredProperty = {.color = Yellow, .houseCost = 150, .hotelCost = 150, .houseCount = 0, .hotelCount = 0, .rent = {24, 120, 360, 850, 1025, 1200}}}};
+const square square_GoToJail = {"Go To Jail", Action, GoToJail, .data.action = GoToJailAction};
+const square square_PacificAvenue = {"Pacific Avenue", Property, PacificAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
+const square square_NorthCarolinaAvenue = {"North Carolina Avenue", Property, NorthCarolinaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 300, .mortgageValue = 150, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {26, 130, 390, 900, 1100, 1275}}}};
+const square square_CommunityChest3 = {"Community Chest", Action, CommunityChest3, .data.action = CommunityChestAction};
+const square square_PennsylvaniaAvenue = {"Pennsylvania Avenue", Property, PennsylvaniaAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 320, .mortgageValue = 160, .mortgaged = false, .coloredProperty = {.color = Green, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {28, 150, 450, 1000, 1200, 1400}}}};
+const square square_ShortLine = {"Short Line", Property, ShortLine, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
+const square square_Chance3 = {"Chance", Action, Chance3, .data.action = ChanceAction};
+const square square_ParkPlace = {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
+const square square_LuxuryTax = {"Luxury Tax", Action, LuxuryTax, .data.action = LuxuryTaxAction};
+const square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
+square board[] = {square_Go, square_MediterraneanAvenue, square_CommunityChest1, square_BalticAvenue, square_IncomeTax, square_ReadingRailRoad, square_OrientalAvenue, square_Chance1, square_VermontAvenue, square_ConnecticutAvenue, square_JustVisiting, square_StCharlesPlace, square_ElectricCompany, square_StatesAvenue, square_VirginiaAvenue, square_PennsylvaniaRailRoad, square_StJamesPlace, square_CommunityChest2, square_TennesseeAvenue, square_NewYorkAvenue, square_FreeParking, square_KentuckyAvenue, square_Chance2, square_IndianaAvenue, square_IllinoisAvenue, square_BAndO_RailRoad, square_AtlanticAvenue, square_VentnorAvenue, square_WaterWorks, square_MarvinGardens, square_GoToJail, square_PacificAvenue, square_NorthCarolinaAvenue, square_CommunityChest3, square_PennsylvaniaAvenue, square_ShortLine, square_Chance3, square_ParkPlace, square_LuxuryTax, square_Boardwalk};
 /*Function defs*/
 
 /**************************************
@@ -98,46 +97,7 @@ square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.
 void initGame(gamestate *game)
 {
     /*Init board*/
-    game->board[0] = square_Go;
-    game->board[1] = square_MediterraneanAvenue;
-    game->board[2] = square_CommunityChest1;
-    game->board[3] = square_BalticAvenue;
-    game->board[4] = square_IncomeTax;
-    game->board[5] = square_ReadingRailRoad;
-    game->board[6] = square_OrientalAvenue;
-    game->board[7] = square_Chance1;
-    game->board[8] = square_VermontAvenue;
-    game->board[9] = square_ConnecticutAvenue;
-    game->board[10] = square_JustVisiting;
-    game->board[11] = square_StCharlesPlace;
-    game->board[12] = square_ElectricCompany;
-    game->board[13] = square_StatesAvenue;
-    game->board[14] = square_VirginiaAvenue;
-    game->board[15] = square_PennsylvaniaRailRoad;
-    game->board[16] = square_StJamesPlace;
-    game->board[17] = square_CommunityChest2;
-    game->board[18] = square_TennesseeAvenue;
-    game->board[19] = square_NewYorkAvenue;
-    game->board[20] = square_FreeParking;
-    game->board[21] = square_KentuckyAvenue;
-    game->board[22] = square_Chance2;
-    game->board[23] = square_IndianaAvenue;
-    game->board[24] = square_IllinoisAvenue;
-    game->board[25] = square_BAndO_RailRoad;
-    game->board[26] = square_AtlanicAvenue;
-    game->board[27] = square_VentnorAvenue;
-    game->board[28] = square_WaterWorks;
-    game->board[29] = square_MarvinGardens;
-    game->board[30] = square_GoToJail;
-    game->board[31] = square_PacificAvenue;
-    game->board[32] = square_NorthCarolinaAvenue;
-    game->board[33] = square_CommunityChest3;
-    game->board[34] = square_PennsylvaniaAvenue;
-    game->board[35] = square_ShortLine;
-    game->board[36] = square_Chance3;
-    game->board[37] = square_ParkPlace;
-    game->board[38] = square_LuxuryTax;
-    game->board[39] = square_Boardwalk;
+    game->board = board;
     /*Init players*/
     for (int i = 0; i < MAX_PLAYERS; i++)
     {
@@ -260,7 +220,7 @@ void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
     int newPositionRaw = player->position + roll.die1 + roll.die2;
     player->position = newPositionRaw % MAX_SQUARES;
 
-    drawseq_move_player(OWNER_TO_PLAYER(player->owner), game, roll, oldPosition, newPositionRaw);
+    DRAWSEQ_MOVE_PLAYER(OWNER_TO_PLAYER(player->owner), game, roll, oldPosition, newPositionRaw);
     if (newPositionRaw >= MAX_SQUARES)
     {
         passGo(player, game);
@@ -357,8 +317,6 @@ void doPropertySquare(player *player, square *square, gamestate *game)
             DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
                                    query);
-
-            // Not implemented: Auctioning
         }
     }
     else if (square->data.property.owner != player->owner)
@@ -601,7 +559,7 @@ void chance(player *player, gamestate *game)
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.");
-        enum SquareType nearestRailroad;
+        enum SquareNames nearestRailroad;
         if (ReadingRailRoad - player->position % MAX_SQUARES < BAndORailRoad - player->position % MAX_SQUARES &&
             ReadingRailRoad - player->position % MAX_SQUARES < ShortLine - player->position % MAX_SQUARES &&
             ReadingRailRoad - player->position % MAX_SQUARES < PennsylvaniaRailRoad - player->position % MAX_SQUARES)
@@ -755,6 +713,7 @@ void payColorSetRent(player *player, square *square, gamestate *game)
     int rent = square->data.property.coloredProperty.rent[0];
     enum Colors setColor = square->data.property.coloredProperty.color;
     bool setOwned = false;
+    // TODO: Add house and hotel rent
     switch (setColor)
     {
     case (Brown):
@@ -946,7 +905,7 @@ void buyProperty(player *player, square *square, gamestate *game)
 
         return;
     }
-    player->money -= square->data.property.price;
+    payMoney(player, square->data.property.price, game);
     square->data.property.owner = player->owner;
     player->owned_properties[player->owned_properties_count] = square;
     player->owned_properties_count++;
@@ -974,12 +933,20 @@ void sellProperty(player *player, square *square, gamestate *game)
 
         return;
     }
-
-    player->money += square->data.property.price;
+    char message[256];
+    if (square->data.property.mortgaged)
+    {
+        square->data.property.mortgaged = false;
+        sprintf(message, "You sold %s for $%d.", square->name, square->data.property.price - square->data.property.mortgageValue);
+        receiveMoney(player, square->data.property.price - square->data.property.mortgageValue, game);
+    }
+    else
+    {
+        sprintf(message, "You sold %s for $%d.", square->name, square->data.property.price);
+        receiveMoney(player, square->data.property.price, game);
+    }
     square->data.property.owner = Bank;
 
-    char message[256];
-    sprintf(message, "You sold %s for $%d.", square->name, square->data.property.price);
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            message);
@@ -998,6 +965,18 @@ void sellProperty(player *player, square *square, gamestate *game)
         }
     }
     player->owned_properties_count--;
+}
+
+void mortgageProperty(player *player, square *square, gamestate *game)
+{
+    game->board[square->squareName].data.property.mortgaged = true;
+    receiveMoney(player, square->data.property.mortgageValue, game);
+}
+
+void unmortgageProperty(player *player, square *square, gamestate *game)
+{
+    game->board[square->squareName].data.property.mortgaged = false;
+    payMoney(player, (int)(square->data.property.mortgageValue * 1.1), game);
 }
 
 /**************************************
@@ -1079,7 +1058,6 @@ void playerInJail(player *player, gamestate *game)
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, jailInfo);
 
     bool getOutOfJail = false;
-    // TODO: Implement get out of jail free cards
     if (player->jailTime < 3 && player->money >= 50)
     {
         // Check if player would like to pay jail fine
@@ -1101,8 +1079,34 @@ void playerInJail(player *player, gamestate *game)
 
     diceRoll roll = rollDice(game);
     DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
+    if (roll.doubles)
+    {
+        getOutOfJail = true;
+    }
+    if (!getOutOfJail && player->getOutOfJailFreeCards > 0)
+    {
+        bool choice = DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner),
+                                              game,
+                                              "Would you like to use a get out of jail free card?");
 
-    if (roll.doubles || getOutOfJail)
+        if (choice)
+        {
+            player->getOutOfJailFreeCards--;
+            getOutOfJail = true;
+        }
+    }
+    if (!getOutOfJail && player->jailTime == 3)
+    {
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                               game,
+                               "You have been in jail for three turns. You must pay $50 now to get out.");
+
+        if (payJailFine(player, game))
+        {
+            getOutOfJail = true;
+        }
+    }
+    if (getOutOfJail)
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
@@ -1114,22 +1118,11 @@ void playerInJail(player *player, gamestate *game)
         player->inJail = false;
         moveToSquare(player, roll, game);
     }
-    else if (player->jailTime == 3)
+    else
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You have been in jail for three turns. You must pay $50 now to get out.");
-
-        if (payJailFine(player, game))
-        {
-            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
-                                   game,
-                                   "You got out of jail!");
-
-            player->jailTime = 0;
-            player->inJail = false;
-            moveToSquare(player, roll, game);
-        }
+                               "You did not get out of jail.");
     }
 }
 
@@ -1164,8 +1157,23 @@ void bankruptPlayer(player *player, gamestate *game)
                            "You are bankrupt and out of the game.");
 
     player->bankrupt = true;
-    // TODO: Return all properties to bank, or auction them off
-    printf("Not implemented yet!\n");
+    // return all properties to bank
+    for (int i = 0; i < MAX_SQUARES; i++)
+    {
+        if (game->board[i].type == Property)
+        {
+            if (game->board[i].data.property.owner == player->owner)
+            {
+                game->board[i].data.property.owner = Bank;
+                game->board[i].data.property.mortgaged = false;
+                if (game->board[i].data.property.type == Colored)
+                {
+                    game->board[i].data.property.coloredProperty.houseCount = 0;
+                    game->board[i].data.property.coloredProperty.hotelCount = 0;
+                }
+            }
+        }
+    }
 }
 
 void waitForNextTurn()
