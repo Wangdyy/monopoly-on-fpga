@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "Squares.h"
 #include "Players.h"
@@ -87,7 +88,7 @@ const square square_Chance3 = {"Chance", Action, Chance3, .data.action = ChanceA
 const square square_ParkPlace = {"Park Place", Property, ParkPlace, .data.property = {.type = Colored, .owner = Bank, .price = 350, .mortgageValue = 175, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {35, 175, 500, 1100, 1300, 1500}}}};
 const square square_LuxuryTax = {"Luxury Tax", Action, LuxuryTax, .data.action = LuxuryTaxAction};
 const square square_Boardwalk = {"Boardwalk", Property, Boardwalk, .data.property = {.type = Colored, .owner = Bank, .price = 400, .mortgageValue = 200, .mortgaged = false, .coloredProperty = {.color = DarkBlue, .houseCost = 200, .hotelCost = 200, .houseCount = 0, .hotelCount = 0, .rent = {50, 200, 600, 1400, 1700, 2000}}}};
-square board[] = {square_Go, square_MediterraneanAvenue, square_CommunityChest1, square_BalticAvenue, square_IncomeTax, square_ReadingRailRoad, square_OrientalAvenue, square_Chance1, square_VermontAvenue, square_ConnecticutAvenue, square_JustVisiting, square_StCharlesPlace, square_ElectricCompany, square_StatesAvenue, square_VirginiaAvenue, square_PennsylvaniaRailRoad, square_StJamesPlace, square_CommunityChest2, square_TennesseeAvenue, square_NewYorkAvenue, square_FreeParking, square_KentuckyAvenue, square_Chance2, square_IndianaAvenue, square_IllinoisAvenue, square_BAndO_RailRoad, square_AtlanticAvenue, square_VentnorAvenue, square_WaterWorks, square_MarvinGardens, square_GoToJail, square_PacificAvenue, square_NorthCarolinaAvenue, square_CommunityChest3, square_PennsylvaniaAvenue, square_ShortLine, square_Chance3, square_ParkPlace, square_LuxuryTax, square_Boardwalk};
+const square *board_ptr[] = {&square_Go, &square_MediterraneanAvenue, &square_CommunityChest1, &square_BalticAvenue, &square_IncomeTax, &square_ReadingRailRoad, &square_OrientalAvenue, &square_Chance1, &square_VermontAvenue, &square_ConnecticutAvenue, &square_JustVisiting, &square_StCharlesPlace, &square_ElectricCompany, &square_StatesAvenue, &square_VirginiaAvenue, &square_PennsylvaniaRailRoad, &square_StJamesPlace, &square_CommunityChest2, &square_TennesseeAvenue, &square_NewYorkAvenue, &square_FreeParking, &square_KentuckyAvenue, &square_Chance2, &square_IndianaAvenue, &square_IllinoisAvenue, &square_BAndO_RailRoad, &square_AtlanticAvenue, &square_VentnorAvenue, &square_WaterWorks, &square_MarvinGardens, &square_GoToJail, &square_PacificAvenue, &square_NorthCarolinaAvenue, &square_CommunityChest3, &square_PennsylvaniaAvenue, &square_ShortLine, &square_Chance3, &square_ParkPlace, &square_LuxuryTax, &square_Boardwalk};
 /*Function defs*/
 
 /**************************************
@@ -97,7 +98,10 @@ square board[] = {square_Go, square_MediterraneanAvenue, square_CommunityChest1,
 void initGame(gamestate *game)
 {
     /*Init board*/
-    game->board = board;
+    for (int i = 0; i < MAX_SQUARES; i++)
+    {
+        memcpy(&game->board[i], board_ptr[i], sizeof(square));
+    }
     /*Init players*/
     for (int i = 0; i < MAX_PLAYERS; i++)
     {
@@ -334,8 +338,6 @@ void doPropertySquare(player *player, square *square, gamestate *game)
  **************************************/
 void payIncomeTax(player *player, gamestate *game)
 {
-    /*Players should get to decide whether to pay 200 or 10% of net worth
-    but for now, we will only implement paying 200*/
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            "You must pay $200 income tax.");
@@ -1036,7 +1038,7 @@ void receiveMoney(player *player, int amount, gamestate *game)
 
 bool sellAssets(player *player, int amount, gamestate *game)
 {
-    // Selling to other players no implemented
+    // TODO: Implement sell assets
     printf("Not implemented yet!\n");
     return false;
 }

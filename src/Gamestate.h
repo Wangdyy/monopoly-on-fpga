@@ -11,7 +11,7 @@
 
 typedef struct gamestate
 {
-    square *board;
+    square board[40];
     player players[4];
     int turn;
     /*Doubles not implemented, does not lead to extra turn*/
