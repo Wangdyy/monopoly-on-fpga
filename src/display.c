@@ -6,8 +6,8 @@
 #include <math.h>
 
 #include "stdbool.h"
-#include "graphics.h"
-#include "Squares.h"
+#include "display.h"
+#include "squares.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // constants
@@ -842,54 +842,58 @@ void draw_houses(int property, int num_houses)
 	int x1, x2, y1, y2, len, house_size;
 	switch (draw_squares[property].orientation)
 	{
-		case 1:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y1 + 8;
-			len = x2 - x1;
-			house_size = (len/4);
-	
-			for (int i = 0; i < num_houses; i++){
-				draw_rectangle(x1 + house_size*i + 1, y1 + 2, x1 + 1 + house_size*(i+1)-1, y2 - 1, DARK_GREEN);
-			}
-			break;
-		case 2:
-			x1 = draw_squares[property].x2 - 8;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			len = y2 - y1;
-			house_size = (len/4);
-	
-			for (int i = 0; i < num_houses; i++){
-				draw_rectangle(x1 + 2, y1 + house_size*i + 1, x2 - 1, y1 + 1 + house_size*(i+1)-1, DARK_GREEN);
-			}
-			break;
-		case 3:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y2 - 8;
-			y2 = draw_squares[property].y2;
-			len = x2 - x1;
-			house_size = (len/4);
-	
-			for (int i = 0; i < num_houses; i++){
-				draw_rectangle(x1 + house_size*i + 1, y1 + 2, x1 + 1 + house_size*(i+1)-1, y2 - 1, DARK_GREEN);
-			}
-			break;
-		case 4:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x1 + 8;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			len = y2 - y1;
-			house_size = (len/4);
-	
-			for (int i = 0; i < num_houses; i++){
-				draw_rectangle(x1 + 2, y1 + house_size*i + 1, x2 - 1, y1 + 1 + house_size*(i+1)-1, DARK_GREEN);
-			}
-			break;
+	case 1:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y1 + 8;
+		len = x2 - x1;
+		house_size = (len / 4);
+
+		for (int i = 0; i < num_houses; i++)
+		{
+			draw_rectangle(x1 + house_size * i + 1, y1 + 2, x1 + 1 + house_size * (i + 1) - 1, y2 - 1, DARK_GREEN);
+		}
+		break;
+	case 2:
+		x1 = draw_squares[property].x2 - 8;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		len = y2 - y1;
+		house_size = (len / 4);
+
+		for (int i = 0; i < num_houses; i++)
+		{
+			draw_rectangle(x1 + 2, y1 + house_size * i + 1, x2 - 1, y1 + 1 + house_size * (i + 1) - 1, DARK_GREEN);
+		}
+		break;
+	case 3:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y2 - 8;
+		y2 = draw_squares[property].y2;
+		len = x2 - x1;
+		house_size = (len / 4);
+
+		for (int i = 0; i < num_houses; i++)
+		{
+			draw_rectangle(x1 + house_size * i + 1, y1 + 2, x1 + 1 + house_size * (i + 1) - 1, y2 - 1, DARK_GREEN);
+		}
+		break;
+	case 4:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x1 + 8;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		len = y2 - y1;
+		house_size = (len / 4);
+
+		for (int i = 0; i < num_houses; i++)
+		{
+			draw_rectangle(x1 + 2, y1 + house_size * i + 1, x2 - 1, y1 + 1 + house_size * (i + 1) - 1, DARK_GREEN);
+		}
+		break;
 	}
 }
 
@@ -899,65 +903,65 @@ void draw_hotel(int property)
 
 	switch (draw_squares[property].orientation)
 	{
-		case 1:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y1 + 8;
-			break;
-		case 2:
-			x1 = draw_squares[property].x2 - 8;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			break;
-		case 3:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y2 - 8;
-			y2 = draw_squares[property].y2;
-			break;
-		case 4:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x1 + 8;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			break;
+	case 1:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y1 + 8;
+		break;
+	case 2:
+		x1 = draw_squares[property].x2 - 8;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 3:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y2 - 8;
+		y2 = draw_squares[property].y2;
+		break;
+	case 4:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x1 + 8;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
 	}
 
 	draw_rectangle(x1 + 2, y1 + 2, x2 - 1, y2 - 1, DARK_RED);
 }
 
 void draw_owned_property(int player, int property)
-{	
+{
 	int x1, x2, y1, y2;
 
 	switch (draw_squares[property].orientation)
 	{
-		case 1:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y2 - 10;
-			y2 = draw_squares[property].y2;
-			break;
-		case 2:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x1 + 10;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			break;
-		case 3:
-			x1 = draw_squares[property].x1;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y1 + 10;
-			break;
-		case 4:
-			x1 = draw_squares[property].x2 - 10;
-			x2 = draw_squares[property].x2;
-			y1 = draw_squares[property].y1;
-			y2 = draw_squares[property].y2;
-			break;
+	case 1:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y2 - 10;
+		y2 = draw_squares[property].y2;
+		break;
+	case 2:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x1 + 10;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 3:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y1 + 10;
+		break;
+	case 4:
+		x1 = draw_squares[property].x2 - 10;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
 	}
 
 	int colors[] = {DARK_BLUE, GREEN, YELLOW, RED, PINK, ORANGE};
@@ -1351,6 +1355,8 @@ int write_string(char *line, int max_x, int max_y, int start_x, int start_y)
 void draw_options_box(char *question,
 					  int num_options,
 					  char **options,
+					  bool add_prev,
+					  bool add_next,
 					  bool chance,
 					  bool community_chest)
 {
@@ -1388,6 +1394,21 @@ void draw_options_box(char *question,
 		sprintf(str, "<%c> - %s", choice_symbols[i], options[i]);
 		last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2) + 1;
 	}
+
+	char *scroll_string = "";
+	if (add_prev && add_next)
+	{
+		scroll_string = "<7> - Prev            <8> - Next";
+	}
+	else if (add_prev)
+	{
+		scroll_string = "<7> - Prev";
+	}
+	else if (add_next)
+	{
+		scroll_string = "                      <8> - Next";
+	}
+	write_string(scroll_string, LINE_END, LINE_END, LINE_START, LINE_END - 2);
 }
 
 void clear_text_buffer()

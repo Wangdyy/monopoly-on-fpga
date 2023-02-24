@@ -1,7 +1,7 @@
 #pragma once
-#include "Squares.h"
-#include "Players.h"
-#include "Gamestate.h"
+#include "squares.h"
+#include "players.h"
+#include "gamestate.h"
 /*Function decl*/
 
 /**************************************

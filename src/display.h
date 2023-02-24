@@ -51,12 +51,13 @@ void draw_hotel(int property);
 void clear_text_buffer();
 void draw_text(char *text, int x_position, int y_position);
 int write_string(char *line, int max_x, int max_y, int start_x, int start_y);
-void draw_dialogue(char *question, int num_options, char **options, bool chance, bool community_chest);
 void draw_player_turn(int player);
 void draw_board_frame();
 void draw_options_box(char *question,
                       int num_options,
                       char **options,
+                      bool add_prev,
+                      bool add_next,
                       bool chance,
                       bool community_chest);
 

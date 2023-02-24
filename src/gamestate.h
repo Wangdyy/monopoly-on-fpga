@@ -1,10 +1,10 @@
 /****************************************************************************************
- * Gamestate.h
+ * gamestate.h
  * This file contains the struct defininition of the Gamestate
  *****************************************************************************************/
 #pragma once
-#include "Squares.h"
-#include "Players.h"
+#include "squares.h"
+#include "players.h"
 
 #define MAX_PLAYERS 4
 #define MAX_SQUARES 40

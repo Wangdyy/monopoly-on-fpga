@@ -5,13 +5,14 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "Squares.h"
-#include "Players.h"
-#include "Gamestate.h"
-#include "helper_functions.h"
-#include "graphics.h"
+#include "squares.h"
+#include "players.h"
+#include "gamestate.h"
+#include "helpers.h"
+#include "display.h"
 #include "interface.h"
 
+#define GRAPHICS_ENABLED
 #define OWNER_TO_PLAYER(player) (player + 1)
 #ifdef GRAPHICS_ENABLED
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) drawseq_normal_confirm(curr_player, game, question)

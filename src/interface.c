@@ -3,11 +3,11 @@
 #include <string.h>
 
 #include "stdbool.h"
-#include "Gamestate.h"
-#include "Players.h"
-#include "Squares.h"
+#include "gamestate.h"
+#include "players.h"
+#include "squares.h"
 #include "interface.h"
-#include "graphics.h"
+#include "display.h"
 
 #define QUEUE_TYPE KeyReleased
 
@@ -567,9 +567,13 @@ void print_options(int num_options, char **options)
 ///////////////////////////////////////////////////////////////////////////////
 // interface constants
 int MAX_OPTS_PER_PAGE = 6;
+int PREV_OPT = 6; // since there are max 6 options per page,
+int NEXT_OPT = 7; // prev and next will just use the next two buttons
 int MAX_HOUSES_ON_PROPERTY = 4;
 int MAX_HOTELS_ON_PROPERTY = 1;
 int NUM_SQUARES = 40;
+char *PROPERTY_SELECT_DIALOG_OPTIONS[] = {"Next", "Prev", "Confirm", "Cancel"};
+int NUM_PROPERTY_SELECT_DIALOG_OPTIONS = sizeof(PROPERTY_SELECT_DIALOG_OPTIONS) / sizeof(char *);
 
 ///////////////////////////////////////////////////////////////////////////////
 // interface impl
@@ -697,13 +701,6 @@ void drawseq_turn_start(int curr_player, gamestate *game)
 	wait_for_vsync();
 }
 
-void drawseq_board_frame(gamestate *game)
-{
-	draw_board_frame();
-	draw_player_pieces_with_gamestate(game);
-	wait_for_vsync();
-}
-
 int drawseq_dialogue_get_choice(int curr_player,
 								gamestate *game,
 								char *question,
@@ -712,94 +709,75 @@ int drawseq_dialogue_get_choice(int curr_player,
 								bool chance,
 								bool community_chest)
 {
-	// draw the dialogue
-	draw_basic_setup(curr_player, game);
-
 	int choice = -1;
 
 	if (num_options <= MAX_OPTS_PER_PAGE)
 	{
-		draw_options_box(question, num_options, options, chance, community_chest);
+		draw_basic_setup(curr_player, game);
+		draw_options_box(question, num_options, options, false, false, chance, community_chest);
 		wait_for_vsync();
-		choice = get_choice(num_options);
+		return get_choice(num_options);
 	}
-	else
+
+	int before_page = -1, page = 0;
+	int total_pages = (num_options - 1) / MAX_OPTS_PER_PAGE + 1;
+	bool has_prev_page = false, has_next_page = false;
+
+	while (choice == -1)
 	{
-		int page = 0;
-		char *prev_page_option = "Previous Page";
-		char *next_page_option = "Next Page";
+		has_prev_page = page != 0;
+		has_next_page = page != total_pages - 1;
 
-		while (choice == -1)
+		// skip redrawing if the choice before was illegal turning
+		if (before_page != page)
 		{
+			int num_page_options = MAX_OPTS_PER_PAGE;
 			char *page_options[MAX_OPTS_PER_PAGE];
-			int n_options = MAX_OPTS_PER_PAGE;
-			int n_options_with_page_changes = MAX_OPTS_PER_PAGE;
 
-			// check for next page/////////////////////////////////////////////
-			int total_options_before_page = 0, total_options_so_far = 0;
-
-			// first page can hold MAX_OPTS_PER_PAGE - 1 options
-			// since it has next page but no prev page
-			if (page > 0)
-				total_options_before_page += MAX_OPTS_PER_PAGE - 1;
-
-			// all the pages before this one (after the first) can hold 10 items
-			if (page > 1)
-				total_options_before_page += (page - 1) * (MAX_OPTS_PER_PAGE - 2);
-
-			// this page can hold MAX_OPTS_PER_PAGE - 1 items if it is the last page
-			total_options_so_far = total_options_before_page;
-			total_options_so_far += MAX_OPTS_PER_PAGE - 1;
-
-			if (total_options_so_far < num_options)
+			for (int i = 0; i < MAX_OPTS_PER_PAGE; i++)
 			{
-				n_options -= 1;
-				page_options[n_options] = next_page_option;
-			}
-			else
-			{
-				// the last page may have less than MAX_OPTS_PER_PAGE - 1 items
-				// initialize them to the same value, only n_options will be updated
-				n_options = num_options - total_options_before_page + 1;
-				n_options_with_page_changes = n_options;
+				int opt_i = page * MAX_OPTS_PER_PAGE + i;
+				if (opt_i == num_options)
+				{
+					num_page_options = i;
+					break;
+				}
+				page_options[i] = options[opt_i];
 			}
 
-			// check for previous page/////////////////////////////////////////
-			if (page > 0)
-			{
-				n_options -= 1;
-				page_options[n_options] = prev_page_option;
-			}
-
-			// now fill in all the actual options//////////////////////////////
-			for (int i = 0; i < n_options; i++)
-			{
-				page_options[i] = options[total_options_before_page + i];
-			}
-
-			clear_text_buffer();
-			draw_options_box(question, n_options_with_page_changes, page_options, chance, community_chest);
+			draw_basic_setup(curr_player, game);
+			draw_options_box(question,
+							 num_page_options,
+							 page_options,
+							 has_prev_page,
+							 has_next_page,
+							 chance,
+							 community_chest);
 			wait_for_vsync();
-			choice = get_choice(num_options);
+		}
 
-			if (page_options[choice] == prev_page_option)
-			{
-				choice = -1;
-				page -= 1;
-			}
-			else if (page_options[choice] == next_page_option)
-			{
-				choice = -1;
-				page += 1;
-			}
+		choice = get_choice(MAX_OPTS_PER_PAGE + 2);
+		if (has_prev_page && choice == PREV_OPT)
+		{
+			choice = -1;
+			before_page = page;
+			page -= 1;
+		}
+		else if (has_next_page && choice == NEXT_OPT)
+		{
+			choice = -1;
+			before_page = page;
+			page += 1;
+		}
+		else if (choice == PREV_OPT || choice == NEXT_OPT)
+		{
+			// illegal page turning
+			before_page = page;
+			choice = -1;
 		}
 	}
 
-	// now remove the dialogue	// the backside should just be the normal setup
-	draw_basic_setup(curr_player, game);
-	clear_text_buffer();
-	wait_for_vsync();
-
+	choice = page * MAX_OPTS_PER_PAGE + choice;
 	return choice;
 }
 
@@ -822,108 +800,83 @@ void drawseq_roll_dice(int curr_player, gamestate *game, diceRoll dice_roll)
 	wait_for_vsync();
 }
 
-int drawseq_mortgage_property(player *curr_player_struct, gamestate *game)
-{
-	char *question = "Which property would you like to mortgage?";
-	int num_props = curr_player_struct->owned_properties_count;
-	char *all_opts[num_props + 1]; // last option is for cancel
-
-	for (int i = 0; i < num_props; i++)
-	{
-		all_opts[i] = malloc(256);
-		sprintf(all_opts[i],
-				"%s for $%d",
-				curr_player_struct->owned_properties[i]->name,
-				curr_player_struct->owned_properties[i]->data.property.price);
-	}
-
-	all_opts[num_props] = "Cancel";
-
-	int ret = drawseq_dialogue_get_choice(curr_player_struct->owner,
-										  game,
-										  question,
-										  num_props + 1,
-										  all_opts,
-										  false,
-										  false);
-
-	for (int i = 0; i < num_props; i++)
-	{
-		free(all_opts[i]);
-	}
-
-	return ret;
-}
-
-int drawseq_buy_house_on_property(player *curr_player_struct, gamestate *game)
-{
-	char *question = "What would you like to buy?";
-	int total_props = curr_player_struct->owned_properties_count;
-	char *all_opts[total_props + 1]; // last option is for cancel
-
-	int num_props = 0;
-	for (int i = 0; i < total_props; i++)
-	{
-		if (curr_player_struct->owned_properties[i]->data.property.type == Colored)
-		{
-			coloredProperty *cp = &curr_player_struct->owned_properties[i]->data.property.coloredPropety;
-			if (cp->houseCount < MAX_HOUSES_ON_PROPERTY)
-			{
-				all_opts[i] = malloc(256);
-				sprintf(all_opts[i],
-						"A house on %s for $%d",
-						curr_player_struct->owned_properties[i]->name,
-						cp->houseCost);
-
-				num_props += 1;
-			}
-			else if (cp->hotelCount < MAX_HOTELS_ON_PROPERTY)
-			{
-				all_opts[i] = malloc(256);
-				sprintf(all_opts[i],
-						"A hotel on %s for $%d",
-						curr_player_struct->owned_properties[i]->name,
-						cp->houseCost);
-
-				num_props += 1;
-			}
-		}
-	}
-
-	all_opts[num_props] = "Cancel";
-
-	int ret = drawseq_dialogue_get_choice(curr_player_struct->owner,
-										  game,
-										  question,
-										  num_props + 1,
-										  all_opts,
-										  false,
-										  false);
-
-	for (int i = 0; i < num_props; i++)
-	{
-		free(all_opts[i]);
-	}
-
-	return ret;
-}
-
 void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, int old_pos, int new_pos)
 {
-	// should always enter from the dice roll animation
-	// draw the same dice on this screen so they stay while player moves
-	draw_dice_roll(dice_roll.die1, dice_roll.die2);
-
-	int total = dice_roll.die1 + dice_roll.die2;
-
 	for (int i = 0; i < (new_pos + NUM_SQUARES - old_pos) % NUM_SQUARES; i++)
 	{
-		draw_board_frame();
+		// draw_basic_setup, but without drawing players
+		clear_text_buffer();
+		draw_plain_board();
+		draw_player_turn(curr_player);
+		draw_all_player_cash(game);
+
+		draw_dice_roll(dice_roll.die1, dice_roll.die2);
 		draw_player_pieces_with_update(game, curr_player - 1, (old_pos + i + 1) % NUM_SQUARES);
 		wait_for_vsync();
 	}
 }
 
+void draw_property_select_screen(int curr_player, gamestate *game, int num_choices, int *choices, int curr_choice)
+{
+	int highlight_id = 6;
+
+	draw_basic_setup(curr_player, game);
+
+	// highlight all eligible property
+	for (int i = 0; i < num_choices; i++)
+	{
+		draw_owned_property(curr_player, choices[i]);
+	}
+
+	// current highlight
+	draw_owned_property(highlight_id, choices[curr_choice]);
+
+	// instructions in the middle
+	draw_options_box("Choose an eligible property:",
+					 NUM_PROPERTY_SELECT_DIALOG_OPTIONS,
+					 PROPERTY_SELECT_DIALOG_OPTIONS,
+					 false,
+					 false,
+					 false,
+					 false);
+}
+
+int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choices, int *choices)
+{
+	if (num_choices == 0)
+	{
+		drawseq_normal_confirm(curr_player, game, "You have no eligible properties to choose from!");
+		return -1;
+	}
+
+	// start from the first property, go around until one is chosen
+	int chosen = 0;
+
+	bool done = false;
+	while (!done)
+	{
+		draw_property_select_screen(curr_player, game, num_choices, choices, chosen);
+		wait_for_vsync();
+
+		switch (get_choice(NUM_PROPERTY_SELECT_DIALOG_OPTIONS))
+		{
+		case 0:
+			chosen = (chosen + 1) % num_choices;
+			break;
+		case 1:
+			chosen = (chosen + num_choices - 1) % num_choices;
+			break;
+		case 2:
+			return chosen;
+		case 3:
+			return -1;
+		default:
+			printf("Illegal choice received.\n");
+			exit(1);
+		}
+	}
+	return -1;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Demo //
 // int main()

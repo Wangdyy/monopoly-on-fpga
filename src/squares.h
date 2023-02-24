@@ -1,5 +1,5 @@
 /****************************************************************************************
- * Squares.h
+ * squares.h
  * This file contains the struct defininition of the all the squares,
  * which are either properties or action squares
  *****************************************************************************************/

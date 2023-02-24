@@ -1,9 +1,9 @@
 /****************************************************************************************
- * Players.h
+ * players.h
  * This file contains the struct defininition of the all players
  *****************************************************************************************/
 #pragma once
-#include "Squares.h"
+#include "squares.h"
 
 typedef struct player
 {

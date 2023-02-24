@@ -7,7 +7,7 @@ LDIR =../lib
 
 LIBS=
 
-_DEPS = Gamestate.h helper_functions.h Players.h Squares.h
+_DEPS = gamestate.h helper_functions.h players.h squares.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
 _OBJ = Monopoly.o
