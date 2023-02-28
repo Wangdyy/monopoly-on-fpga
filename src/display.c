@@ -1032,6 +1032,151 @@ void draw_4_player(int square, int player1, int player2, int player3, int player
 	draw_single_player(x4, y4, player4);
 }
 
+void draw_1_player_jail(int square, int player, bool player_in_jail)
+{
+	int cell_x1 = 16;
+	int cell_x2 = 27;
+	int cell_y1 = 212;
+	int cell_y2 = 223;
+
+	int x;
+	int y = cell_y1 + ((cell_y2 - cell_y1) / 2);
+
+	if (player_in_jail){
+		x = cell_x1 + ((cell_x2 - cell_x1) / 2);
+	}
+	else{
+		x = 4;
+	}
+	draw_single_player(x, y, player);
+}
+
+void draw_2_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail)
+{
+	int cell_x1 = 16;
+	int cell_x2 = 27;
+	int cell_y1 = 212;
+	int cell_y2 = 223;
+
+	int x1, y1, x2, y2;
+
+	if (player1_in_jail){
+		x1 = cell_x1 + ((cell_x2 - cell_x1) / 4);
+		y1 = cell_y1 + ((cell_y2 - cell_y1) / 2);
+	}
+	else{
+		x1 = 4;
+		y1 = cell_y1;
+	}
+
+	if (player2_in_jail){
+		x2 = cell_x1 + 4*((cell_x2 - cell_x1) / 4);
+		y2 = cell_y1 + ((cell_y2 - cell_y1) / 2);
+	}
+	else{
+		x2 = 4;
+		y2 = cell_y2;
+	}
+	
+
+	draw_single_player(x1, y1, player1);
+	draw_single_player(x2, y2, player2);
+}
+
+void draw_3_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail, int player3, bool player3_in_jail)
+{
+	int cell_x1 = 16;
+	int cell_x2 = 27;
+	int cell_y1 = 212;
+	int cell_y2 = 223;
+
+	int x1, y1, x2, y2, x3, y3;
+
+	if (player1_in_jail){
+		x1 = cell_x1 + ((cell_x2 - cell_x1) / 4);
+		y1 = cell_y1 + ((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x1 = 4;
+		y1 = cell_y1;
+	}
+
+	if (player2_in_jail){
+		x2 = cell_x1 + 4*((cell_x2 - cell_x1) / 4);
+		y2 = cell_y1 + ((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x2 = 4;
+		y2 = cell_y2;
+	}
+
+	if (player3_in_jail){
+		x3 = cell_x1 + ((cell_x2 - cell_x1) / 4);
+		y3 = cell_y1 + 4*((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x3 = cell_x1;
+		y3 = 236;
+	}
+
+	draw_single_player(x1, y1, player1);
+	draw_single_player(x2, y2, player2);
+	draw_single_player(x3, y3, player3);
+}
+
+void draw_4_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail, int player3, bool player3_in_jail, int player4, bool player4_in_jail)
+{
+	
+	int cell_x1 = 16;
+	int cell_x2 = 27;
+	int cell_y1 = 212;
+	int cell_y2 = 223;
+
+	int x1, y1, x2, y2, x3, y3, x4, y4;
+
+	if (player1_in_jail){
+		x1 = cell_x1 + ((cell_x2 - cell_x1) / 4);
+		y1 = cell_y1 + ((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x1 = 4;
+		y1 = cell_y1;
+	}
+
+	if (player2_in_jail){
+		x2 = cell_x1 + 4*((cell_x2 - cell_x1) / 4);
+		y2 = cell_y1 + ((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x2 = 4;
+		y2 = cell_y2;
+	}
+
+	if (player3_in_jail){
+		x3 = cell_x1 + ((cell_x2 - cell_x1) / 4);
+		y3 = cell_y1 + 4*((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x3 = cell_x1;
+		y3 = 236;
+	}
+
+	if (player4_in_jail){
+		x4 = cell_x1 + 4*((cell_x2 - cell_x1) / 4);
+		y4 = cell_y1 + 4*((cell_y2 - cell_y1) / 4);
+	}
+	else{
+		x4 = cell_x2;
+		y4 = 236;
+	}
+
+
+	draw_single_player(x1, y1, player1);
+	draw_single_player(x2, y2, player2);
+	draw_single_player(x3, y3, player3);
+	draw_single_player(x4, y4, player4);
+}
+
 void draw_dice_roll(int r1, int r2)
 {
 	// dice are 40 x 40
