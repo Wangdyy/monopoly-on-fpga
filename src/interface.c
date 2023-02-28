@@ -634,6 +634,27 @@ void draw_player_pieces(gamestate *game)
 			players_here[players_cnt++] = 4;
 		}
 
+		//special case for jail
+		if (square_i == 10){
+			if (players_cnt == 1)
+			{
+				draw_1_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail);
+			}
+			else if (players_cnt == 2)
+			{
+				draw_2_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail, players_here[1], game->players[players_here[1]].inJail);
+			}
+			else if (players_cnt == 3)
+			{
+				draw_3_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail, players_here[1], game->players[players_here[1]].inJail, players_here[2], game->players[players_here[2]].inJail);
+			}
+			else if (players_cnt == 4)
+			{
+				draw_4_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail,  players_here[1], game->players[players_here[1]].inJail, players_here[2], game->players[players_here[2]].inJail, players_here[3], game->players[players_here[3]].inJail);
+			}
+			continue;
+		}
+
 		if (players_cnt == 1)
 		{
 			draw_1_player(square_i, players_here[0]);
