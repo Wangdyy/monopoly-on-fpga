@@ -9,7 +9,6 @@
 #include "display.h"
 #include "squares.h"
 
-///////////////////////////////////////////////////////////////////////////////
 // constants
 
 // colors
@@ -119,6 +118,44 @@ char eight[98] = "87ffffff87ffffff33ffffff33ffffff33ffffff03ffffff87ffffff33ffff
 char nine[98] = "87ffffff03ffffff33fffffff3fffffff3ffffff83ffffff03ffffff33ffffff33ffffff33ffffff03ffffff87ffffffzz";
 char *numbers[10] = {zero, one, two, three, four, five, six, seven, eight, nine};
 
+char A[] = "afffffffafffffff8fffffffafffffffdfffffff";
+char B[] = "9fffffffafffffff9fffffffafffffff9fffffff";
+char C[] = "8fffffffbfffffffbfffffffbfffffff8fffffff";
+char D[] = "9fffffffafffffffafffffffafffffff9fffffff";
+char E[] = "8fffffffbfffffff9fffffffbfffffff8fffffff";
+char F[] = "bfffffffbfffffff9fffffffbfffffff8fffffff";
+char G[] = "8fffffffafffffffafffffffbfffffff8fffffff";
+char H[] = "afffffffafffffff8fffffffafffffffafffffff";
+char I[] = "8fffffffdfffffffdfffffffdfffffff8fffffff";
+char J[] = "8fffffffafffffffefffffffefffffffefffffff";
+char K[] = "afffffffafffffff9fffffffafffffffafffffff";
+char L[] = "8fffffffbfffffffbfffffffbfffffffbfffffff";
+char M[] = "afffffffafffffff8fffffff8fffffff8fffffff";
+char N[] = "afffffffafffffffafffffffafffffff8fffffff";
+char O[] = "8fffffffafffffffafffffffafffffff8fffffff";
+char P[] = "bfffffffbfffffff8fffffffafffffff8fffffff";
+char Q[] = "87ffffffafffffffafffffffafffffff8fffffff";
+char R[] = "afffffffafffffff9fffffffafffffff8fffffff";
+char S[] = "9fffffffefffffffdfffffffbfffffffcfffffff";
+char T[] = "dfffffffdfffffffdfffffffdfffffff8fffffff";
+char U[] = "8fffffffafffffffafffffffafffffffafffffff";
+char V[] = "dfffffffafffffffafffffffafffffffafffffff";
+char W[] = "8fffffff8fffffff8fffffffafffffffafffffff";
+char X[] = "afffffffafffffffdfffffffafffffffafffffff";
+char Y[] = "dfffffffdfffffff8fffffffafffffffafffffff";
+char Z[] = "8fffffffbfffffffdfffffffefffffff8fffffff";
+char dollar_sign_mini[] = "dfffffff0fffffffd7ffffff07ffffff5fffffff87ffffffdfffffff";
+char zero_mini[] = "8fffffffafffffffafffffffafffffff8fffffff";
+char one_mini[] = "dfffffffdfffffffdfffffff9fffffffdfffffff";
+char two_mini[] = "8fffffffbfffffffdfffffffefffffff8fffffff";
+/*char three_mini[] = "";
+char four_mini[] = "";
+char five_mini[] = "";
+char six_mini[] = "";
+char seven_mini[] = "";
+char eight_mini[] = "";
+char nine_mini[] = "";*/
+
 ///////////////////////////////////////////////////////////////////////////////
 // globals
 volatile int pixel_buffer_start;
@@ -141,18 +178,26 @@ int abs(int x)
 {
 	return x < 0 ? -x : x;
 }
+/*
+int main(void)
+{
 
-// int main(void)
-// {
-// 	init_graphics();
+ 	init_graphics();
+ 	// initialize board function- currently assumes at least 2 players
+ 	draw_plain_board();
+	
+	char testing_string[] = "ABC DEF GHI JKL MNO PQRST U VWXYZ $1200";
 
-// 	// initialize board function- currently assumes at least 2 players
-// 	draw_plain_board();
+	draw_string(testing_string, 50, 100);
+	
+	
 
-// 	wait_for_vsync(); // swap buffers
+ 	wait_for_vsync(); // swap buffers
 
 // 	// TESTING GRAPHIC FUNCTIONS
-// }
+}
+*/
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // impl
@@ -1429,6 +1474,121 @@ void wait_for_vsync()
 	}
 
 	pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// new text module
+
+void draw_string(char *text, int x_position, int y_position)
+{
+	int x = x_position;
+	int y = y_position;
+	
+	// iterate through text and print character accordingly
+	for (int i = 0; i < strlen(text); i++)
+	{
+		switch (text[i])
+		{
+		case '0':
+			plot_monochrome_bitmap(zero_mini, x, y, 32, 5, BLACK);
+			break;
+		case '1':
+			plot_monochrome_bitmap(one_mini, x, y, 32, 5, BLACK);
+			break;
+		case '2':
+			plot_monochrome_bitmap(two_mini, x, y, 32, 5, BLACK);
+			break;
+		case 'A':
+			plot_monochrome_bitmap(A, x, y, 32, 5, BLACK);
+			break;
+		case 'B':
+			plot_monochrome_bitmap(B, x, y, 32, 5, BLACK);
+			break;
+		case 'C':
+			plot_monochrome_bitmap(C, x, y, 32, 5, BLACK);
+			break;
+		case 'D':
+			plot_monochrome_bitmap(D, x, y, 32, 5, BLACK);
+			break;
+		case 'E':
+			plot_monochrome_bitmap(E, x, y, 32, 5, BLACK);
+			break;
+		case 'F':
+			plot_monochrome_bitmap(F, x, y, 32, 5, BLACK);
+			break;
+		case 'G':
+			plot_monochrome_bitmap(G, x, y, 32, 5, BLACK);
+			break;
+		case 'H':
+			plot_monochrome_bitmap(H, x, y, 32, 5, BLACK);
+			break;
+		case 'I':
+			plot_monochrome_bitmap(I, x, y, 32, 5, BLACK);
+			break;
+		case 'J':
+			plot_monochrome_bitmap(J, x, y, 32, 5, BLACK);
+			break;
+		case 'K':
+			plot_monochrome_bitmap(K, x, y, 32, 5, BLACK);
+			break;
+		case 'L':
+			plot_monochrome_bitmap(L, x, y, 32, 5, BLACK);
+			break;
+		case 'M':
+			plot_monochrome_bitmap(M, x, y, 32, 5, BLACK);
+			break;
+		case 'N':
+			plot_monochrome_bitmap(N, x, y, 32, 5, BLACK);
+			break;
+		case 'O':
+			plot_monochrome_bitmap(O, x, y, 32, 5, BLACK);
+			break;
+		case 'P':
+			plot_monochrome_bitmap(P, x, y, 32, 5, BLACK);
+			break;
+		case 'Q':
+			plot_monochrome_bitmap(Q, x, y, 32, 5, BLACK);
+			x++;
+			break;
+		case 'R':
+			plot_monochrome_bitmap(R, x, y, 32, 5, BLACK);
+			break;
+		case 'S':
+			plot_monochrome_bitmap(S, x, y, 32, 5, BLACK);
+			break;
+		case 'T':
+			plot_monochrome_bitmap(T, x, y, 32, 5, BLACK);
+			break;
+		case 'U':
+			plot_monochrome_bitmap(U, x, y, 32, 5, BLACK);
+			break;
+		case 'V':
+			plot_monochrome_bitmap(V, x, y, 32, 5, BLACK);
+			break;
+		case 'W':
+			plot_monochrome_bitmap(W, x, y, 32, 5, BLACK);
+			break;
+		case 'X':
+			plot_monochrome_bitmap(X, x, y, 32, 5, BLACK);
+			break;
+		case 'Y':
+			plot_monochrome_bitmap(Y, x, y, 32, 5, BLACK);
+			break;
+		case 'Z':
+			plot_monochrome_bitmap(Z, x, y, 32, 5, BLACK);
+			break;
+		case '$':
+			plot_monochrome_bitmap(dollar_sign_mini, x, y-1, 32, 7, BLACK);
+			break;
+		case ' ':
+			x -= 1;
+		}
+		x += 5;
+		if (!((i+1)%20)){
+			y+=7;
+			x = x_position;
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
