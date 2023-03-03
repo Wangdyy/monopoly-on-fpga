@@ -24,8 +24,10 @@
 #define GREEN 0x1D8B
 #define DARK_GREEN 0x01A0
 #define DARK_BLUE 0x0397
-#define WHITE 0xffff
+#define WHITE 0xFFFF
 #define CREAM 0xEF5B
+#define MUSTARD_YELLOW 0xE640
+#define PEACH 0xFC4C
 
 #define MIN_X 0
 #define MIN_Y 0
@@ -144,17 +146,30 @@ char W[] = "8fffffff8fffffff8fffffffafffffffafffffff";
 char X[] = "afffffffafffffffdfffffffafffffffafffffff";
 char Y[] = "dfffffffdfffffff8fffffffafffffffafffffff";
 char Z[] = "8fffffffbfffffffdfffffffefffffff8fffffff";
+char period[] = "bfffffffffffffffffffffffffffffffffffffff";
+char comma[] = "bfffffffdfffffffffffffffffffffffffffffff";
+char forward_slash[] = "ffffffffbfffffffdfffffffefffffffffffffff";
+char backward_slash[] = "ffffffffefffffffdfffffffbfffffffffffffff";
+char left_paren[] = "dfffffffbfffffffbfffffffbfffffffdfffffff";
+char right_paren[] = "7fffffffbfffffffbfffffffbfffffff7fffffff";
+char less_than[] = "ffffffffbfffffff7fffffffbfffffffffffffff";
+char greater_than[] = "ffffffffbfffffffdfffffffbfffffffffffffff";
+char dash[] = "ffffffffffffffff8fffffffffffffffffffffff";
+char question_mark[] = "bfffffffffffffffbfffffffdfffffff6fffffff9fffffffffffffffffffffff";
+char exclamation_mark[] = "bfffffffffffffffbfffffffbfffffffbfffffff";
 char dollar_sign_mini[] = "dfffffff0fffffffd7ffffff07ffffff5fffffff87ffffffdfffffff";
 char zero_mini[] = "8fffffffafffffffafffffffafffffff8fffffff";
 char one_mini[] = "dfffffffdfffffffdfffffff9fffffffdfffffff";
 char two_mini[] = "8fffffffbfffffffdfffffffefffffff8fffffff";
-/*char three_mini[] = "";
-char four_mini[] = "";
-char five_mini[] = "";
-char six_mini[] = "";
-char seven_mini[] = "";
-char eight_mini[] = "";
-char nine_mini[] = "";*/
+char three_mini[] = "9fffffffefffffffdfffffffefffffff9fffffff";
+char four_mini[] = "efffffffefffffff8fffffffafffffffafffffff";
+char five_mini[] = "8fffffffefffffff8fffffffbfffffff8fffffff";
+char six_mini[] = "8fffffffafffffff8fffffffbfffffff8fffffff";
+char seven_mini[] = "bfffffffbfffffffdfffffffefffffff8fffffff";
+char eight_mini[] = "8fffffffafffffff8fffffffafffffff8fffffff";
+char nine_mini[] = "8fffffffefffffff8fffffffafffffff8fffffff";
+//apple
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // globals
@@ -654,7 +669,7 @@ void draw_plain_board()
 	// chance draw_squares
 	draw_chance(71, 209, 0);
 	draw_chance(70, 32, 2);
-	draw_chance(209, 185, 3);
+	draw_chance(209, 147, 3);
 
 	// community chests
 	draw_chest(166, 209, 184, 216, 1);
@@ -1479,7 +1494,34 @@ void wait_for_vsync()
 ///////////////////////////////////////////////////////////////////////////////
 // new text module
 
-void draw_string(char *text, int x_position, int y_position)
+int draw_string(char *text, int x_position, int y_position){
+	
+	//Assumbing no single word will exceed 136 px.
+	int x = x_position;
+	int y = y_position;
+	//const char delim[] = " ";
+	char* token;
+	int text_len = strlen(text);
+	char remaining[text_len+1];
+	strncpy(remaining, text, text_len);
+	remaining[text_len] = '\0';
+	char* r = remaining;
+	
+	//Continue extracting drawing each word in string
+		while (token = strtok_r(r, " ", &r)){
+
+		//If the x value is too close to right margin, start new line
+		int len = strlen(token);
+		if (x + len*5 > 188){
+			y +=9;
+			x = x_position;
+		}
+		x = draw_word(token,x,y);
+	}
+	return y + 9;
+}
+
+int draw_word(char *text, int x_position, int y_position)
 {
 	int x = x_position;
 	int y = y_position;
@@ -1498,97 +1540,174 @@ void draw_string(char *text, int x_position, int y_position)
 		case '2':
 			plot_monochrome_bitmap(two_mini, x, y, 32, 5, BLACK);
 			break;
+		case '3':
+			plot_monochrome_bitmap(three_mini, x, y, 32, 5, BLACK);
+			break;
+		case '4':
+			plot_monochrome_bitmap(four_mini, x, y, 32, 5, BLACK);
+			break;
+		case '5':
+			plot_monochrome_bitmap(five_mini, x, y, 32, 5, BLACK);
+			break;
+		case '6':
+			plot_monochrome_bitmap(six_mini, x, y, 32, 5, BLACK);
+			break;
+		case '7':
+			plot_monochrome_bitmap(seven_mini, x, y, 32, 5, BLACK);
+			break;
+		case '8':
+			plot_monochrome_bitmap(eight_mini, x, y, 32, 5, BLACK);
+			break;
+		case '9':
+			plot_monochrome_bitmap(nine_mini, x, y, 32, 5, BLACK);
+			break;
 		case 'A':
+		case 'a':
 			plot_monochrome_bitmap(A, x, y, 32, 5, BLACK);
 			break;
 		case 'B':
+		case 'b':
 			plot_monochrome_bitmap(B, x, y, 32, 5, BLACK);
 			break;
 		case 'C':
+		case 'c':
 			plot_monochrome_bitmap(C, x, y, 32, 5, BLACK);
 			break;
 		case 'D':
+		case 'd':
 			plot_monochrome_bitmap(D, x, y, 32, 5, BLACK);
 			break;
 		case 'E':
+		case 'e':
 			plot_monochrome_bitmap(E, x, y, 32, 5, BLACK);
 			break;
 		case 'F':
+		case 'f':
 			plot_monochrome_bitmap(F, x, y, 32, 5, BLACK);
 			break;
 		case 'G':
+		case 'g':
 			plot_monochrome_bitmap(G, x, y, 32, 5, BLACK);
 			break;
 		case 'H':
+		case 'h':
 			plot_monochrome_bitmap(H, x, y, 32, 5, BLACK);
 			break;
 		case 'I':
+		case 'i':
 			plot_monochrome_bitmap(I, x, y, 32, 5, BLACK);
 			break;
 		case 'J':
+		case 'j':
 			plot_monochrome_bitmap(J, x, y, 32, 5, BLACK);
 			break;
 		case 'K':
+		case 'k':
 			plot_monochrome_bitmap(K, x, y, 32, 5, BLACK);
 			break;
 		case 'L':
+		case 'l':
 			plot_monochrome_bitmap(L, x, y, 32, 5, BLACK);
 			break;
 		case 'M':
+		case 'm':
 			plot_monochrome_bitmap(M, x, y, 32, 5, BLACK);
 			break;
 		case 'N':
+		case 'n':
 			plot_monochrome_bitmap(N, x, y, 32, 5, BLACK);
 			break;
 		case 'O':
+		case 'o':
 			plot_monochrome_bitmap(O, x, y, 32, 5, BLACK);
 			break;
 		case 'P':
+		case 'p':
 			plot_monochrome_bitmap(P, x, y, 32, 5, BLACK);
 			break;
 		case 'Q':
+		case 'q':
 			plot_monochrome_bitmap(Q, x, y, 32, 5, BLACK);
 			x++;
 			break;
 		case 'R':
+		case 'r':
 			plot_monochrome_bitmap(R, x, y, 32, 5, BLACK);
 			break;
 		case 'S':
+		case 's':
 			plot_monochrome_bitmap(S, x, y, 32, 5, BLACK);
 			break;
 		case 'T':
+		case 't':
 			plot_monochrome_bitmap(T, x, y, 32, 5, BLACK);
 			break;
 		case 'U':
+		case 'u':
 			plot_monochrome_bitmap(U, x, y, 32, 5, BLACK);
 			break;
 		case 'V':
+		case 'v':
 			plot_monochrome_bitmap(V, x, y, 32, 5, BLACK);
 			break;
 		case 'W':
+		case 'w':
 			plot_monochrome_bitmap(W, x, y, 32, 5, BLACK);
 			break;
 		case 'X':
+		case 'x':
 			plot_monochrome_bitmap(X, x, y, 32, 5, BLACK);
 			break;
 		case 'Y':
+		case 'y':
 			plot_monochrome_bitmap(Y, x, y, 32, 5, BLACK);
 			break;
 		case 'Z':
+		case 'z':
 			plot_monochrome_bitmap(Z, x, y, 32, 5, BLACK);
+			break;
+		case '.':
+			plot_monochrome_bitmap(period, x, y, 32, 5, BLACK);
+			break;
+		case ',':
+			plot_monochrome_bitmap(comma, x, y, 32, 5, BLACK);
+			break;
+		case '\'':
+			plot_monochrome_bitmap(comma, x, y-3, 32, 5, BLACK);
+			break;
+		case '/':
+			plot_monochrome_bitmap(forward_slash, x, y, 32, 5, BLACK);
+			break;
+		case '(':
+			plot_monochrome_bitmap(left_paren, x, y, 32, 5, BLACK);
+			break;
+		case ')':
+			x++;
+			plot_monochrome_bitmap(right_paren, x, y, 32, 5, BLACK);
+			break;
+		case '<':
+			plot_monochrome_bitmap(less_than, x, y, 32, 5, BLACK);
+			break;
+		case '>':
+			x++;
+			plot_monochrome_bitmap(greater_than, x, y, 32, 5, BLACK);
+			break;
+		case '-':
+			plot_monochrome_bitmap(dash, x, y, 32, 5, BLACK);
+			break;
+		case '?':
+			plot_monochrome_bitmap(question_mark, x, y-3, 32, 8, BLACK);
+			break;
+		case '!':
+			plot_monochrome_bitmap(exclamation_mark, x, y, 32, 5, BLACK);
 			break;
 		case '$':
 			plot_monochrome_bitmap(dollar_sign_mini, x, y-1, 32, 7, BLACK);
 			break;
-		case ' ':
-			x -= 1;
 		}
 		x += 5;
-		if (!((i+1)%20)){
-			y+=7;
-			x = x_position;
-		}
 	}
+	return x + 4;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1665,39 +1784,55 @@ void draw_options_box(char *question,
 					  bool chance,
 					  bool community_chest)
 {
-	// draw background
-	int PADDING = 15;
-
-	draw_rectangle_with_border(MIN_CORNER_LINE + PADDING,
-							   MIN_CORNER_LINE + PADDING,
-							   MAX_CORNER_LINE - PADDING,
-							   MAX_CORNER_LINE - PADDING,
-							   BLACK);
-
 	// consts
-	int LINE_START = 14, LINE_END = 46;
+	int PADDING = 15;
+	int X_MARGIN = MIN_CORNER_LINE + PADDING + 5;
+	int Y_OFFSET = MIN_CORNER_LINE + PADDING + 5;	
 
-	int last_y = LINE_START;
-
+	//Draw chance or community chest cards
 	if (chance)
 	{
-		last_y = write_string("CHANCE", LINE_END, LINE_END, LINE_START, last_y);
-		last_y = write_string("------", LINE_END, LINE_END, LINE_START, last_y + 1);
+		draw_rectangle_with_border(MIN_CORNER_LINE + PADDING,
+							   MIN_CORNER_LINE + PADDING,
+							   MAX_CORNER_LINE - PADDING,
+							   (MAX_CORNER_LINE - PADDING),
+							   PEACH);	
+		draw_chance(70, Y_OFFSET-5, 0);
+		draw_chance(155, Y_OFFSET-5, 0);
+		Y_OFFSET +=10;
+		Y_OFFSET = draw_string("CHANCE", 107, Y_OFFSET) + 10;
+		Y_OFFSET = draw_string(question, X_MARGIN, Y_OFFSET) + 20;
 	}
 	else if (community_chest)
 	{
-		last_y = write_string("COMMUNITY CHEST", LINE_END, LINE_END, LINE_START, last_y);
-		last_y = write_string("---------------", LINE_END, LINE_END, LINE_START, last_y + 1);
+		draw_rectangle_with_border(MIN_CORNER_LINE + PADDING,
+							   MIN_CORNER_LINE + PADDING,
+							   MAX_CORNER_LINE - PADDING,
+							   (MAX_CORNER_LINE - PADDING),
+							   MUSTARD_YELLOW);	 
+		draw_chest(46, Y_OFFSET-4, 78, Y_OFFSET+14, 1);
+		draw_chest(158, Y_OFFSET-4, 190, Y_OFFSET+14, 1);
+		Y_OFFSET +=10;
+		Y_OFFSET = draw_string("COMMUNITY CHEST", 82, Y_OFFSET) + 10;
+		Y_OFFSET = draw_string(question, X_MARGIN, Y_OFFSET) + 20;
 	}
 
-	// leave a space after the question
-	last_y = write_string(question, LINE_END, LINE_END, LINE_START, last_y + 2) + 2;
-
+	// draw background
+	else{
+		draw_rectangle_with_border(MIN_CORNER_LINE + PADDING,
+							   MIN_CORNER_LINE + PADDING,
+							   MAX_CORNER_LINE - PADDING,
+							   MAX_CORNER_LINE - PADDING,
+							   WHITE);	
+	
+		Y_OFFSET = draw_string(question, X_MARGIN,  Y_OFFSET);
+	}
 	for (int i = 0; i < num_options; i++)
 	{
 		char str[8 + strlen(options[i]) + 1];
 		sprintf(str, "<%c> - %s", choice_symbols[i], options[i]);
-		last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2) + 1;
+		//last_y = write_string(str, LINE_END, LINE_END, LINE_START, last_y + 2) + 1;
+		Y_OFFSET = draw_string(str, X_MARGIN, Y_OFFSET);
 	}
 
 	char *scroll_string = "";
@@ -1713,7 +1848,10 @@ void draw_options_box(char *question,
 	{
 		scroll_string = "                      <8> - Next";
 	}
-	write_string(scroll_string, LINE_END, LINE_END, LINE_START, LINE_END - 2);
+	else{
+		return;
+	}
+	Y_OFFSET = draw_string(scroll_string, X_MARGIN, Y_OFFSET);
 }
 
 void clear_text_buffer()
