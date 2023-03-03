@@ -15,7 +15,7 @@ int drawseq_dialogue_get_choice(int curr_player,
                                 bool chance,
                                 bool community_chest);
 
-void drawseq_normal_confirm(int curr_player, gamestate *game, char *question);
+void drawseq_normal_confirm(int curr_player, gamestate *game, char *question, bool chance, bool community_chest);
 
 bool drawseq_dialogue_yes_no(int curr_player, gamestate *game, char *question);
 
