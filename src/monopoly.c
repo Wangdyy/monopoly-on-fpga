@@ -15,7 +15,7 @@
 #define GRAPHICS_ENABLED
 #define OWNER_TO_PLAYER(player) (player + 1)
 #ifdef GRAPHICS_ENABLED
-#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) drawseq_normal_confirm(curr_player, game, question)
+#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) drawseq_normal_confirm(curr_player, game, question, chance, community_chest)
 #define DRAWSEQ_TURN_START(curr_player, game) drawseq_turn_start(curr_player, game)
 #define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll) drawseq_roll_dice(curr_player, game, diceRoll)
 #define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos) drawseq_move_player(curr_player, game, diceRoll, old_pos, new_pos)
@@ -150,7 +150,7 @@ bool checkForGameOver(gamestate *game)
     {
         char winStmt[128];
         sprintf(winStmt, "Game Over! The winner is player %d.", winningPlayer);
-        DRAWSEQ_NORMAL_CONFIRM(winningPlayer, game, winStmt);
+        DRAWSEQ_NORMAL_CONFIRM(winningPlayer, game, winStmt, false, false);
 
         return true;
     }
@@ -198,7 +198,7 @@ void playerTurn(player *player, gamestate *game)
     }
     else
     {
-        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "Roll dice to move.");
+        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "Roll dice to move.", false, false);
         diceRoll roll = rollDice(game);
         DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
 
@@ -321,7 +321,7 @@ void doPropertySquare(player *player, square *square, gamestate *game)
 
             DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
-                                   query);
+                                   query, false, false);
         }
     }
     else if (square->data.property.owner != player->owner)
@@ -341,7 +341,7 @@ void payIncomeTax(player *player, gamestate *game)
 {
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "You must pay $200 income tax.");
+                           "You must pay $200 income tax.", false, false);
 
     payMoney(player, 200, game);
 }
@@ -350,7 +350,7 @@ void payLuxuryTax(player *player, gamestate *game)
 {
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "You must pay $200 luxury tax.");
+                           "You must pay $200 luxury tax.", false, false);
 
     payMoney(player, 100, game);
 }
@@ -359,7 +359,7 @@ void goToJail(player *player, gamestate *game)
 {
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "Go to jail! Do not pass Go. Do not collect $200.");
+                           "Go to jail! Do not pass Go. Do not collect $200.", false, false);
 
     player->position = JustVisiting;
     player->inJail = true;
@@ -373,44 +373,44 @@ void communityChest(player *player, gamestate *game)
     case (0):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance to Go (Collect $200)");
+                               "Advance to Go (Collect $200)", false, true);
         landOnSquare(player, &game->board[Go], game);
         passGo(player, game);
         break;
     case (1):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Bank error in your favor. Collect $200.");
+                               "Bank error in your favor. Collect $200.", false, true);
         receiveMoney(player, 200, game);
         break;
     case (2):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Doctor's fees. Pay $50.");
+                               "Doctor's fees. Pay $50.", false, true);
         payMoney(player, 50, game);
         break;
     case (3):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "From sale of stock you get $50.");
+                               "From sale of stock you get $50.", false, true);
         receiveMoney(player, 50, game);
         break;
     case (4):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Get Out of Jail Free. This card may be kept until needed, or sold.");
+                               "Get Out of Jail Free. This card may be kept until needed, or sold.", false, true);
         player->getOutOfJailFreeCards++;
         break;
     case (5):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Go to Jail. Go directly to jail. Do not pass Go. Do not collect $200.");
+                               "Go to Jail. Go directly to jail. Do not pass Go. Do not collect $200.", false, true);
         goToJail(player, game);
         break;
     case (6):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Grand Opera Night. Collect $50 from every player for opening night seats.");
+                               "Grand Opera Night. Collect $50 from every player for opening night seats.", false, true);
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             if (game->players[i].owner != player->owner && game->players[i].bankrupt == false)
@@ -422,19 +422,19 @@ void communityChest(player *player, gamestate *game)
     case (7):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Holiday Fund matures. Receive $100.");
+                               "Holiday Fund matures. Receive $100.", false, true);
         receiveMoney(player, 100, game);
         break;
     case (8):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Income tax refund. Collect $20.");
+                               "Income tax refund. Collect $20.", false, true);
         receiveMoney(player, 20, game);
         break;
     case (9):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "It is your birthday. Collect $10 from every player.");
+                               "It is your birthday. Collect $10 from every player.", false, true);
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             if (game->players[i].owner != player->owner && game->players[i].bankrupt == false)
@@ -446,31 +446,31 @@ void communityChest(player *player, gamestate *game)
     case (10):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Life insurance matures - Collect $100.");
+                               "Life insurance matures - Collect $100.", false, true);
         receiveMoney(player, 100, game);
         break;
     case (11):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Pay hospital fees of $100.");
+                               "Pay hospital fees of $100.", false, true);
         payMoney(player, 100, game);
         break;
     case (12):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Pay school fees of $50.");
+                               "Pay school fees of $50.", false, true);
         payMoney(player, 50, game);
         break;
     case (13):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Receive $25 consultancy fee.");
+                               "Receive $25 consultancy fee.", false, true);
         receiveMoney(player, 25, game);
         break;
     case (14):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You are assessed for street repairs - $40 per house, $115 per hotel.");
+                               "You are assessed for street repairs - $40 per house, $115 per hotel.", false, true);
         int totalHouses = 0;
         int totalHotels = 0;
         for (int i = 0; i < MAX_SQUARES; i++)
@@ -495,13 +495,13 @@ void communityChest(player *player, gamestate *game)
     case (15):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You have won second prize in a beauty contest - Collect $10.");
+                               "You have won second prize in a beauty contest - Collect $10.", false, true);
         receiveMoney(player, 10, game);
         break;
     case (16):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You inherit $100.");
+                               "You inherit $100.", false, true);
         receiveMoney(player, 100, game);
         break;
     }
@@ -515,14 +515,14 @@ void chance(player *player, gamestate *game)
     case (0):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance to Go (Collect $200)");
+                               "Advance to Go (Collect $200)", true, false);
         landOnSquare(player, &game->board[Go], game);
         passGo(player, game);
         break;
     case (1):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance to Illinois Ave. If you pass Go, collect $200.");
+                               "Advance to Illinois Ave. If you pass Go, collect $200.", true, false);
         if (player->position >= IllinoisAvenue)
         {
             passGo(player, game);
@@ -532,7 +532,7 @@ void chance(player *player, gamestate *game)
     case (2):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance to St. Charles Place. If you pass Go, collect $200.");
+                               "Advance to St. Charles Place. If you pass Go, collect $200.", true, false);
         if (player->position >= StCharlesPlace)
         {
             passGo(player, game);
@@ -542,7 +542,7 @@ void chance(player *player, gamestate *game)
     case (3):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance token to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.");
+                               "Advance token to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total ten times the amount thrown.", true, false);
         enum SquareNames nearestUtility;
         if (WaterWorks - player->position % MAX_SQUARES < ElectricCompany - player->position % MAX_SQUARES)
         {
@@ -561,7 +561,7 @@ void chance(player *player, gamestate *game)
     case (4):
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.");
+                               "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.", true, false);
         enum SquareNames nearestRailroad;
         if (ReadingRailRoad - player->position % MAX_SQUARES < BAndORailRoad - player->position % MAX_SQUARES &&
             ReadingRailRoad - player->position % MAX_SQUARES < ShortLine - player->position % MAX_SQUARES &&
@@ -592,21 +592,21 @@ void chance(player *player, gamestate *game)
         // bank pays 50
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Bank pays you dividend of $50.");
+                               "Bank pays you dividend of $50.", true, false);
         receiveMoney(player, 50, game);
         break;
     case (6):
         // get out of jail free
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Get out of jail free. This card may be kept until needed, or traded/sold.");
+                               "Get out of jail free. This card may be kept until needed, or traded/sold.", true, false);
         player->getOutOfJailFreeCards++;
         break;
     case (7):
         // go back 3 spaces
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Go back 3 spaces.");
+                               "Go back 3 spaces.", true, false);
         player->position = (player->position - 3) % MAX_SQUARES;
         landOnSquare(player, &game->board[player->position], game);
         break;
@@ -614,14 +614,14 @@ void chance(player *player, gamestate *game)
         // go to jail
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Go to jail. Go directly to jail. Do not pass Go. Do not collect $200.");
+                               "Go to jail. Go directly to jail. Do not pass Go. Do not collect $200.", true, false);
         goToJail(player, game);
         break;
     case (9):
         // make general repairs on all your property
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Make general repairs on all your property. For each house pay $25. For each hotel pay $100.");
+                               "Make general repairs on all your property. For each house pay $25. For each hotel pay $100.", true, false);
         int totalHouses = 0;
         int totalHotels = 0;
         for (int i = 0; i < MAX_SQUARES; i++)
@@ -647,7 +647,7 @@ void chance(player *player, gamestate *game)
         // go to Reading Railroad
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Take a trip to Reading Railroad.");
+                               "Take a trip to Reading Railroad.", true, false);
         if (player->position >= ReadingRailRoad)
         {
             passGo(player, game);
@@ -658,7 +658,7 @@ void chance(player *player, gamestate *game)
         // go to Boardwalk
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Take a walk on the Boardwalk. Advance token to Boardwalk.");
+                               "Take a walk on the Boardwalk. Advance token to Boardwalk.", true, false);
         if (player->position >= Boardwalk)
         {
             passGo(player, game);
@@ -669,7 +669,7 @@ void chance(player *player, gamestate *game)
         // elected chairman of the board
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You have been elected chairman of the board. Pay each player $50.");
+                               "You have been elected chairman of the board. Pay each player $50.", true, false);
         for (int i = 0; i < MAX_PLAYERS; i++)
         {
             if (game->players[i].owner != player->owner && game->players[i].bankrupt == false)
@@ -682,7 +682,7 @@ void chance(player *player, gamestate *game)
         // your building loan matures
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "Your building loan matures. Collect $150.");
+                               "Your building loan matures. Collect $150.", true, false);
         receiveMoney(player, 150, game);
         break;
     }
@@ -797,7 +797,7 @@ void payColorSetRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(owner),
             rent);
-    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
     payPlayer(player, &game->players[owner], rent, game);
@@ -838,7 +838,7 @@ void payUtilityRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(utilityOwner),
             rent);
-    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
     payPlayer(player, &game->players[utilityOwner], rent, game);
@@ -890,7 +890,7 @@ void payRailroadRent(player *player, square *square, gamestate *game)
             square->name,
             OWNER_TO_PLAYER(railroadOwner),
             rent);
-    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
     printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
     payPlayer(player, &game->players[railroadOwner], rent, game);
@@ -904,7 +904,7 @@ void buyProperty(player *player, square *square, gamestate *game)
         sprintf(message, "You do not have enough money to buy %s.\n", square->name);
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               message);
+                               message, false, false);
 
         return;
     }
@@ -921,7 +921,7 @@ void buyProperty(player *player, square *square, gamestate *game)
 
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           message);
+                           message, false, false);
 }
 
 void sellProperty(player *player, square *square, gamestate *game)
@@ -932,7 +932,7 @@ void sellProperty(player *player, square *square, gamestate *game)
         sprintf(message, "You do not own %s and cannot sell it.\n", square->name);
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               message);
+                               message, false, false);
 
         return;
     }
@@ -952,7 +952,7 @@ void sellProperty(player *player, square *square, gamestate *game)
 
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           message);
+                           message, false, false);
 
     bool found = false;
     for (int i = 0; i < player->owned_properties_count; i++)
@@ -998,13 +998,13 @@ int payMoney(player *player, int amount, gamestate *game)
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You do not have enough money to pay and must sell assets to continue.");
+                               "You do not have enough money to pay and must sell assets to continue.", false, false);
 
         if (sellAssets(player, amount, game))
         {
             DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
-                                   "You have sold enough assets to pay.");
+                                   "You have sold enough assets to pay.", false, false);
         }
         else
         {
@@ -1021,7 +1021,7 @@ int payMoney(player *player, int amount, gamestate *game)
                     amount);
             DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                    game,
-                                   bankruptInfo);
+                                   bankruptInfo, false, false);
 
             return amount;
         }
@@ -1058,7 +1058,7 @@ void playerInJail(player *player, gamestate *game)
             OWNER_TO_PLAYER(player->owner),
             player->jailTime);
 
-    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, jailInfo);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, jailInfo, false, false);
 
     bool getOutOfJail = false;
     if (player->jailTime < 3 && player->money >= 50)
@@ -1078,7 +1078,7 @@ void playerInJail(player *player, gamestate *game)
 
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "If you did not pay, you may still get out if you roll doubles.");
+                           "If you did not pay, you may still get out if you roll doubles.", false, false);
 
     diceRoll roll = rollDice(game);
     DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
@@ -1102,7 +1102,7 @@ void playerInJail(player *player, gamestate *game)
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You have been in jail for three turns. You must pay $50 now to get out.");
+                               "You have been in jail for three turns. You must pay $50 now to get out.", false, false);
 
         if (payJailFine(player, game))
         {
@@ -1113,7 +1113,7 @@ void playerInJail(player *player, gamestate *game)
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You got out of jail!");
+                               "You got out of jail!", false, false);
 
         DRAWSEQ_ROLL_DICE(OWNER_TO_PLAYER(player->owner), game, roll);
 
@@ -1125,7 +1125,7 @@ void playerInJail(player *player, gamestate *game)
     {
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
-                               "You did not get out of jail.");
+                               "You did not get out of jail.", false, false);
     }
 }
 
@@ -1148,7 +1148,7 @@ void passGo(player *player, gamestate *game)
 {
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "You passes Go! You get $200.");
+                           "You passes Go! You get $200.", false, false);
 
     receiveMoney(player, 200, game);
 }
@@ -1157,7 +1157,7 @@ void bankruptPlayer(player *player, gamestate *game)
 {
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
-                           "You are bankrupt and out of the game.");
+                           "You are bankrupt and out of the game.", false, false);
 
     player->bankrupt = true;
     // return all properties to bank
@@ -1355,12 +1355,12 @@ void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
                             }
                             else
                             {
-                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!");
+                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
                             }
                         }
                         else
                         {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!");
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
                         }
                     }
                 }
@@ -1386,12 +1386,12 @@ void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
                         }
                         else
                         {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!");
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!", false, false);
                         }
                     }
                     else
                     {
-                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!");
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
                     }
                 }
                 enum SquareNames temp = squareName1;
@@ -1422,12 +1422,12 @@ void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
                                 }
                                 else
                                 {
-                                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!");
+                                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
                                 }
                             }
                             else
                             {
-                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!");
+                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
                             }
                         }
                     }
@@ -1455,12 +1455,12 @@ void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
                         }
                         else
                         {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!");
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!", false, false);
                         }
                     }
                     else
                     {
-                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!");
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
                     }
                 }
                 enum SquareNames tmp = squareName1;
