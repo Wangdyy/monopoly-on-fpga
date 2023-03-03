@@ -638,19 +638,19 @@ void draw_player_pieces(gamestate *game)
 		if (square_i == 10){
 			if (players_cnt == 1)
 			{
-				draw_1_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail);
+				draw_1_player_jail(square_i, players_here[0], game->players[players_here[0]-1].inJail);
 			}
 			else if (players_cnt == 2)
 			{
-				draw_2_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail, players_here[1], game->players[players_here[1]].inJail);
+				draw_2_player_jail(square_i, players_here[0], game->players[players_here[0]-1].inJail, players_here[1], game->players[players_here[1]-1].inJail);
 			}
 			else if (players_cnt == 3)
 			{
-				draw_3_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail, players_here[1], game->players[players_here[1]].inJail, players_here[2], game->players[players_here[2]].inJail);
+				draw_3_player_jail(square_i, players_here[0], game->players[players_here[0]-1].inJail, players_here[1], game->players[players_here[1]-1].inJail, players_here[2], game->players[players_here[2]-1].inJail);
 			}
 			else if (players_cnt == 4)
 			{
-				draw_4_player_jail(square_i, players_here[0], game->players[players_here[0]].inJail,  players_here[1], game->players[players_here[1]].inJail, players_here[2], game->players[players_here[2]].inJail, players_here[3], game->players[players_here[3]].inJail);
+				draw_4_player_jail(square_i, players_here[0], game->players[players_here[0]-1].inJail,  players_here[1], game->players[players_here[1]-1].inJail, players_here[2], game->players[players_here[2]-1].inJail, players_here[3], game->players[players_here[3]-1].inJail);
 			}
 			continue;
 		}
@@ -802,10 +802,10 @@ int drawseq_dialogue_get_choice(int curr_player,
 	return choice;
 }
 
-void drawseq_normal_confirm(int curr_player, gamestate *game, char *question)
+void drawseq_normal_confirm(int curr_player, gamestate *game, char *question, bool chance, bool community_chest)
 {
 	char *options[1] = {"Confirm"};
-	drawseq_dialogue_get_choice(curr_player, game, question, 1, options, false, false);
+	drawseq_dialogue_get_choice(curr_player, game, question, 1, options, chance, community_chest);
 }
 
 bool drawseq_dialogue_yes_no(int curr_player, gamestate *game, char *question)
@@ -866,7 +866,7 @@ int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choi
 {
 	if (num_choices == 0)
 	{
-		drawseq_normal_confirm(curr_player, game, "You have no eligible properties to choose from!");
+		drawseq_normal_confirm(curr_player, game, "You have no eligible properties to choose from!", false, false);
 		return -1;
 	}
 
