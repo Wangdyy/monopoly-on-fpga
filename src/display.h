@@ -44,9 +44,16 @@ void draw_1_player(int square, int player);
 void draw_2_player(int square, int player1, int player2);
 void draw_3_player(int square, int player1, int player2, int player3);
 void draw_4_player(int square, int player1, int player2, int player3, int player4);
+void draw_1_player_jail(int square, int player, bool player_in_jail);
+void draw_2_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail);
+void draw_3_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail, int player3, bool player3_in_jail);
+void draw_4_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail, int player3, bool player3_in_jail, int player4, bool player4_in_jail);
 void draw_owned_property(int player, int property);
 void draw_houses(int property, int num_houses);
 void draw_hotel(int property);
+
+int draw_string(char *text, int x_position, int y_position);
+int draw_word(char *text, int x_position, int y_position);
 
 void clear_text_buffer();
 void draw_text(char *text, int x_position, int y_position);
