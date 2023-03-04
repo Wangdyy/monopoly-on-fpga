@@ -28,6 +28,7 @@
 #define CREAM 0xEF5B
 #define MUSTARD_YELLOW 0xE640
 #define PEACH 0xFC4C
+#define CANDLELIGHT 0xFE61
 
 #define MIN_X 0
 #define MIN_Y 0
@@ -101,8 +102,11 @@ char jail[48] = "ffffffffc6a23fffd6b6fffff636fffff6b6ffffc362ffff";
 char paytax[128] = "b55fffffb55fffffb1bfffffb55fffff1b5fffffffffffffffffffffffffffff75bfffff75bfffff11bfffff555fffff1b5fffffffffffff";
 char lightbulb[128] = "ffffffffffffffffffff07fffffcf9fffff3feffffceff7ff0317fbff28fbfbff10fbfbff0317fbfffceff7ffff3fefffffcf9ffffff07ffffffffffffffffff";
 char lightbulb_yellow[128] = "ffffffffffffffffffffffffffff07fffffc01fffff100ffffce807ffd70407ffef0407fffce807ffff100fffffc01ffffff07ffffffffffffffffffffffffff";
+char ring_outline[] = "ffff0fffff7cf7ffffbd9bffffdb6dfffffaf6ffffe07affffef7affffef7afffe2f7affffef7affffe07afffffaf6ffffdb6dffffbd9bffff7cf7ffffff0fff";
+char ring_yellow[] = "ffffffffffc3ffffff99ffffff3cffffff7e7fffffff7fffffff7fffffff7fffffff7fffffff7fffffff7fffff7e7fffff3cffffff99ffffffc3ffffffffffff";
+char ring_stone[] = "fffffffffffffffffffffffffffffffffffffffffffffffffff0fffffff0fffffff0fffffff0ffffffffffffffffffffffffffffffffffffffffffffffffffff";
 char monopoly_text[800] = "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc71c7f03f8fc7f03f8fffc0fe003f8ffffffffffc71c7c00f8f87c00f8fff003e003f8ffffffffffc60c787878f8787878ffe1e1e3fff8ffffffffffc64c78fc78f078fc78ffe3f1e3fff8ffffffffffc64c71fe38f071fe38ffc7f8e3fff8ffffffffffc64c71fe38e471fe38ffc7f8e3fff8ffffffffffc44471fe38e471fe3803c7f8e3fff07fffffffffc4e471fe38cc71fe3801c7f8e3fff07fffffffffc4e471fe38cc71fe38f0c7f8e3ffe23fffffffffc4e471fe389c71fe38f8c7f8e3ffe23fffffffffc0e071fe389c71fe38f8c7f8e3ffc71fffffffffc0e078fc783c78fc78f8e3f1e3ffc71fffffffffc1f07878783c787878f0e1e1e3ff870fffffffffc1f07c00f87c7c00f801f003e3ff8f8fffffffffc1f07f03f87c7f03f803fc0fe3ff8f8fffffffffffffffffffffffffffffffffffffffffffff";
-char player1[196] = "3f8139e7c067cf033f8139e7c0678f033f9f39e7cfe79fcf3f9f39e7cfe71fcf3f9f01e7cfe73fcf039f01e7c0603fcf019f39c3c0601fcf399f39c3cfe79fcf399f9399cfe79f4f399f9399cfe79f0f019fc73cc0601f8f039fc73cc0603fcf";
+char player_text[196] = "3f8139e7c067cfff3f8139e7c0678fff3f9f39e7cfe79fff3f9f39e7cfe71fff3f9f01e7cfe73fff039f01e7c0603fff019f39c3c0601fff399f39c3cfe79fff399f9399cfe79fff399f9399cfe79fff019fc73cc0601fff039fc73cc0603fff";
 char dollar_sign[98] = "efffffff83ffffff01ffffff29ffffffe9ffffff81ffffff03ffffff2fffffff29ffffff81ffffff83ffffffefffffffzz";
 char bank[212] = "8079f33f19f9ffff8039f33f19f9ffff9f99f33e19f3ffff9f99f33c19e3ffff9f98033c99c7ffff9f98033998cfffff8038e331981fffff8018e333981fffff9f98e327998fffff9f9c470799c7ffff9f9e0f0f99e3ffff803e0f1f99f1ffff807f1f1f99f9ffffzzzz";
 
@@ -158,6 +162,7 @@ char dash[] = "ffffffffffffffff8fffffffffffffffffffffff";
 char question_mark[] = "bfffffffffffffffbfffffffdfffffff6fffffff9fffffffffffffffffffffff";
 char exclamation_mark[] = "bfffffffffffffffbfffffffbfffffffbfffffff";
 char dollar_sign_mini[] = "dfffffff0fffffffd7ffffff07ffffff5fffffff87ffffffdfffffff";
+char ampersand[] = "dfffffff8fffffff5fffffff8fffffff5fffffff8fffffffdfffffff";
 char zero_mini[] = "8fffffffafffffffafffffffafffffff8fffffff";
 char one_mini[] = "dfffffffdfffffffdfffffff9fffffffdfffffff";
 char two_mini[] = "8fffffffbfffffffdfffffffefffffff8fffffff";
@@ -168,7 +173,6 @@ char six_mini[] = "8fffffffafffffff8fffffffbfffffff8fffffff";
 char seven_mini[] = "bfffffffbfffffffdfffffffefffffff8fffffff";
 char eight_mini[] = "8fffffffafffffff8fffffffafffffff8fffffff";
 char nine_mini[] = "8fffffffefffffff8fffffffafffffff8fffffff";
-//apple
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -561,7 +565,8 @@ void plot_monochrome_bitmap(char bitmap[], int x, int y, int width, int height, 
 
 void draw_player_turn(int player)
 {
-	plot_monochrome_bitmap(numbers[player], 248, 10, 32, 12, BLACK);
+	plot_monochrome_bitmap(player_text, 243, 10, 64, 12, BLACK);
+	plot_monochrome_bitmap(numbers[player], 305, 10, 32, 12, BLACK);
 }
 
 void draw_plain_board()
@@ -676,6 +681,13 @@ void draw_plain_board()
 	draw_chest(32, 71, 0, 89, 2);
 	draw_chest(209, 89, 240, 71, 4);
 
+	//chance and community chest spaces
+	/*draw_rectangle_with_border(85, 81, 155, 115, PEACH);
+	draw_chance(112, 52, 0);
+	draw_rectangle_with_border(85, 125, 155, 159, MUSTARD_YELLOW);
+	draw_chest(115, 127, 125, 145, 1);
+	*/
+
 	plot_monochrome_bitmap(jail, 12, 225, 32, 6, BLACK);
 	plot_monochrome_bitmap(water, 167, 5, 32, 18, BLACK);
 	plot_monochrome_bitmap(water_blue, 167, 5, 32, 18, LIGHT_BLUE);
@@ -683,12 +695,15 @@ void draw_plain_board()
 	plot_monochrome_bitmap(gotojail, 209, 5, 32, 16, BLACK);
 	plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
-	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
+	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, CANDLELIGHT);
+	plot_monochrome_bitmap(ring_outline, 209, 167, 32, 16, BLACK);
+	plot_monochrome_bitmap(ring_yellow, 215, 167, 32, 16, CANDLELIGHT);
+	plot_monochrome_bitmap(ring_stone, 210, 167, 32, 16, WHITE);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
 	plot_monochrome_bitmap(bank, 255, 55, 64, 13, BLACK);
-
 	// BANK
 	// draw player numbers for bank
+	
 	plot_monochrome_bitmap(one, 243, 80, 32, 12, BLACK);
 	plot_monochrome_bitmap(dollar_sign, 256, 80, 32, 12, BLACK);
 
@@ -1704,6 +1719,9 @@ int draw_word(char *text, int x_position, int y_position)
 		case '$':
 			plot_monochrome_bitmap(dollar_sign_mini, x, y-1, 32, 7, BLACK);
 			break;
+		case '&':
+			plot_monochrome_bitmap(ampersand, x, y-1, 32, 7, BLACK);
+			break;
 		}
 		x += 5;
 	}
@@ -1869,3 +1887,4 @@ void clear_text_buffer()
 		}
 	}
 }
+
