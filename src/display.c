@@ -698,7 +698,7 @@ void draw_plain_board()
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, CANDLELIGHT);
 	plot_monochrome_bitmap(ring_outline, 209, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(ring_yellow, 215, 167, 32, 16, CANDLELIGHT);
-	plot_monochrome_bitmap(ring_stone, 210, 167, 32, 16, WHITE);
+	plot_monochrome_bitmap(ring_stone, 209, 167, 32, 16, WHITE);
 	plot_monochrome_bitmap(monopoly_text, 43, 55, 160, 20, RED);
 	plot_monochrome_bitmap(bank, 255, 55, 64, 13, BLACK);
 	// BANK
