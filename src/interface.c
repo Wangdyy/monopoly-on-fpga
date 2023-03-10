@@ -674,6 +674,22 @@ void draw_player_pieces(gamestate *game)
 	}
 }
 
+void draw_houses_and_hotels(gamestate *game) {
+	for (int square_i = 0; square_i < MAX_SQUARES; square_i++) {
+		if (game->board->type == Property) {
+			propertySquare *p_prop = &(game->board->data.property);
+
+			if (p_prop->type == Colored) {
+				draw_houses(square_i, p_prop->coloredProperty.houseCount);
+
+				if (p_prop->coloredProperty.hotelCount == 1) {
+					draw_hotel(square_i);
+				}
+			}
+		} 
+	}
+}
+
 void draw_player_pieces_with_gamestate(gamestate *game)
 {
 	fill_location_has_players_with_gamestate(game);
@@ -707,12 +723,17 @@ void draw_all_player_cash(gamestate *game)
 	draw_bank_balance(4, game->players[3].money);
 }
 
-void draw_basic_setup(int curr_player, gamestate *game)
-{
+void draw_basic_setup_without_player_pieces(int curr_player, gamestate *game) {
 	clear_text_buffer();
 	draw_plain_board();
 	draw_player_turn(curr_player);
+	draw_houses_and_hotels(game);
 	draw_all_player_cash(game);
+}
+
+void draw_basic_setup(int curr_player, gamestate *game)
+{
+	draw_basic_setup_without_player_pieces(curr_player, game);
 	draw_player_pieces_with_gamestate(game);
 }
 
@@ -825,12 +846,7 @@ void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, i
 {
 	for (int i = 0; i < (new_pos + NUM_SQUARES - old_pos) % NUM_SQUARES; i++)
 	{
-		// draw_basic_setup, but without drawing players
-		clear_text_buffer();
-		draw_plain_board();
-		draw_player_turn(curr_player);
-		draw_all_player_cash(game);
-
+		draw_basic_setup_without_player_pieces(curr_player, game);
 		draw_dice_roll(dice_roll.die1, dice_roll.die2);
 		draw_player_pieces_with_update(game, curr_player - 1, (old_pos + i + 1) % NUM_SQUARES);
 		wait_for_vsync();

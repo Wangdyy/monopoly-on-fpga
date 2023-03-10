@@ -716,7 +716,7 @@ void payColorSetRent(player *player, square *square, gamestate *game)
     int rent = square->data.property.coloredProperty.rent[0];
     enum Colors setColor = square->data.property.coloredProperty.color;
     bool setOwned = false;
-    if (square->data.coloredProperty.hotelCount == 1)
+    if (square->data.property.coloredProperty.hotelCount == 1)
     {
         rent = square->data.property.coloredProperty.rent[5];
     }
