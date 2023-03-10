@@ -716,74 +716,98 @@ void payColorSetRent(player *player, square *square, gamestate *game)
     int rent = square->data.property.coloredProperty.rent[0];
     enum Colors setColor = square->data.property.coloredProperty.color;
     bool setOwned = false;
-    // TODO: Add house and hotel rent
-    switch (setColor)
+    if (square->data.coloredProperty.hotelCount == 1)
     {
-    case (Brown):
-        if (game->board[MediteraneanAvenue].data.property.owner == owner &&
-            game->board[BalticAvenue].data.property.owner == owner)
+        rent = square->data.property.coloredProperty.rent[5];
+    }
+    else if (square->data.property.coloredProperty.houseCount > 0)
+    {
+        switch (square->data.property.coloredProperty.houseCount)
         {
-            setOwned = true;
+        case (1):
+            rent = square->data.property.coloredProperty.rent[1];
+            break;
+        case (2):
+            rent = square->data.property.coloredProperty.rent[2];
+            break;
+        case (3):
+            rent = square->data.property.coloredProperty.rent[3];
+            break;
+        case (4):
+            rent = square->data.property.coloredProperty.rent[4];
+            break;
         }
-        break;
-    case (LightBlue):
-        if (game->board[OrientalAvenue].data.property.owner == owner &&
-            game->board[VermontAvenue].data.property.owner == owner &&
-            game->board[ConnecticutAvenue].data.property.owner == owner)
+    }
+    else
+    {
+        switch (setColor)
         {
-            setOwned = true;
+        case (Brown):
+            if (game->board[MediteraneanAvenue].data.property.owner == owner &&
+                game->board[BalticAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (LightBlue):
+            if (game->board[OrientalAvenue].data.property.owner == owner &&
+                game->board[VermontAvenue].data.property.owner == owner &&
+                game->board[ConnecticutAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Pink):
+            if (game->board[StCharlesPlace].data.property.owner == owner &&
+                game->board[StatesAvenue].data.property.owner == owner &&
+                game->board[VirginiaAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Orange):
+            if (game->board[StJamesPlace].data.property.owner == owner &&
+                game->board[TennesseeAvenue].data.property.owner == owner &&
+                game->board[NewYorkAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Red):
+            if (game->board[KentuckyAvenue].data.property.owner == owner &&
+                game->board[IndianaAvenue].data.property.owner == owner &&
+                game->board[IllinoisAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Yellow):
+            if (game->board[AtlanticAvenue].data.property.owner == owner &&
+                game->board[VentnorAvenue].data.property.owner == owner &&
+                game->board[MarvinGardens].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (Green):
+            if (game->board[PacificAvenue].data.property.owner == owner &&
+                game->board[NorthCarolinaAvenue].data.property.owner == owner &&
+                game->board[PennsylvaniaAvenue].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        case (DarkBlue):
+            if (game->board[ParkPlace].data.property.owner == owner &&
+                game->board[Boardwalk].data.property.owner == owner)
+            {
+                setOwned = true;
+            }
+            break;
+        default:
+            printf("Error: Color not recognized\n");
+            break;
         }
-        break;
-    case (Pink):
-        if (game->board[StCharlesPlace].data.property.owner == owner &&
-            game->board[StatesAvenue].data.property.owner == owner &&
-            game->board[VirginiaAvenue].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    case (Orange):
-        if (game->board[StJamesPlace].data.property.owner == owner &&
-            game->board[TennesseeAvenue].data.property.owner == owner &&
-            game->board[NewYorkAvenue].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    case (Red):
-        if (game->board[KentuckyAvenue].data.property.owner == owner &&
-            game->board[IndianaAvenue].data.property.owner == owner &&
-            game->board[IllinoisAvenue].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    case (Yellow):
-        if (game->board[AtlanticAvenue].data.property.owner == owner &&
-            game->board[VentnorAvenue].data.property.owner == owner &&
-            game->board[MarvinGardens].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    case (Green):
-        if (game->board[PacificAvenue].data.property.owner == owner &&
-            game->board[NorthCarolinaAvenue].data.property.owner == owner &&
-            game->board[PennsylvaniaAvenue].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    case (DarkBlue):
-        if (game->board[ParkPlace].data.property.owner == owner &&
-            game->board[Boardwalk].data.property.owner == owner)
-        {
-            setOwned = true;
-        }
-        break;
-    default:
-        printf("Error: Color not recognized\n");
-        break;
     }
     if (setOwned)
     {
@@ -1277,55 +1301,55 @@ void checkForMonopoly(player *player, gamestate *game)
 
 void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
 {
-    enum SquareNames squareName1 = 0, squareName2 = 0, squareName3 = 0;
+    enum SquareNames squareNames[3];
     int propertiesInSet = 0;
 
     switch (setColor)
     {
     case (Brown):
-        squareName1 = MediteraneanAvenue;
-        squareName2 = BalticAvenue;
+        squareNames[0] = MediteraneanAvenue;
+        squareNames[1] = BalticAvenue;
         propertiesInSet = 2;
         break;
     case (LightBlue):
-        squareName1 = OrientalAvenue;
-        squareName2 = VermontAvenue;
-        squareName3 = ConnecticutAvenue;
+        squareNames[0] = OrientalAvenue;
+        squareNames[1] = VermontAvenue;
+        squareNames[2] = ConnecticutAvenue;
         propertiesInSet = 3;
         break;
     case (Pink):
-        squareName1 = StCharlesPlace;
-        squareName2 = StatesAvenue;
-        squareName3 = VirginiaAvenue;
+        squareNames[0] = StCharlesPlace;
+        squareNames[1] = StatesAvenue;
+        squareNames[2] = VirginiaAvenue;
         propertiesInSet = 3;
         break;
     case (Orange):
-        squareName1 = StJamesPlace;
-        squareName2 = TennesseeAvenue;
-        squareName3 = NewYorkAvenue;
+        squareNames[0] = StJamesPlace;
+        squareNames[1] = TennesseeAvenue;
+        squareNames[2] = NewYorkAvenue;
         propertiesInSet = 3;
         break;
     case (Red):
-        squareName1 = KentuckyAvenue;
-        squareName2 = IndianaAvenue;
-        squareName3 = IllinoisAvenue;
+        squareNames[0] = KentuckyAvenue;
+        squareNames[1] = IndianaAvenue;
+        squareNames[2] = IllinoisAvenue;
         propertiesInSet = 3;
         break;
     case (Yellow):
-        squareName1 = AtlanticAvenue;
-        squareName2 = VentnorAvenue;
-        squareName3 = MarvinGardens;
+        squareNames[0] = AtlanticAvenue;
+        squareNames[1] = VentnorAvenue;
+        squareNames[2] = MarvinGardens;
         propertiesInSet = 3;
         break;
     case (Green):
-        squareName1 = PacificAvenue;
-        squareName2 = NorthCarolinaAvenue;
-        squareName3 = PennsylvaniaAvenue;
+        squareNames[0] = PacificAvenue;
+        squareNames[1] = NorthCarolinaAvenue;
+        squareNames[2] = PennsylvaniaAvenue;
         propertiesInSet = 3;
         break;
     case (DarkBlue):
-        squareName1 = ParkPlace;
-        squareName2 = Boardwalk;
+        squareNames[0] = ParkPlace;
+        squareNames[1] = Boardwalk;
         propertiesInSet = 2;
         break;
 
@@ -1333,140 +1357,53 @@ void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
         printf("Error: Color not recognized\n");
         break;
     }
-    if (propertiesInSet == 2)
+    for (int i = 0; i < propertiesInSet; i++)
     {
-        if (game->board[squareName1].data.property.coloredProperty.houseCount < 4 ||
-            game->board[squareName2].data.property.coloredProperty.houseCount < 4)
-        { // Buying houses
-            for (int i = 0; i < 2; i++)
+        if (game->board[squareNames[i]].data.property.coloredProperty.houseCount < 4)
+        {
+            char query[256];
+            sprintf(query, "Would you like to buy a house on %s?", game->board[squareNames[i]].name);
+            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
             {
-                if (game->board[squareName1].data.property.coloredProperty.houseCount < 4)
+                if (player->money >= game->board[squareNames[i]].data.property.coloredProperty.houseCost)
+                { // Check for money
+                    if ((propertiesInSet == 2 && MIN(game->board[squareNames[0]].data.property.coloredProperty.houseCount, game->board[squareNames[1]].data.property.coloredProperty.houseCount) != game->board[squareNames[i]].data.property.coloredProperty.houseCount) || (propertiesInSet == 3 && MIN(game->board[squareNames[0]].data.property.coloredProperty.houseCount, MIN(game->board[squareNames[1]].data.property.coloredProperty.houseCount, game->board[squareNames[2]].data.property.coloredProperty.houseCount)) != game->board[squareNames[i]].data.property.coloredProperty.houseCount))
+                    { // Check for house number difference
+                        payMoney(player, game->board[squareNames[i]].data.property.coloredProperty.houseCost, game);
+                        game->board[squareNames[i]].data.property.coloredProperty.houseCount++;
+                    }
+                    else
+                    {
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
+                    }
+                }
+                else
                 {
+                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
+                }
+            }
+        }
+        else
+        { // Buying hotels
+            if ((propertiesInSet == 2 && game->board[squareNames[0]].data.property.coloredProperty.houseCount == 4 && game->board[squareNames[1]].data.property.coloredProperty.houseCount == 4) || (propertiesInSet == 3 && game->board[squareNames[0]].data.property.coloredProperty.houseCount == 4 && game->board[squareNames[2]].data.property.coloredProperty.houseCount == 4))
+            { // Check if all properties have 4 houses
+                if (game->board[squareNames[i]].data.property.coloredProperty.hotelCount == 0)
+                { // Check if hotel is already bought
                     char query[256];
-                    sprintf(query, "Would you like to buy a house on %s?", game->board[squareName1].name);
+                    sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareNames[i]].name);
                     if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
                     {
-                        if (player->money >= game->board[squareName1].data.property.coloredProperty.houseCost)
+                        if (player->money >= game->board[squareNames[i]].data.property.coloredProperty.hotelCost)
                         { // Check for money
-                            if (MIN(game->board[squareName1].data.property.coloredProperty.houseCount, game->board[squareName2].data.property.coloredProperty.houseCount) != game->board[squareName1].data.property.coloredProperty.houseCount)
-                            { // Check for house number difference
-                                payMoney(player, game->board[squareName1].data.property.coloredProperty.houseCost, game);
-                                game->board[squareName1].data.property.coloredProperty.houseCount++;
-                            }
-                            else
-                            {
-                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
-                            }
+                            payMoney(player, game->board[squareNames[i]].data.property.coloredProperty.hotelCost, game);
+                            game->board[squareNames[i]].data.property.coloredProperty.hotelCount++;
                         }
                         else
                         {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
+                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
                         }
                     }
                 }
-                enum SquareNames temp = squareName1;
-                squareName1 = squareName2;
-                squareName2 = temp;
-            }
-        }
-        else
-        { // Buying hotels
-            for (int i = 0; i < 2; i++)
-            {
-                char query[256];
-                sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareName1].name);
-                if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-                {
-                    if (player->money >= game->board[squareName1].data.property.coloredProperty.hotelCost)
-                    { // Check for money
-                        if (game->board[squareName1].data.property.coloredProperty.hotelCount != 0)
-                        { // Check for hotel number difference
-                            payMoney(player, game->board[squareName1].data.property.coloredProperty.hotelCost, game);
-                            game->board[squareName1].data.property.coloredProperty.hotelCount++;
-                        }
-                        else
-                        {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!", false, false);
-                        }
-                    }
-                    else
-                    {
-                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
-                    }
-                }
-                enum SquareNames temp = squareName1;
-                squareName1 = squareName2;
-                squareName2 = temp;
-            }
-        }
-        if (propertiesInSet == 3)
-        {
-            if (game->board[squareName1].data.property.coloredProperty.houseCount < 4 ||
-                game->board[squareName2].data.property.coloredProperty.houseCount < 4 ||
-                game->board[squareName3].data.property.coloredProperty.houseCount < 4)
-            { // Buying houses
-                for (int i = 0; i < 3; i++)
-                {
-                    if (game->board[squareName1].data.property.coloredProperty.houseCount < 4)
-                    {
-                        char query[256];
-                        sprintf(query, "Would you like to buy a house on %s?", game->board[squareName1].name);
-                        if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-                        {
-                            if (player->money >= game->board[squareName1].data.property.coloredProperty.houseCost)
-                            { // Check for money
-                                if (MIN(game->board[squareName1].data.property.coloredProperty.houseCount, MIN(game->board[squareName2].data.property.coloredProperty.houseCount, game->board[squareName3].data.property.coloredProperty.houseCount)) != game->board[squareName1].data.property.coloredProperty.houseCount)
-                                { // Check for house number difference
-                                    payMoney(player, game->board[squareName1].data.property.coloredProperty.houseCost, game);
-                                    game->board[squareName1].data.property.coloredProperty.houseCount++;
-                                }
-                                else
-                                {
-                                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
-                                }
-                            }
-                            else
-                            {
-                                DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
-                            }
-                        }
-                    }
-                    enum SquareNames tmp = squareName1;
-                    squareName1 = squareName2;
-                    squareName2 = squareName3;
-                    squareName3 = tmp;
-                }
-            }
-        }
-        else
-        { // Buying hotels
-            for (int i = 0; i < 3; i++)
-            {
-                char query[256];
-                sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareName1].name);
-                if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-                {
-                    if (player->money >= game->board[squareName1].data.property.coloredProperty.hotelCost)
-                    { // Check for money
-                        if (game->board[squareName1].data.property.coloredProperty.hotelCount != 0)
-                        { // Check for hotel number difference
-                            payMoney(player, game->board[squareName1].data.property.coloredProperty.hotelCost, game);
-                            game->board[squareName1].data.property.coloredProperty.hotelCount++;
-                        }
-                        else
-                        {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a hotel on a property with a different number of hotel!", false, false);
-                        }
-                    }
-                    else
-                    {
-                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
-                    }
-                }
-                enum SquareNames tmp = squareName1;
-                squareName1 = squareName2;
-                squareName2 = squareName3;
-                squareName3 = tmp;
             }
         }
     }
