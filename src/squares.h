@@ -44,16 +44,6 @@ enum Colors
     NUM_COLORS
 };
 
-char colorStrings[][20] = {
-    "Brown",
-    "Light Blue",
-    "Pink",
-    "Orange",
-    "Red",
-    "Yellow",
-    "Green",
-    "Dark Blue"};
-
 enum Owners
 {
     Player1,

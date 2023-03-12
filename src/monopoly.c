@@ -11,6 +11,7 @@
 #include "helpers.h"
 #include "display.h"
 #include "interface.h"
+#include "presets.h"
 #define OWNER_TO_PLAYER(player) (player + 1)
 
 #define GRAPHICS_DISABLED
@@ -47,14 +48,19 @@ int userInput(int curr_player, gamestate *game, char *question)
     {
         return 0;
     }
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+        ;
+    }
 }
 
 int chooseProperty(int curr_player, gamestate *game, int num_choices, enum SquareNames *choices)
 {
-    printf("Select a property");
+    printf("Select a property\n");
     for (int i = 0; i < num_choices; i++)
     {
-        printf("%s", game->board[choices[i]].name);
+        printf("%d: %s\n", game->board[choices[i]].squareName, game->board[choices[i]].name);
     }
     int input;
     scanf(" %d", &input);
@@ -129,10 +135,17 @@ void initGame(gamestate *game)
         game->players[i].bankrupt = false;
     }
     game->turn = 0;
-    game->doubles = 0;
-    game->houses = 32;
-    game->hotels = 12;
     game->lastDiceRoll = 0;
+}
+
+void loadPreset(gamestate *game)
+{
+    char query[128];
+    sprintf(query, "Would you to select the 'everyThingOwnedByPlayer0' present?");
+    if (DRAWSEQ_DIALOGUE_YES_NO(0, game, query))
+    {
+        everyThingOwnedByPlayer0(game);
+    }
 }
 
 void gameStart(gamestate *game)
@@ -185,10 +198,6 @@ diceRoll rollDice(gamestate *game)
     }
     printf("You rolled a %d and a %d\n", roll.die1, roll.die2);
     game->lastDiceRoll = roll.die1 + roll.die2;
-    if (roll.doubles)
-    {
-        game->doubles++;
-    }
     return roll;
 }
 
@@ -226,7 +235,6 @@ void playerTurn(player *player, gamestate *game)
 bool turnEnd(gamestate *game)
 {
     game->turn = (game->turn + 1) % MAX_PLAYERS;
-    game->doubles = 0;
     return checkForGameOver(game);
 }
 
@@ -1010,10 +1018,13 @@ void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], in
     *numPropertiesOwned = 0;
     for (i = 0; i < MAX_SQUARES; i++)
     {
-        if (game->board[i].data.property.owner == player->owner)
+        if (game->board[i].type == Property)
         {
-            propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
-            (*numPropertiesOwned)++;
+            if (game->board[i].data.property.owner == player->owner)
+            {
+                propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+                (*numPropertiesOwned)++;
+            }
         }
     }
 }
@@ -1465,6 +1476,7 @@ int main(void)
     srand(time(NULL));
     gamestate game;
     initGame(&game);
+    loadPreset(&game);
     gameStart(&game);
 
 #ifndef GRAPHICS_DISABLED

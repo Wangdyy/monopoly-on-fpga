@@ -11,6 +11,8 @@ void initGame(gamestate *game);
 
 void gameStart(gamestate *game);
 
+void loadPreset(gamestate *game);
+
 /*Return True if game should end*/
 bool checkForGameOver(gamestate *game);
 

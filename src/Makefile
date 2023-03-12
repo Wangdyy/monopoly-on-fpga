@@ -7,10 +7,10 @@ LDIR =../lib
 
 LIBS=
 
-_DEPS = gamestate.h helpers.h players.h squares.h
+_DEPS = gamestate.h helpers.h players.h squares.h presets.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = monopoly.o
+_OBJ = monopoly.o load_presents.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 
