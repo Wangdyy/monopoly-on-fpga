@@ -5,6 +5,7 @@
 #pragma once
 #include "squares.h"
 #include "players.h"
+#include "stdbool.h"
 
 #define MAX_PLAYERS 4
 #define MAX_SQUARES 40

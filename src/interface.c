@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "stdbool.h"
 #include "gamestate.h"
@@ -9,6 +10,7 @@
 #include "interface.h"
 #include "display.h"
 
+// #define DELAY_ON	// activate delays in player movement on fpga
 #define QUEUE_TYPE KeyReleased
 
 typedef enum key_released
@@ -579,6 +581,11 @@ int NUM_PROPERTY_SELECT_DIALOG_OPTIONS = sizeof(PROPERTY_SELECT_DIALOG_OPTIONS) 
 // interface impl
 bool location_has_players[MAX_SQUARES][MAX_PLAYERS];
 
+void delay_ms(int ms) {
+	int start = clock();
+	while(clock() - start < ms);
+}
+
 void fill_location_has_players_with_gamestate(gamestate *game)
 {
 	for (int i = 0; i < MAX_SQUARES; i++)
@@ -676,8 +683,8 @@ void draw_player_pieces(gamestate *game)
 
 void draw_houses_and_hotels(gamestate *game) {
 	for (int square_i = 0; square_i < MAX_SQUARES; square_i++) {
-		if (game->board->type == Property) {
-			propertySquare *p_prop = &(game->board->data.property);
+		if (game->board[square_i].type == Property) {
+			propertySquare *p_prop = &(game->board[square_i].data.property);
 
 			if (p_prop->type == Colored) {
 				draw_houses(square_i, p_prop->coloredProperty.houseCount);
@@ -686,6 +693,18 @@ void draw_houses_and_hotels(gamestate *game) {
 					draw_hotel(square_i);
 				}
 			}
+		} 
+	}
+}
+
+void draw_property_owners(gamestate *game) {
+	for (int square_i = 0; square_i < MAX_SQUARES; square_i++) {
+		if (game->board[square_i].type == Property) {
+			propertySquare *p_prop = &(game->board[square_i].data.property);
+			
+			if (p_prop->owner != Bank) {
+				draw_owned_property(p_prop->owner + 1, square_i);
+			}			
 		} 
 	}
 }
@@ -727,6 +746,7 @@ void draw_basic_setup_without_player_pieces(int curr_player, gamestate *game) {
 	clear_text_buffer();
 	draw_plain_board();
 	draw_player_turn(curr_player);
+	draw_property_owners(game);
 	draw_houses_and_hotels(game);
 	draw_all_player_cash(game);
 }
@@ -846,6 +866,10 @@ void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, i
 {
 	for (int i = 0; i < (new_pos + NUM_SQUARES - old_pos) % NUM_SQUARES; i++)
 	{
+		#ifdef DELAY_ON
+		delay_ms(50);
+		#endif
+
 		draw_basic_setup_without_player_pieces(curr_player, game);
 		draw_dice_roll(dice_roll.die1, dice_roll.die2);
 		draw_player_pieces_with_update(game, curr_player - 1, (old_pos + i + 1) % NUM_SQUARES);

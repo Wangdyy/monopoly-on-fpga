@@ -1056,11 +1056,15 @@ void buyAssets(player *player, gamestate *game)
         enum SquareNames propertiesOwned[28];
         int numPropertiesOwned;
         getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
+		int intPropertiesOwned[28];
+		for (int i = 0; i < 28; i++) {
+			intPropertiesOwned[i] = (int)(propertiesOwned[i]);
+		}
         if (numPropertiesOwned == 0)
         {
             return;
         }
-        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, propertiesOwned);
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, intPropertiesOwned);
         // Check if property is mortgaged
         if (game->board[choice].data.property.mortgaged)
         {
@@ -1227,11 +1231,16 @@ bool sellAssets(player *player, int amount, gamestate *game)
         enum SquareNames propertiesOwned[28];
         int numPropertiesOwned;
         getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
+		int intPropertiesOwned[28];
+		for (int i = 0; i < 28; i++) {
+			intPropertiesOwned[i] = (int)(propertiesOwned[i]);
+		}
+        
         if (numPropertiesOwned == 0)
         {
             return false;
         }
-        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, propertiesOwned);
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, intPropertiesOwned);
         // Check if property is mortgaged
         if (game->board[choice].data.property.mortgaged)
         {
@@ -1476,7 +1485,7 @@ int main(void)
     srand(time(NULL));
     gamestate game;
     initGame(&game);
-    loadPreset(&game);
+    //loadPreset(&game);
     gameStart(&game);
 
 #ifndef GRAPHICS_DISABLED

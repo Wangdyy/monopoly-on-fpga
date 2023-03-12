@@ -5,6 +5,7 @@
  *****************************************************************************************/
 #pragma once
 #define MAX_PROPERTY_SET 3
+#include "stdbool.h"
 
 enum SquareType
 {

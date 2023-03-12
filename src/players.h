@@ -4,6 +4,7 @@
  *****************************************************************************************/
 #pragma once
 #include "squares.h"
+#include "stdbool.h"
 
 typedef struct player
 {

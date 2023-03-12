@@ -2,6 +2,7 @@
 #include "squares.h"
 #include "players.h"
 #include "gamestate.h"
+#include "stdbool.h"
 /*Function decl*/
 
 /**************************************
