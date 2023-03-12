@@ -14,8 +14,6 @@ typedef struct player
     int jailTime;
     bool inJail;
     bool bankrupt;
-    square *owned_properties[28];
-    int owned_properties_count;
     int getOutOfJailFreeCards;
 
 } player;

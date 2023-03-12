@@ -61,6 +61,12 @@ void mortgageProperty(player *player, square *square, gamestate *game);
 
 void unmortgageProperty(player *player, square *square, gamestate *game);
 
+void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
+
+void getPropertiesOfColor(player *player, enum Colors color, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
+
+void buyAssets(player *player, gamestate *game);
+
 /**************************************
  * Payment
  **************************************/
@@ -96,8 +102,10 @@ void waitForNextTurn();
  * Houses and Hotels
  **************************************/
 
-void checkForMonopoly(player *player, gamestate *game);
+void buyHouse(player *player, square *square, gamestate *game);
 
-void buyHouseorHotelSet(player *player, enum Colors color, gamestate *game);
+void buyHotel(player *player, square *square, gamestate *game);
 
-void sellHouseorHotelSet(player *player, propertySquare *property, gamestate *game);
+void sellHotel(player *player, square *square, gamestate *game);
+
+void sellHouse(player *player, square *square, gamestate *game);

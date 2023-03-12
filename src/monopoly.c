@@ -11,21 +11,24 @@
 #include "helpers.h"
 #include "display.h"
 #include "interface.h"
-
-#define GRAPHICS_ENABLED
 #define OWNER_TO_PLAYER(player) (player + 1)
-#ifdef GRAPHICS_ENABLED
+
+#define GRAPHICS_DISABLED
+#ifdef GRAPHICS_DISABLED
+#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) printf("%s\n", question)
+#define DRAWSEQ_TURN_START(curr_player, game)
+#define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll)
+#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos)
+#define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) userInput(curr_player, game, question)
+#define DRAWSEQ_CHOOSE_OWNED_PROPERTY(curr_player, game, num_choices, choices) chooseProperty(curr_player, game, num_choices, choices)
+
+#else
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) drawseq_normal_confirm(curr_player, game, question, chance, community_chest)
 #define DRAWSEQ_TURN_START(curr_player, game) drawseq_turn_start(curr_player, game)
 #define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll) drawseq_roll_dice(curr_player, game, diceRoll)
 #define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos) drawseq_move_player(curr_player, game, diceRoll, old_pos, new_pos)
 #define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) drawseq_dialogue_yes_no(curr_player, game, question)
-#else
-#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question) printf("%s\n", question)
-#define DRAWSEQ_TURN_START(curr_player, game)
-#define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll)
-#define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos)
-#define DRAWSEQ_DIALOGUE_YES_NO(curr_player, game, question) userInput(curr_player, game, question)
+#define DRAWSEQ_CHOOSE_OWNED_PROPERTY(curr_player, game, num_choices, choices) drawseq_choose_owned_property(curr_player, game, num_choices, choices)
 #endif
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -44,6 +47,18 @@ int userInput(int curr_player, gamestate *game, char *question)
     {
         return 0;
     }
+}
+
+int chooseProperty(int curr_player, gamestate *game, int num_choices, enum SquareNames *choices)
+{
+    printf("Select a property");
+    for (int i = 0; i < num_choices; i++)
+    {
+        printf("%s", game->board[choices[i]].name);
+    }
+    int input;
+    scanf(" %d", &input);
+    return input;
 }
 
 /****************************************************************************************
@@ -112,7 +127,6 @@ void initGame(gamestate *game)
         game->players[i].jailTime = 0;
         game->players[i].inJail = false;
         game->players[i].bankrupt = false;
-        game->players[i].owned_properties_count = 0;
     }
     game->turn = 0;
     game->doubles = 0;
@@ -205,10 +219,7 @@ void playerTurn(player *player, gamestate *game)
         moveToSquare(player, roll, game);
     }
 
-    if (DRAWSEQ_DIALOGUE_YES_NO(player->owner, game, "Would you like to buy a house or hotel? (y/n)"))
-    {
-        checkForMonopoly(player, game);
-    }
+    buyAssets(player, game);
 }
 
 /*Turn end returns true if game ends*/
@@ -693,6 +704,11 @@ void chance(player *player, gamestate *game)
  **************************************/
 void payRent(player *player, square *square, gamestate *game)
 {
+    // check if the property is mortgaged
+    if (square->data.property.mortgaged == true)
+    {
+        return;
+    }
     switch (square->data.property.type)
     {
     case (Colored):
@@ -934,9 +950,6 @@ void buyProperty(player *player, square *square, gamestate *game)
     }
     payMoney(player, square->data.property.price, game);
     square->data.property.owner = player->owner;
-    player->owned_properties[player->owned_properties_count] = square;
-    player->owned_properties_count++;
-
     char message[256];
     sprintf(message, "Player %d successfully bought %s for $%d.",
             OWNER_TO_PLAYER(player->owner),
@@ -977,21 +990,6 @@ void sellProperty(player *player, square *square, gamestate *game)
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                            game,
                            message, false, false);
-
-    bool found = false;
-    for (int i = 0; i < player->owned_properties_count; i++)
-    {
-        if (player->owned_properties[i] == square)
-        {
-            player->owned_properties[i] = NULL;
-            found = true;
-        }
-        if (found && i < player->owned_properties_count - 1)
-        {
-            player->owned_properties[i] = player->owned_properties[i + 1];
-        }
-    }
-    player->owned_properties_count--;
 }
 
 void mortgageProperty(player *player, square *square, gamestate *game)
@@ -1006,6 +1004,153 @@ void unmortgageProperty(player *player, square *square, gamestate *game)
     payMoney(player, (int)(square->data.property.mortgageValue * 1.1), game);
 }
 
+void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+{
+    int i;
+    *numPropertiesOwned = 0;
+    for (i = 0; i < MAX_SQUARES; i++)
+    {
+        if (game->board[i].data.property.owner == player->owner)
+        {
+            propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+            (*numPropertiesOwned)++;
+        }
+    }
+}
+
+void getPropertiesOfColor(player *player, enum Colors color, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+{
+    int i;
+    *numPropertiesOwned = 0;
+    for (i = 0; i < MAX_SQUARES; i++)
+    {
+        if (game->board[i].data.property.coloredProperty.color == color)
+        {
+            propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+            (*numPropertiesOwned)++;
+        }
+    }
+}
+
+void buyAssets(player *player, gamestate *game)
+{
+    char query[256];
+    sprintf(query, "Would you like to buy assets and/or unmortage a property?");
+    if (!DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+    {
+        return;
+    }
+    while (true)
+    {
+        enum SquareNames propertiesOwned[28];
+        int numPropertiesOwned;
+        getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
+        if (numPropertiesOwned == 0)
+        {
+            return;
+        }
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, propertiesOwned);
+        // Check if property is mortgaged
+        if (game->board[choice].data.property.mortgaged)
+        {
+            printf("Property is mortgaged\n");
+            char query[256];
+            sprintf(query, "Would you unmortage the property?");
+            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+            {
+                if (player->money < (int)(game->board[choice].data.property.mortgageValue * 1.1))
+                {
+                    char message[256];
+                    sprintf(message, "You do not have enough money to unmortgage %s.\n", game->board[choice].name);
+                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                                           game,
+                                           message, false, false);
+                }
+                else
+                {
+                    unmortgageProperty(player, &game->board[choice], game);
+                }
+            }
+        }
+        else
+        {
+            if (game->board[choice].data.property.type == Colored)
+            {
+                enum Colors color = game->board[choice].data.property.coloredProperty.color;
+                enum SquareNames propertiesOfColor[28];
+                int numPropertiesOfColor;
+                getPropertiesOfColor(player, color, propertiesOfColor, &numPropertiesOfColor, game);
+                for (int i = 0; i < numPropertiesOfColor; i++)
+                {
+                    // check if player owns all properties of color
+                    if (game->board[propertiesOfColor[i]].data.property.owner != player->owner)
+                    {
+                        char message[256];
+                        sprintf(message, "You do not own all properties of color %s.\n", game->board[choice].name);
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                                               game,
+                                               message, false, false);
+                        continue;
+                    }
+                }
+                if (game->board[choice].data.property.coloredProperty.houseCount < 4)
+                {
+                    if (player->money < game->board[choice].data.property.coloredProperty.houseCost)
+                    {
+                        char message[256];
+                        sprintf(message, "You do not have enough money to buy a house on %s.\n", game->board[choice].name);
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                                               game,
+                                               message, false, false);
+                    }
+                    else
+                    {
+                        char query[256];
+                        sprintf(query, "Would you like to buy a house on %s?", game->board[choice].name);
+                        if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                        {
+                            buyHouse(player, &game->board[choice], game);
+                        }
+                    }
+                }
+                else if (game->board[choice].data.property.coloredProperty.hotelCount < 1)
+                {
+                    if (player->money < game->board[choice].data.property.coloredProperty.hotelCost)
+                    {
+                        char message[256];
+                        sprintf(message, "You do not have enough money to buy a hotel on %s.\n", game->board[choice].name);
+                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                                               game,
+                                               message, false, false);
+                    }
+                    else
+                    {
+                        char query[256];
+                        sprintf(query, "Would you like to buy a hotel on %s?", game->board[choice].name);
+                        if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                        {
+                            buyHotel(player, &game->board[choice], game);
+                        }
+                    }
+                }
+                else
+                {
+                    char message[256];
+                    sprintf(message, "You cannot buy any more assets on %s.\n", game->board[choice].name);
+                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
+                                           game,
+                                           message, false, false);
+                }
+            }
+        }
+        char query[256];
+        sprintf(query, "Would you like to continue buying assets and/or unmortage a property?");
+        if (!DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+        {
+            return;
+        }
+    }
+}
 /**************************************
  * Payment
  **************************************/
@@ -1063,9 +1208,81 @@ void receiveMoney(player *player, int amount, gamestate *game)
 
 bool sellAssets(player *player, int amount, gamestate *game)
 {
-    // TODO: Implement sell assets
-    printf("Not implemented yet!\n");
-    return false;
+    char query[256];
+    sprintf(query, "You need to sell $%d worth of assets", amount - player->money);
+    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, query, false, false);
+    while (true)
+    {
+        enum SquareNames propertiesOwned[28];
+        int numPropertiesOwned;
+        getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
+        if (numPropertiesOwned == 0)
+        {
+            return false;
+        }
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, propertiesOwned);
+        // Check if property is mortgaged
+        if (game->board[choice].data.property.mortgaged)
+        {
+            printf("Property is mortgaged\n");
+            char query[256];
+            sprintf(query, "Would you like sell the mortaged property?");
+            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+            {
+                // Sell property
+                sellProperty(player, &game->board[choice], game);
+            }
+        }
+        else
+        {
+            if (game->board[choice].data.property.type != Colored || game->board[choice].data.property.coloredProperty.houseCount == 0)
+            {
+                char query[256];
+                sprintf(query, "Would you like to mortage the property?");
+                if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                {
+                    // Mortgage property
+                    mortgageProperty(player, &game->board[choice], game);
+                }
+                else
+                {
+                    sprintf(query, "Would you like sell the property?");
+                    if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                    {
+                        // Sell property
+                        sellProperty(player, &game->board[choice], game);
+                    }
+                }
+            }
+            else
+            {
+                if (game->board[choice].data.property.coloredProperty.hotelCount == 1)
+                {
+                    char query[256];
+                    sprintf(query, "Would you like to sell the hotel?");
+                    if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                    {
+                        // Sell hotel
+                        sellHotel(player, &game->board[choice], game);
+                    }
+                }
+                else
+                {
+                    char query[256];
+                    sprintf(query, "Would you like to sell a house?");
+                    if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
+                    {
+                        // Sell house
+                        sellHouse(player, &game->board[choice], game);
+                    }
+                }
+            }
+        }
+        if (player->money >= amount)
+        {
+            return true;
+        }
+    }
 }
 
 /**************************************
@@ -1214,199 +1431,28 @@ void waitForNextTurn()
 /**************************************
  * Houses and Hotels
  **************************************/
-void checkForMonopoly(player *player, gamestate *game)
+void buyHouse(player *player, square *square, gamestate *game)
 {
-    for (int setColor = 0; setColor < NUM_COLORS; setColor++)
-    {
-        bool setOwned = false;
-        switch (setColor)
-        {
-        case (Brown):
-            if (game->board[MediteraneanAvenue].data.property.owner == player->owner &&
-                game->board[BalticAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (LightBlue):
-            if (game->board[OrientalAvenue].data.property.owner == player->owner &&
-                game->board[VermontAvenue].data.property.owner == player->owner &&
-                game->board[ConnecticutAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (Pink):
-            if (game->board[StCharlesPlace].data.property.owner == player->owner &&
-                game->board[StatesAvenue].data.property.owner == player->owner &&
-                game->board[VirginiaAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (Orange):
-            if (game->board[StJamesPlace].data.property.owner == player->owner &&
-                game->board[TennesseeAvenue].data.property.owner == player->owner &&
-                game->board[NewYorkAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (Red):
-            if (game->board[KentuckyAvenue].data.property.owner == player->owner &&
-                game->board[IndianaAvenue].data.property.owner == player->owner &&
-                game->board[IllinoisAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (Yellow):
-            if (game->board[AtlanticAvenue].data.property.owner == player->owner &&
-                game->board[VentnorAvenue].data.property.owner == player->owner &&
-                game->board[MarvinGardens].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (Green):
-            if (game->board[PacificAvenue].data.property.owner == player->owner &&
-                game->board[NorthCarolinaAvenue].data.property.owner == player->owner &&
-                game->board[PennsylvaniaAvenue].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        case (DarkBlue):
-            if (game->board[ParkPlace].data.property.owner == player->owner &&
-                game->board[Boardwalk].data.property.owner == player->owner)
-            {
-                setOwned = true;
-            }
-            break;
-        default:
-            printf("Error: Color not recognized\n");
-            break;
-        }
-        if (setOwned)
-        {
-            char query[256];
-            sprintf(query, "You own a monopoly on %s! Would you like to buy houses or hotels?", colorStrings[setColor]);
-            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-            {
-                buyHouseorHotelSet(player, setColor, game);
-            }
-        }
-    }
+    payMoney(player, square->data.property.coloredProperty.houseCost, game);
+    square->data.property.coloredProperty.houseCount++;
 }
 
-void buyHouseorHotelSet(player *player, enum Colors setColor, gamestate *game)
+void buyHotel(player *player, square *square, gamestate *game)
 {
-    enum SquareNames squareNames[3];
-    int propertiesInSet = 0;
+    payMoney(player, square->data.property.coloredProperty.hotelCost, game);
+    square->data.property.coloredProperty.hotelCount++;
+}
 
-    switch (setColor)
-    {
-    case (Brown):
-        squareNames[0] = MediteraneanAvenue;
-        squareNames[1] = BalticAvenue;
-        propertiesInSet = 2;
-        break;
-    case (LightBlue):
-        squareNames[0] = OrientalAvenue;
-        squareNames[1] = VermontAvenue;
-        squareNames[2] = ConnecticutAvenue;
-        propertiesInSet = 3;
-        break;
-    case (Pink):
-        squareNames[0] = StCharlesPlace;
-        squareNames[1] = StatesAvenue;
-        squareNames[2] = VirginiaAvenue;
-        propertiesInSet = 3;
-        break;
-    case (Orange):
-        squareNames[0] = StJamesPlace;
-        squareNames[1] = TennesseeAvenue;
-        squareNames[2] = NewYorkAvenue;
-        propertiesInSet = 3;
-        break;
-    case (Red):
-        squareNames[0] = KentuckyAvenue;
-        squareNames[1] = IndianaAvenue;
-        squareNames[2] = IllinoisAvenue;
-        propertiesInSet = 3;
-        break;
-    case (Yellow):
-        squareNames[0] = AtlanticAvenue;
-        squareNames[1] = VentnorAvenue;
-        squareNames[2] = MarvinGardens;
-        propertiesInSet = 3;
-        break;
-    case (Green):
-        squareNames[0] = PacificAvenue;
-        squareNames[1] = NorthCarolinaAvenue;
-        squareNames[2] = PennsylvaniaAvenue;
-        propertiesInSet = 3;
-        break;
-    case (DarkBlue):
-        squareNames[0] = ParkPlace;
-        squareNames[1] = Boardwalk;
-        propertiesInSet = 2;
-        break;
+void sellHotel(player *player, square *square, gamestate *game)
+{
+    square->data.property.coloredProperty.hotelCount--;
+    receiveMoney(player, square->data.property.coloredProperty.hotelCost / 2, game);
+}
 
-    default:
-        printf("Error: Color not recognized\n");
-        break;
-    }
-    for (int i = 0; i < propertiesInSet; i++)
-    {
-        if (game->board[squareNames[i]].data.property.coloredProperty.houseCount < 4)
-        {
-            char query[256];
-            sprintf(query, "Would you like to buy a house on %s?", game->board[squareNames[i]].name);
-            if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-            {
-                if (player->money >= game->board[squareNames[i]].data.property.coloredProperty.houseCost)
-                { // Check for money
-                    if ((propertiesInSet == 2 && MIN(game->board[squareNames[0]].data.property.coloredProperty.houseCount, game->board[squareNames[1]].data.property.coloredProperty.houseCount) != game->board[squareNames[i]].data.property.coloredProperty.houseCount) || (propertiesInSet == 3 && MIN(game->board[squareNames[0]].data.property.coloredProperty.houseCount, MIN(game->board[squareNames[1]].data.property.coloredProperty.houseCount, game->board[squareNames[2]].data.property.coloredProperty.houseCount)) != game->board[squareNames[i]].data.property.coloredProperty.houseCount))
-                    { // Check for house number difference
-                        payMoney(player, game->board[squareNames[i]].data.property.coloredProperty.houseCost, game);
-                        game->board[squareNames[i]].data.property.coloredProperty.houseCount++;
-                    }
-                    else
-                    {
-                        DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You can't buy a house on a property with a different number of houses!", false, false);
-                    }
-                }
-                else
-                {
-                    DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a house!", false, false);
-                }
-            }
-        }
-        else
-        { // Buying hotels
-            if ((propertiesInSet == 2 && game->board[squareNames[0]].data.property.coloredProperty.houseCount == 4 && game->board[squareNames[1]].data.property.coloredProperty.houseCount == 4) || (propertiesInSet == 3 && game->board[squareNames[0]].data.property.coloredProperty.houseCount == 4 && game->board[squareNames[2]].data.property.coloredProperty.houseCount == 4))
-            { // Check if all properties have 4 houses
-                if (game->board[squareNames[i]].data.property.coloredProperty.hotelCount == 0)
-                { // Check if hotel is already bought
-                    char query[256];
-                    sprintf(query, "Would you like to buy a hotel on %s?", game->board[squareNames[i]].name);
-                    if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
-                    {
-                        if (player->money >= game->board[squareNames[i]].data.property.coloredProperty.hotelCost)
-                        { // Check for money
-                            payMoney(player, game->board[squareNames[i]].data.property.coloredProperty.hotelCost, game);
-                            game->board[squareNames[i]].data.property.coloredProperty.hotelCount++;
-                        }
-                        else
-                        {
-                            DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, "You don't have enough money to buy a hotel!", false, false);
-                        }
-                    }
-                }
-            }
-        }
-    }
+void sellHouse(player *player, square *square, gamestate *game)
+{
+    square->data.property.coloredProperty.houseCount--;
+    receiveMoney(player, square->data.property.coloredProperty.houseCost / 2, game);
 }
 
 /**************************************
@@ -1421,7 +1467,7 @@ int main(void)
     initGame(&game);
     gameStart(&game);
 
-#ifdef GRAPHICS_ENABLED
+#ifndef GRAPHICS_DISABLED
     init_graphics();
 #endif
     while (true)
@@ -1432,7 +1478,7 @@ int main(void)
         {
             break;
         }
-#ifndef GRAPHICS_ENABLED
+#ifdef GRAPHICS_DISABLED
         waitForNextTurn();
 #endif
     }
