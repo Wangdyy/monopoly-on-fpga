@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 #include <string.h>
 
+#include "stdbool.h"
 #include "squares.h"
 #include "players.h"
 #include "gamestate.h"
@@ -14,7 +14,7 @@
 #include "presets.h"
 #define OWNER_TO_PLAYER(player) (player + 1)
 
-#define GRAPHICS_DISABLED
+// #define GRAPHICS_DISABLED
 #ifdef GRAPHICS_DISABLED
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) printf("%s\n", question)
 #define DRAWSEQ_TURN_START(curr_player, game)
@@ -141,7 +141,7 @@ void initGame(gamestate *game)
 void loadPreset(gamestate *game)
 {
     char query[128];
-    sprintf(query, "Would you to select the 'everyThingOwnedByPlayer0' present?");
+    sprintf(query, "Would you to select the 'everyThingOwnedByPlayer0' preset?");
     if (DRAWSEQ_DIALOGUE_YES_NO(0, game, query))
     {
         everyThingOwnedByPlayer0(game);

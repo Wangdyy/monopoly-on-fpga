@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <stdbool.h>
 #include <string.h>
 
+#include "stdbool.h"
 #include "squares.h"
 #include "players.h"
 #include "gamestate.h"
