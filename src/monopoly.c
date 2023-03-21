@@ -141,7 +141,7 @@ void initGame(gamestate *game)
 void loadPreset(gamestate *game)
 {
     char query[128];
-	sprintf(query, "Would you to select the everyThingOwnedByPlayer0 preset?");
+    sprintf(query, "Would you to select the everyThingOwnedByPlayer0 preset?");
     if (DRAWSEQ_DIALOGUE_YES_NO(0, game, query))
     {
         everyThingOwnedByPlayer0(game);
@@ -393,6 +393,7 @@ void communityChest(player *player, gamestate *game)
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "Advance to Go (Collect $200)", false, true);
+        player->position = Go;
         landOnSquare(player, &game->board[Go], game);
         passGo(player, game);
         break;
@@ -535,6 +536,7 @@ void chance(player *player, gamestate *game)
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
                                "Advance to Go (Collect $200)", true, false);
+        player->position = Go;
         landOnSquare(player, &game->board[Go], game);
         passGo(player, game);
         break;
@@ -546,6 +548,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = IllinoisAvenue;
         landOnSquare(player, &game->board[IllinoisAvenue], game);
         break;
     case (2):
@@ -556,6 +559,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = StCharlesPlace;
         landOnSquare(player, &game->board[StCharlesPlace], game);
         break;
     case (3):
@@ -575,6 +579,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = nearestUtility;
         landOnSquare(player, &game->board[nearestUtility], game);
         break;
     case (4):
@@ -605,6 +610,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = nearestRailroad;
         landOnSquare(player, &game->board[nearestRailroad], game);
         break;
     case (5):
@@ -671,6 +677,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = ReadingRailRoad;
         landOnSquare(player, &game->board[ReadingRailRoad], game);
         break;
     case (11):
@@ -682,6 +689,7 @@ void chance(player *player, gamestate *game)
         {
             passGo(player, game);
         }
+        player->position = Boardwalk;
         landOnSquare(player, &game->board[Boardwalk], game);
         break;
     case (12):
@@ -1060,7 +1068,7 @@ void buyAssets(player *player, gamestate *game)
         {
             return;
         }
-        
+
         int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, (int *)propertiesOwned);
         // Check if property is mortgaged
         if (game->board[choice].data.property.mortgaged)
@@ -1228,12 +1236,12 @@ bool sellAssets(player *player, int amount, gamestate *game)
         enum SquareNames propertiesOwned[28];
         int numPropertiesOwned;
         getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
-        
+
         if (numPropertiesOwned == 0)
         {
             return false;
         }
-        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, (int *) propertiesOwned);
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numPropertiesOwned, (int *)propertiesOwned);
         // Check if property is mortgaged
         if (game->board[choice].data.property.mortgaged)
         {
@@ -1476,9 +1484,9 @@ int main(void)
     printf("Welcome to Monopoly!\n");
     /*Make it not random for debugging*/
     srand(time(NULL));
-	#ifndef GRAPHICS_DISABLED
+#ifndef GRAPHICS_DISABLED
     init_graphics();
-	#endif
+#endif
     gamestate game;
     initGame(&game);
     loadPreset(&game);
