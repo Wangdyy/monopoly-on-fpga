@@ -66,6 +66,10 @@ void unmortgageProperty(player *player, square *square, gamestate *game);
 
 void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
 
+void getUnmortagedColoredPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
+
+void getMortagedPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
+
 void getPropertiesOfColor(player *player, enum Colors color, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game);
 
 void buyAssets(player *player, gamestate *game);
