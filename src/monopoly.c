@@ -723,7 +723,8 @@ void payRent(player *player, square *square, gamestate *game)
     // check if the property is mortgaged
     if (square->data.property.mortgaged == true)
     {
-        print("%s is mortgaged. No rent is due.\n", square->name) char message[256];
+        printf("%s is mortgaged. No rent is due.\n", square->name);
+        char message[256];
         sprintf(message, "%s is mortgaged. No rent is due.", square->name);
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
                                game,
