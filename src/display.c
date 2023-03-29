@@ -715,6 +715,7 @@ void draw_plain_board()
 
 	plot_monochrome_bitmap(four, 244, 140, 32, 12, BLACK);
 	plot_monochrome_bitmap(dollar_sign, 256, 140, 32, 12, BLACK);
+
 }
 
 void draw_board_frame()
@@ -1005,6 +1006,46 @@ void draw_hotel(int property)
 	}
 
 	draw_rectangle(x1 + 2, y1 + 2, x2 - 1, y2 - 1, DARK_RED);
+}
+
+void draw_highlight_property(int property){
+	int x1, x2, y1, y2;
+
+	switch (draw_squares[property].orientation)
+	{
+	case 1:
+		x1 = draw_squares[property].x1-1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2-1;
+		break;
+	case 2:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1-1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 3:
+		x1 = draw_squares[property].x1-1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 4:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1-1;
+		y2 = draw_squares[property].y2;
+		break;
+	}
+
+	for (int x = x1; x <= x2; x++){
+		for (int y = y1; y <= y2; y++){
+			if (x == x1 || x == x2 || y == y1 || y == y2){
+				plot_pixel(x, y, RED);
+			}
+		}
+	}
 }
 
 void draw_owned_property(int player, int property)
