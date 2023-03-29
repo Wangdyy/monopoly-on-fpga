@@ -25,6 +25,7 @@ void draw_circle(int x, int y, int r, int color);
 void draw_arc(int x, int y, int radius, int start_degrees, int end_degrees, int thickness, int color);
 void draw_horizontal(int x_start, int x_end, int y, int thickness, int color);
 void draw_vertical(int x, int y_start, int y_end, int thickness, int color);
+void draw_diagonal(int x1, int y1, int x2, int y2, int color);
 
 void draw_railroad(int x1, int y1, int x2, int y2, int orientation);
 void draw_jail();
@@ -50,6 +51,7 @@ void draw_3_player_jail(int square, int player1, bool player1_in_jail, int playe
 void draw_4_player_jail(int square, int player1, bool player1_in_jail, int player2, bool player2_in_jail, int player3, bool player3_in_jail, int player4, bool player4_in_jail);
 void draw_owned_property(int player, int property);
 void draw_highlight_property(int property);
+void draw_mortgaged_property(int property);
 void draw_houses(int property, int num_houses);
 void draw_hotel(int property);
 

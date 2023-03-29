@@ -373,6 +373,38 @@ void draw_vertical(int x, int y_start, int y_end, int thickness, int color)
 	}
 }
 
+void draw_diagonal(int x1, int y1, int x2, int y2, int color){
+	int dx = abs(x2 - x1);
+    int sx = x1 < x2 ? 1 : -1;
+    int dy = -abs(y2 - y1);
+    int sy = y1 < y2 ? 1 : -1;
+    int error = dx + dy;
+    
+    while (true){
+        plot_pixel(x1, y1, color);
+        if (x1 == x2 && y1 == y2){
+			break;
+		}
+        int e2 = 2 * error;
+        if (e2 >= dy){
+			if (x1 == x2){
+				break;
+			}
+            error = error + dy;
+            x1 = x1 + sx;
+		}
+            
+        if (e2 <= dx){
+			if (y1 == y2) {
+				break;
+			}
+            error = error + dx;
+            y1 = y1 + sy;
+		}
+            
+	}
+}
+
 void draw_rectangle_with_border(int x1, int y1, int x2, int y2, int color)
 {
 	int x_min = min(x1, x2);
@@ -715,7 +747,6 @@ void draw_plain_board()
 
 	plot_monochrome_bitmap(four, 244, 140, 32, 12, BLACK);
 	plot_monochrome_bitmap(dollar_sign, 256, 140, 32, 12, BLACK);
-
 }
 
 void draw_board_frame()
@@ -857,6 +888,7 @@ void draw_board_frame()
 	plot_monochrome_bitmap(paytax, 131, 215, 32, 14, BLACK);
 	plot_monochrome_bitmap(lightbulb, 0, 167, 32, 16, BLACK);
 	plot_monochrome_bitmap(lightbulb_yellow, 0, 167, 32, 16, YELLOW);
+
 }
 
 void draw_bank_balance(int player, int value)
@@ -1006,6 +1038,41 @@ void draw_hotel(int property)
 	}
 
 	draw_rectangle(x1 + 2, y1 + 2, x2 - 1, y2 - 1, DARK_RED);
+}
+
+void draw_mortgaged_property(int property){
+	int x1, x2, y1, y2;
+
+	switch (draw_squares[property].orientation)
+	{
+	case 1:
+		x1 = draw_squares[property].x1-1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2-1;
+		break;
+	case 2:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1-1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 3:
+		x1 = draw_squares[property].x1-1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
+		break;
+	case 4:
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1-1;
+		y2 = draw_squares[property].y2;
+		break;
+	}
+	printf(x1,y1,x2,y2);
+	draw_diagonal(x1,y1,x2,y2,RED);
+	draw_diagonal(x2,y1,x1,y2,RED);
 }
 
 void draw_highlight_property(int property){
