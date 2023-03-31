@@ -709,6 +709,18 @@ void draw_property_owners(gamestate *game) {
 	}
 }
 
+void draw_mortgages(gamestate *game) {
+	for (int square_i = 0; square_i < MAX_SQUARES; square_i++) {
+		if (game->board[square_i].type == Property) {
+			propertySquare *p_prop = &(game->board[square_i].data.property);
+			
+			if (p_prop->mortgaged) {
+				draw_mortgaged_property(square_i);
+			}			
+		} 
+	}
+}
+
 void draw_player_pieces_with_gamestate(gamestate *game)
 {
 	fill_location_has_players_with_gamestate(game);
@@ -747,6 +759,7 @@ void draw_basic_setup_without_player_pieces(int curr_player, gamestate *game) {
 	draw_plain_board();
 	draw_player_turn(curr_player);
 	draw_property_owners(game);
+	draw_mortgages(game);
 	draw_houses_and_hotels(game);
 	draw_all_player_cash(game);
 }
@@ -890,7 +903,7 @@ void draw_property_select_screen(int curr_player, gamestate *game, int num_choic
 	}
 
 	// current highlight
-	draw_owned_property(highlight_id, choices[curr_choice]);
+	draw_highlight_property(choices[curr_choice]);
 
 	// instructions in the middle
 	draw_options_box("Choose an eligible property:",
