@@ -86,7 +86,7 @@ Queue create_queue(unsigned int max_size)
 	q.elems = (QUEUE_TYPE *)malloc(sizeof(QUEUE_TYPE) * (max_size + 1));
 	if (!q.elems)
 	{
-		printf("Unable to allocate queue of size %d\n", max_size);
+		//printf("Unable to allocate queue of size %d\n", max_size);
 		exit(-1);
 	}
 	return q;
@@ -96,7 +96,7 @@ void queue_enqueue(Queue *q, QUEUE_TYPE c)
 {
 	if (q->start == (q->end + 1) % (q->size + 1))
 	{
-		printf("Cannot insert any more elements into queue\n");
+		//printf("Cannot insert any more elements into queue\n");
 		exit(-1);
 	}
 
@@ -108,7 +108,7 @@ QUEUE_TYPE queue_dequeue(Queue *q)
 {
 	if (q->start == q->end)
 	{
-		printf("Cannot dequeue element since queue is empty\n");
+		//printf("Cannot dequeue element since queue is empty\n");
 		exit(-1);
 	}
 
@@ -291,207 +291,207 @@ void print_key(KeyReleased k)
 	switch (k)
 	{
 		// case ENTER:
-		// 	printf("Enter");
+		// 	//printf("Enter");
 		// 	break;
 
 		// case UP:
-		// 	printf("Up");
+		// 	//printf("Up");
 		// 	break;
 
 		// case LEFT:
-		// 	printf("Left");
+		// 	//printf("Left");
 		// 	break;
 
 		// case DOWN:
-		// 	printf("Down");
+		// 	//printf("Down");
 		// 	break;
 
 		// case RIGHT:
-		// 	printf("Right");
+		// 	//printf("Right");
 		// 	break;
 
 	case NUM_1:
-		printf("1");
+		//printf("1");
 		break;
 
 	case NUM_2:
-		printf("2");
+		//printf("2");
 		break;
 
 	case NUM_3:
-		printf("3");
+		//printf("3");
 		break;
 
 	case NUM_4:
-		printf("4");
+		//printf("4");
 		break;
 
 	case NUM_5:
-		printf("5");
+		//printf("5");
 		break;
 
 	case NUM_6:
-		printf("6");
+		//printf("6");
 		break;
 
 	case NUM_7:
-		printf("7");
+		//printf("7");
 		break;
 
 	case NUM_8:
-		printf("8");
+		//printf("8");
 		break;
 
 	case NUM_9:
-		printf("9");
+		//printf("9");
 		break;
 
 	case NUM_0:
-		printf("0");
+		//printf("0");
 		break;
 
 	case SYM_DASH:
-		printf("-");
+		//printf("-");
 		break;
 
 	case SYM_EQ:
-		printf("=");
+		//printf("=");
 		break;
 
 	case CHAR_Q:
-		printf("q");
+		//printf("q");
 		break;
 
 	case CHAR_W:
-		printf("w");
+		//printf("w");
 		break;
 
 	case CHAR_E:
-		printf("e");
+		//printf("e");
 		break;
 
 	case CHAR_R:
-		printf("r");
+		//printf("r");
 		break;
 
 	case CHAR_T:
-		printf("t");
+		//printf("t");
 		break;
 
 	case CHAR_Y:
-		printf("y");
+		//printf("y");
 		break;
 
 	case CHAR_U:
-		printf("u");
+		//printf("u");
 		break;
 
 	case CHAR_I:
-		printf("i");
+		//printf("i");
 		break;
 
 	case CHAR_O:
-		printf("o");
+		//printf("o");
 		break;
 
 	case CHAR_P:
-		printf("p");
+		//printf("p");
 		break;
 
 	case SYM_LS:
-		printf("[");
+		//printf("[");
 		break;
 
 	case SYM_RS:
-		printf("]");
+		//printf("]");
 		break;
 
 	case CHAR_A:
-		printf("a");
+		//printf("a");
 		break;
 
 	case CHAR_S:
-		printf("s");
+		//printf("s");
 		break;
 
 	case CHAR_D:
-		printf("d");
+		//printf("d");
 		break;
 
 	case CHAR_F:
-		printf("f");
+		//printf("f");
 		break;
 
 	case CHAR_G:
-		printf("g");
+		//printf("g");
 		break;
 
 	case CHAR_H:
-		printf("h");
+		//printf("h");
 		break;
 
 	case CHAR_J:
-		printf("j");
+		//printf("j");
 		break;
 
 	case CHAR_K:
-		printf("k");
+		//printf("k");
 		break;
 
 	case CHAR_L:
-		printf("l");
+		//printf("l");
 		break;
 
 	case SYM_SEMI:
-		printf(";");
+		//printf(";");
 		break;
 
 	case SYM_APOS:
-		printf("'");
+		//printf("'");
 		break;
 
 	case CHAR_Z:
-		printf("z");
+		//printf("z");
 		break;
 
 	case CHAR_X:
-		printf("x");
+		//printf("x");
 		break;
 
 	case CHAR_C:
-		printf("c");
+		//printf("c");
 		break;
 
 	case CHAR_V:
-		printf("v");
+		//printf("v");
 		break;
 
 	case CHAR_B:
-		printf("b");
+		//printf("b");
 		break;
 
 	case CHAR_N:
-		printf("n");
+		//printf("n");
 		break;
 
 	case CHAR_M:
-		printf("m");
+		//printf("m");
 		break;
 
 	case SYM_COMMA:
-		printf(",");
+		//printf(",");
 		break;
 
 	case SYM_DOT:
-		printf(".");
+		//printf(".");
 		break;
 
 	case SYM_SLASH:
-		printf("/");
+		//printf("/");
 		break;
 
 	default:
-		printf("Invalid");
+		//printf("Invalid");
 		break;
 	}
 }
@@ -503,11 +503,11 @@ void print_key_released_queue(Queue q)
 	while (i != q.end)
 	{
 		print_key(q.elems[i]);
-		printf(" ");
+		//printf(" ");
 		i = (i + 1) % (q.size + 1);
 	}
 
-	printf("\n");
+	//printf("\n");
 }
 
 char read_next_char()
@@ -560,9 +560,9 @@ void print_options(int num_options, char **options)
 {
 	for (int i = 0; i < num_options; i++)
 	{
-		printf(" <");
+		//printf(" <");
 		print_key(i);
-		printf("> - %s ", options[i]);
+		//printf("> - %s ", options[i]);
 	}
 }
 
@@ -892,15 +892,13 @@ void drawseq_move_player(int curr_player, gamestate *game, diceRoll dice_roll, i
 
 void draw_property_select_screen(int curr_player, gamestate *game, int num_choices, int *choices, int curr_choice)
 {
-	int highlight_id = 6;
-
 	draw_basic_setup(curr_player, game);
 
-	// highlight all eligible property
+	/* // highlight all eligible property
 	for (int i = 0; i < num_choices; i++)
 	{
 		draw_owned_property(curr_player, choices[i]);
-	}
+	} */
 
 	// current highlight
 	draw_highlight_property(choices[curr_choice]);
@@ -929,11 +927,15 @@ int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choi
 	bool done = false;
 	while (!done)
 	{
+		// char message[256];
+		// sprintf(message, "Current choice: %d\n", chosen);
+		// drawseq_normal_confirm(curr_player, game, message, false, false);
+			
 		draw_property_select_screen(curr_player, game, num_choices, choices, chosen);
 		wait_for_vsync();
 
 		switch (get_choice(NUM_PROPERTY_SELECT_DIALOG_OPTIONS))
-		{
+		{	
 		case 0:
 			chosen = (chosen + 1) % num_choices;
 			break;
@@ -941,12 +943,9 @@ int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choi
 			chosen = (chosen + num_choices - 1) % num_choices;
 			break;
 		case 2:
-			return chosen;
+			return choices[chosen];
 		case 3:
 			return -1;
-		default:
-			printf("Illegal choice received.\n");
-			exit(1);
 		}
 	}
 	return -1;
@@ -959,7 +958,7 @@ int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choi
 // {
 // 	KeyReleased next_key = read_next_key();
 // 	print_key(next_key);
-// 	printf("\n");
+// 	//printf("\n");
 // }
 // Queue q = create_queue(5);
 // int cnt = 0;
@@ -974,7 +973,7 @@ int drawseq_choose_owned_property(int curr_player, gamestate *game, int num_choi
 // 	cnt += 1;
 // }
 
-// printf("\nNow pop the objects one by one:\n");
+// //printf("\nNow pop the objects one by one:\n");
 
 // for (int i = 0; i < 5; i++)
 // {

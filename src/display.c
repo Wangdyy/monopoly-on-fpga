@@ -1070,7 +1070,7 @@ void draw_mortgaged_property(int property){
 		y2 = draw_squares[property].y2;
 		break;
 	}
-	printf(x1,y1,x2,y2);
+	//printf(x1,y1,x2,y2);
 	draw_diagonal(x1,y1,x2,y2,RED);
 	draw_diagonal(x2,y1,x1,y2,RED);
 }
@@ -1081,28 +1081,28 @@ void draw_highlight_property(int property){
 	switch (draw_squares[property].orientation)
 	{
 	case 1:
-		x1 = draw_squares[property].x1-1;
+		x1 = draw_squares[property].x1;
 		x2 = draw_squares[property].x2;
 		y1 = draw_squares[property].y1;
-		y2 = draw_squares[property].y2-1;
+		y2 = draw_squares[property].y2;
 		break;
 	case 2:
 		x1 = draw_squares[property].x1;
 		x2 = draw_squares[property].x2;
-		y1 = draw_squares[property].y1-1;
-		y2 = draw_squares[property].y2;
-		break;
-	case 3:
-		x1 = draw_squares[property].x1-1;
-		x2 = draw_squares[property].x2;
 		y1 = draw_squares[property].y1;
 		y2 = draw_squares[property].y2;
 		break;
+	case 3:
+		x1 = draw_squares[property].x2;
+		x2 = draw_squares[property].x1;
+		y1 = draw_squares[property].y2;
+		y2 = draw_squares[property].y1;
+		break;
 	case 4:
-		x1 = draw_squares[property].x1;
-		x2 = draw_squares[property].x2;
-		y1 = draw_squares[property].y1-1;
-		y2 = draw_squares[property].y2;
+		x1 = draw_squares[property].x2;
+		x2 = draw_squares[property].x1;
+		y1 = draw_squares[property].y2;
+		y2 = draw_squares[property].y1;
 		break;
 	}
 

@@ -16,7 +16,7 @@
 
 // #define GRAPHICS_DISABLED
 #ifdef GRAPHICS_DISABLED
-#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) printf("%s\n", question)
+#define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) //printf("%s\n", question)
 #define DRAWSEQ_TURN_START(curr_player, game)
 #define DRAWSEQ_ROLL_DICE(curr_player, game, diceRoll)
 #define DRAWSEQ_MOVE_PLAYER(curr_player, game, diceRoll, old_pos, new_pos)
@@ -37,7 +37,7 @@
 
 int userInput(int curr_player, gamestate *game, char *question)
 {
-    printf("%s\n", question);
+    //printf("%s\n", question);
     char input;
     scanf(" %c", &input);
     if (input == 'y' || input == 'Y')
@@ -57,10 +57,10 @@ int userInput(int curr_player, gamestate *game, char *question)
 
 int chooseProperty(int curr_player, gamestate *game, int num_choices, int *choices)
 {
-    printf("Select a property\n");
+    //printf("Select a property\n");
     for (int i = 0; i < num_choices; i++)
     {
-        printf("%d: %s\n", game->board[choices[i]].squareName, game->board[choices[i]].name);
+        //printf("%d: %s\n", game->board[choices[i]].squareName, game->board[choices[i]].name);
     }
     int input;
     scanf(" %d", &input);
@@ -152,7 +152,7 @@ void gameStart(gamestate *game)
 {
     // TODO: Roll dice to determine turn order
     // TODO: Ask for player names
-    printf("Not implemented yet!\n");
+    //printf("Not implemented yet!\n");
 }
 
 bool checkForGameOver(gamestate *game)
@@ -196,7 +196,7 @@ diceRoll rollDice(gamestate *game)
     {
         roll.doubles = false;
     }
-    printf("You rolled a %d and a %d\n", roll.die1, roll.die2);
+    //printf("You rolled a %d and a %d\n", roll.die1, roll.die2);
     game->lastDiceRoll = roll.die1 + roll.die2;
     return roll;
 }
@@ -207,11 +207,11 @@ void playerTurn(player *player, gamestate *game)
     {
         return;
     }
-    printf("/**************************************\n");
-    printf("It is player %d's turn!\n", OWNER_TO_PLAYER(game->players[game->turn].owner));
-    printf("You are currently located at %s\n", game->board[player->position].name);
-    printf("You currently have $%d\n", player->money);
-    printf("**************************************/\n");
+    //printf("/**************************************\n");
+    //printf("It is player %d's turn!\n", OWNER_TO_PLAYER(game->players[game->turn].owner));
+    //printf("You are currently located at %s\n", game->board[player->position].name);
+    //printf("You currently have $%d\n", player->money);
+    //printf("**************************************/\n");
 
     DRAWSEQ_TURN_START(OWNER_TO_PLAYER(player->owner), game);
 
@@ -254,7 +254,7 @@ void moveToSquare(player *player, struct diceRoll roll, gamestate *game)
 
 void landOnSquare(player *player, square *square, gamestate *game)
 {
-    printf("player %d landed on %s\n", OWNER_TO_PLAYER(player->owner), square->name);
+    //printf("player %d landed on %s\n", OWNER_TO_PLAYER(player->owner), square->name);
     if (square->type == Property)
     {
         doPropertySquare(player, square, game);
@@ -265,7 +265,7 @@ void landOnSquare(player *player, square *square, gamestate *game)
     }
     else
     {
-        printf("Error: Square type not recognized\n");
+        //printf("Error: Square type not recognized\n");
     }
 }
 
@@ -289,16 +289,16 @@ void doActionSquare(player *player, square *square, gamestate *game)
         communityChest(player, game);
         break;
     case (GoAction):
-        printf("You've passed go!\n");
+        //printf("You've passed go!\n");
         break;
     case (FreeParkingAction):
-        printf("Nothing happens...\n");
+        //printf("Nothing happens...\n");
         break;
     case (JailAction):
-        printf("Just visiting...nothing happens\n");
+        //printf("Just visiting...nothing happens\n");
         break;
     default:
-        printf("Error: Action Square type not recognized\n");
+        //printf("Error: Action Square type not recognized\n");
         break;
     }
 }
@@ -322,12 +322,12 @@ void doPropertySquare(player *player, square *square, gamestate *game)
 
             if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
             {
-                printf("You chose to buy the property.\n");
+                //printf("You chose to buy the property.\n");
                 buyProperty(player, square, game);
             }
             else
             {
-                printf("You did not buy the property.\n");
+                //printf("You did not buy the property.\n");
             }
         }
         else
@@ -349,7 +349,7 @@ void doPropertySquare(player *player, square *square, gamestate *game)
     }
     else
     {
-        printf("You own this property!\n");
+        //printf("You own this property!\n");
     }
 }
 
@@ -723,7 +723,7 @@ void payRent(player *player, square *square, gamestate *game)
     // check if the property is mortgaged
     if (square->data.property.mortgaged == true)
     {
-        printf("%s is mortgaged. No rent is due.\n", square->name);
+        //printf("%s is mortgaged. No rent is due.\n", square->name);
         char message[256];
         sprintf(message, "%s is mortgaged. No rent is due.", square->name);
         DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner),
@@ -743,7 +743,7 @@ void payRent(player *player, square *square, gamestate *game)
         payRailroadRent(player, square, game);
         break;
     default:
-        printf("Error: Property type not recognized\n");
+        //printf("Error: Property type not recognized\n");
         break;
     }
 }
@@ -843,13 +843,13 @@ void payColorSetRent(player *player, square *square, gamestate *game)
             }
             break;
         default:
-            printf("Error: Color not recognized\n");
+            //printf("Error: Color not recognized\n");
             break;
         }
     }
     if (setOwned)
     {
-        printf("Player %d owns the set, rent is doubled!\n", OWNER_TO_PLAYER(owner));
+        //printf("Player %d owns the set, rent is doubled!\n", OWNER_TO_PLAYER(owner));
         rent *= 2;
     }
 
@@ -861,7 +861,7 @@ void payColorSetRent(player *player, square *square, gamestate *game)
             rent);
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
-    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
+    //printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(owner), rent);
     payPlayer(player, &game->players[owner], rent, game);
 }
 
@@ -879,18 +879,18 @@ void payUtilityRent(player *player, square *square, gamestate *game)
     }
     else
     {
-        printf("Error: Utility square not recognized\n");
+        //printf("Error: Utility square not recognized\n");
         return;
     }
     int rent;
     if (utilityOwner == otherUtilityOwner)
     {
-        printf("Both utilities owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+        //printf("Both utilities owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
         rent = 10 * game->lastDiceRoll;
     }
     else
     {
-        printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
+        //printf("Utility owned by player %d!\n", OWNER_TO_PLAYER(utilityOwner));
         rent = 4 * game->lastDiceRoll;
     }
 
@@ -902,7 +902,7 @@ void payUtilityRent(player *player, square *square, gamestate *game)
             rent);
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
-    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
+    //printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(utilityOwner), rent);
     payPlayer(player, &game->players[utilityOwner], rent, game);
 }
 
@@ -942,7 +942,7 @@ void payRailroadRent(player *player, square *square, gamestate *game)
         rent = 200;
         break;
     default:
-        printf("Error: Wrong Number of railroads owned\n");
+        //printf("Error: Wrong Number of railroads owned\n");
         break;
     }
 
@@ -954,7 +954,7 @@ void payRailroadRent(player *player, square *square, gamestate *game)
             rent);
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, payConfirm, false, false);
 
-    printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
+    //printf("Paying player %d $%d rent...\n", OWNER_TO_PLAYER(railroadOwner), rent);
     payPlayer(player, &game->players[railroadOwner], rent, game);
 }
 
@@ -1026,7 +1026,7 @@ void unmortgageProperty(player *player, square *square, gamestate *game)
     payMoney(player, (int)(square->data.property.mortgageValue * 1.1), game);
 }
 
-void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+void getPropertiesOwned(player *player, int *propertiesOwned, int *numPropertiesOwned, gamestate *game)
 {
     int i;
     *numPropertiesOwned = 0;
@@ -1043,7 +1043,7 @@ void getPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], in
     }
 }
 
-void getUnmortagedColoredPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+void getUnmortagedColoredPropertiesOwned(player *player, int *propertiesOwned, int *numPropertiesOwned, gamestate *game)
 {
     int i;
     *numPropertiesOwned = 0;
@@ -1057,7 +1057,7 @@ void getUnmortagedColoredPropertiesOwned(player *player, enum SquareNames proper
                 {
                     if (game->board[i].data.property.type == Colored)
                     {
-                        propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+                        propertiesOwned[*numPropertiesOwned] = i;
                         (*numPropertiesOwned)++;
                     }
                 }
@@ -1066,7 +1066,7 @@ void getUnmortagedColoredPropertiesOwned(player *player, enum SquareNames proper
     }
 }
 
-void getMortagedPropertiesOwned(player *player, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+void getMortagedPropertiesOwned(player *player, int *propertiesOwned, int *numPropertiesOwned, gamestate *game)
 {
     int i;
     *numPropertiesOwned = 0;
@@ -1078,7 +1078,7 @@ void getMortagedPropertiesOwned(player *player, enum SquareNames propertiesOwned
             {
                 if (game->board[i].data.property.mortgaged == true)
                 {
-                    propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+                    propertiesOwned[*numPropertiesOwned] = i;
                     (*numPropertiesOwned)++;
                 }
             }
@@ -1086,7 +1086,7 @@ void getMortagedPropertiesOwned(player *player, enum SquareNames propertiesOwned
     }
 }
 
-void getPropertiesOfColor(player *player, enum Colors color, enum SquareNames propertiesOwned[28], int *numPropertiesOwned, gamestate *game)
+void getPropertiesOfColor(player *player, enum Colors color, int *propertiesOwned, int *numPropertiesOwned, gamestate *game)
 {
     int i;
     *numPropertiesOwned = 0;
@@ -1094,7 +1094,7 @@ void getPropertiesOfColor(player *player, enum Colors color, enum SquareNames pr
     {
         if (game->board[i].data.property.coloredProperty.color == color)
         {
-            propertiesOwned[*numPropertiesOwned] = game->board[i].squareName;
+            propertiesOwned[*numPropertiesOwned] = i;
             (*numPropertiesOwned)++;
         }
     }
@@ -1104,7 +1104,7 @@ void buyAssets(player *player, gamestate *game)
 {
     while (true)
     {
-        enum SquareNames mortagedPropertiesOwned[28];
+        int mortagedPropertiesOwned[28];
         int numMortagedPropertiesOwned;
         getMortagedPropertiesOwned(player, mortagedPropertiesOwned, &numMortagedPropertiesOwned, game);
         if (numMortagedPropertiesOwned == 0)
@@ -1117,7 +1117,7 @@ void buyAssets(player *player, gamestate *game)
         {
             break;
         }
-        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numMortagedPropertiesOwned, (int *)mortagedPropertiesOwned);
+        int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numMortagedPropertiesOwned, mortagedPropertiesOwned);
         if (choice < 0 || choice >= numMortagedPropertiesOwned)
         {
             break;
@@ -1138,7 +1138,7 @@ void buyAssets(player *player, gamestate *game)
 
     while (true)
     {
-        enum SquareNames coloredPropertiesOwned[28];
+        int coloredPropertiesOwned[28];
         int numColoredPropertiesOwned;
         getUnmortagedColoredPropertiesOwned(player, coloredPropertiesOwned, &numColoredPropertiesOwned, game);
         if (numColoredPropertiesOwned == 0)
@@ -1152,13 +1152,14 @@ void buyAssets(player *player, gamestate *game)
             break;
         }
         int choice = DRAWSEQ_CHOOSE_OWNED_PROPERTY(OWNER_TO_PLAYER(player->owner), game, numColoredPropertiesOwned, (int *)coloredPropertiesOwned);
-        if (choice < 0 || choice >= numColoredPropertiesOwned)
+        if (choice < 0) // || choice >= numColoredPropertiesOwned)
         {
             break;
         }
-
+		 
         enum Colors color = game->board[choice].data.property.coloredProperty.color;
-        enum SquareNames propertiesOfColor[28];
+        
+		int propertiesOfColor[28];
         int numPropertiesOfColor;
         getPropertiesOfColor(player, color, propertiesOfColor, &numPropertiesOfColor, game);
         bool setOwned = true;
@@ -1173,7 +1174,8 @@ void buyAssets(player *player, gamestate *game)
                                        game,
                                        message, false, false);
                 setOwned = false;
-            }
+				break;
+			}
         }
         if (setOwned)
         {
@@ -1233,7 +1235,7 @@ void buyAssets(player *player, gamestate *game)
  **************************************/
 void payPlayer(player *payer, player *payee, int amount, gamestate *game)
 {
-    printf("Player %d is paying player %d $%d\n", OWNER_TO_PLAYER(payer->owner), OWNER_TO_PLAYER(payee->owner), amount);
+    //printf("Player %d is paying player %d $%d\n", OWNER_TO_PLAYER(payer->owner), OWNER_TO_PLAYER(payee->owner), amount);
     int moneyPaid = payMoney(payer, amount, game);
     receiveMoney(payee, moneyPaid, game);
 }
@@ -1254,11 +1256,11 @@ int payMoney(player *player, int amount, gamestate *game)
         }
         else
         {
-            printf("You don't have enough money to pay!\n");
+            //printf("You don't have enough money to pay!\n");
             amount = player->money;
             player->money = 0;
             bankruptPlayer(player, game);
-            printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
+            //printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 
             char bankruptInfo[128];
             sprintf(bankruptInfo,
@@ -1273,14 +1275,14 @@ int payMoney(player *player, int amount, gamestate *game)
         }
     }
     player->money -= amount;
-    printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
+    //printf("Player %d paid $%d\n", OWNER_TO_PLAYER(player->owner), amount);
     return amount;
 }
 
 void receiveMoney(player *player, int amount, gamestate *game)
 {
     player->money += amount;
-    printf("Player %d received $%d\n", OWNER_TO_PLAYER(player->owner), amount);
+    //printf("Player %d received $%d\n", OWNER_TO_PLAYER(player->owner), amount);
 }
 
 bool sellAssets(player *player, int amount, gamestate *game)
@@ -1290,7 +1292,7 @@ bool sellAssets(player *player, int amount, gamestate *game)
     DRAWSEQ_NORMAL_CONFIRM(OWNER_TO_PLAYER(player->owner), game, query, false, false);
     while (true)
     {
-        enum SquareNames propertiesOwned[28];
+        int propertiesOwned[28];
         int numPropertiesOwned;
         getPropertiesOwned(player, propertiesOwned, &numPropertiesOwned, game);
 
@@ -1306,7 +1308,7 @@ bool sellAssets(player *player, int amount, gamestate *game)
         // Check if property is mortgaged
         if (game->board[choice].data.property.mortgaged)
         {
-            printf("Property is mortgaged\n");
+            //printf("Property is mortgaged\n");
             char query[256];
             sprintf(query, "Would you like sell the mortaged property?");
             if (DRAWSEQ_DIALOGUE_YES_NO(OWNER_TO_PLAYER(player->owner), game, query))
@@ -1504,7 +1506,7 @@ void bankruptPlayer(player *player, gamestate *game)
 
 void waitForNextTurn()
 {
-    printf("Press enter to continue...\n");
+    //printf("Press enter to continue...\n");
     while (getchar() != '\n')
         ;
     getchar();
@@ -1542,7 +1544,7 @@ void sellHouse(player *player, square *square, gamestate *game)
  **************************************/
 int main(void)
 {
-    printf("Welcome to Monopoly!\n");
+    //printf("Welcome to Monopoly!\n");
     /*Make it not random for debugging*/
     srand(time(NULL));
 #ifndef GRAPHICS_DISABLED
