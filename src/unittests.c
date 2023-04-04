@@ -34,7 +34,19 @@ MunitResult initGame_test(const MunitParameter params[], void *fixture)
     initGame(game);
     square Parkplace = game->board[37];
     munit_assert_string_equal(Parkplace.name, "Park Place");
-    // munit_assert_int(Parkplace.name)
+    munit_assert_int(game->players[0].money, ==, 1500);
+    return MUNIT_OK;
+}
+
+MunitResult checkForGameOver_test(const MunitParameter params[], void *fixture)
+{
+    gamestate *game = (gamestate *)fixture;
+    initGame(game);
+    for (int i = 0; i < MAX_PLAYERS - 1; i++)
+    {
+        game->players[i].bankrupt = true;
+    }
+    munit_assert_true(checkForGameOver(game));
     return MUNIT_OK;
 }
 
@@ -62,6 +74,14 @@ MunitTest tests[] = {
     {
         "/initgame",            /* name */
         initGame_test,          /* test */
+        game_setup,             /* setup */
+        game_tear_down,         /* tear_down */
+        MUNIT_TEST_OPTION_NONE, /* options */
+        NULL                    /* parameters */
+    },
+    {
+        "/checkforgameover",    /* name */
+        checkForGameOver_test,  /* test */
         game_setup,             /* setup */
         game_tear_down,         /* tear_down */
         MUNIT_TEST_OPTION_NONE, /* options */
