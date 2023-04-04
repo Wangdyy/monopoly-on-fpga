@@ -14,7 +14,7 @@
 #include "presets.h"
 #define OWNER_TO_PLAYER(player) (player + 1)
 
-// #define GRAPHICS_DISABLED
+#define GRAPHICS_DISABLED
 #ifdef GRAPHICS_DISABLED
 #define DRAWSEQ_NORMAL_CONFIRM(curr_player, game, question, chance, community_chest) printf("%s\n", question)
 #define DRAWSEQ_TURN_START(curr_player, game)
@@ -74,7 +74,7 @@ const square square_Go = {"Go", Action, Go, .data.action = GoAction};
 const square square_MediterraneanAvenue = {"Mediterranean Avenue", Property, MediteraneanAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {2, 10, 30, 90, 160, 250}}}};
 const square square_CommunityChest1 = {"Community Chest", Action, CommunityChest1, .data.action = CommunityChestAction};
 const square square_BalticAvenue = {"Baltic Avenue", Property, BalticAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 60, .mortgageValue = 30, .mortgaged = false, .coloredProperty = {.color = Brown, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {4, 20, 60, 180, 320, 450}}}};
-const square square_IncomeTax = {"Income Tax", Action, IncomeTaxAction, .data.action = IncomeTaxAction};
+const square square_IncomeTax = {"Income Tax", Action, IncomeTax, .data.action = IncomeTaxAction};
 const square square_ReadingRailRoad = {"Reading Rail Road", Property, ReadingRailRoad, .data.property = {.type = RailRoad, .owner = Bank, .price = 200, .mortgageValue = 100, .mortgaged = false}};
 const square square_OrientalAvenue = {"Oriental Avenue", Property, OrientalAvenue, .data.property = {.type = Colored, .owner = Bank, .price = 100, .mortgageValue = 50, .mortgaged = false, .coloredProperty = {.color = LightBlue, .houseCost = 50, .hotelCost = 50, .houseCount = 0, .hotelCount = 0, .rent = {6, 30, 90, 270, 400, 550}}}};
 const square square_Chance1 = {"Chance", Action, Chance1, .data.action = ChanceAction};
@@ -1540,30 +1540,30 @@ void sellHouse(player *player, square *square, gamestate *game)
 /**************************************
  * Main
  **************************************/
-int main(void)
-{
-    printf("Welcome to Monopoly!\n");
-    /*Make it not random for debugging*/
-    srand(time(NULL));
-#ifndef GRAPHICS_DISABLED
-    init_graphics();
-#endif
-    gamestate game;
-    initGame(&game);
-    loadPreset(&game);
-    gameStart(&game);
+// int main(void)
+// {
+//     printf("Welcome to Monopoly!\n");
+//     /*Make it not random for debugging*/
+//     srand(time(NULL));
+// #ifndef GRAPHICS_DISABLED
+//     init_graphics();
+// #endif
+//     gamestate game;
+//     initGame(&game);
+//     loadPreset(&game);
+//     gameStart(&game);
 
-    while (true)
-    {
-        playerTurn(&game.players[game.turn], &game);
+//     while (true)
+//     {
+//         playerTurn(&game.players[game.turn], &game);
 
-        if (turnEnd(&game))
-        {
-            break;
-        }
-#ifdef GRAPHICS_DISABLED
-        waitForNextTurn();
-#endif
-    }
-    return 0;
-}
+//         if (turnEnd(&game))
+//         {
+//             break;
+//         }
+// #ifdef GRAPHICS_DISABLED
+//         waitForNextTurn();
+// #endif
+//     }
+//     return 0;
+// }
