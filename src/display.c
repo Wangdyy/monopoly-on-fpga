@@ -1093,16 +1093,16 @@ void draw_highlight_property(int property){
 		y2 = draw_squares[property].y2;
 		break;
 	case 3:
-		x1 = draw_squares[property].x2;
-		x2 = draw_squares[property].x1;
-		y1 = draw_squares[property].y2;
-		y2 = draw_squares[property].y1;
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
 		break;
 	case 4:
-		x1 = draw_squares[property].x2;
-		x2 = draw_squares[property].x1;
-		y1 = draw_squares[property].y2;
-		y2 = draw_squares[property].y1;
+		x1 = draw_squares[property].x1;
+		x2 = draw_squares[property].x2;
+		y1 = draw_squares[property].y1;
+		y2 = draw_squares[property].y2;
 		break;
 	}
 
