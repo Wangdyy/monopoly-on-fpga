@@ -5,3 +5,7 @@
 
 // Preset names
 void everyThingOwnedByPlayer0(gamestate *game);
+
+void midGame(gamestate *game);
+
+void endGame(gamestate *game);
